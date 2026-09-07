@@ -1,0 +1,23 @@
+@FakeMetasysApi_HostAddress = http://localhost:5100
+
+GET {{FakeMetasysApi_HostAddress}}/api/metasys/objects
+Accept: application/json
+
+###
+
+GET {{FakeMetasysApi_HostAddress}}/api/metasys/objects/WATER-001
+Accept: application/json
+
+###
+
+POST {{FakeMetasysApi_HostAddress}}/api/metasys/subscriptions
+Content-Type: application/json
+
+{
+  "objectIds": ["WATER-001", "WATER-002", "TEMP-001"]
+}
+
+### Replace SUB-001 if needed after creating a subscription.
+
+GET {{FakeMetasysApi_HostAddress}}/api/metasys/subscriptions/SUB-001/stream
+Accept: text/event-stream

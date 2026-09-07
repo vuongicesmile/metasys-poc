@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{b9433a2e-ad97-48d9-8aa6-eb8bf1f493a2}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_bmsreadingid">
+          <cell name="fmc_objectid" width="220" />
+          <cell name="fmc_objectname" width="220" />
+          <cell name="fmc_objecttype" width="140" />
+          <cell name="fmc_readingvalue" width="140" />
+          <cell name="fmc_unit" width="140" />
+          <cell name="fmc_readingtime" width="140" />
+          <cell name="fmc_building" width="140" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_bmsreading">
+          <attribute name="fmc_bmsreadingid" />
+          <attribute name="fmc_objectid" />
+          <attribute name="fmc_objectname" />
+          <attribute name="fmc_objecttype" />
+          <attribute name="fmc_readingvalue" />
+          <attribute name="fmc_unit" />
+          <attribute name="fmc_readingtime" />
+          <attribute name="fmc_building" />
+          <order attribute="fmc_readingtime" descending="true" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="All BMS Readings" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

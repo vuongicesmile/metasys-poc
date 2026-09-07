@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.secret.json
+*.pfx
+*.key
+dataverse/*.zip
+appsettings.Local.json

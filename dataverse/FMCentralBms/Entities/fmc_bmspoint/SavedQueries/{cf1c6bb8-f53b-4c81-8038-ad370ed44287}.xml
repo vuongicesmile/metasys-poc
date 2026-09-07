@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{cf1c6bb8-f53b-4c81-8038-ad370ed44287}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_bmspointid">
+          <cell name="fmc_objectid" width="220" />
+          <cell name="fmc_name" width="220" />
+          <cell name="fmc_objecttype" width="140" />
+          <cell name="fmc_currentvalue" width="140" />
+          <cell name="fmc_unit" width="140" />
+          <cell name="fmc_lastreadingtime" width="140" />
+          <cell name="fmc_building" width="140" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_bmspoint">
+          <attribute name="fmc_bmspointid" />
+          <attribute name="fmc_objectid" />
+          <attribute name="fmc_name" />
+          <attribute name="fmc_objecttype" />
+          <attribute name="fmc_currentvalue" />
+          <attribute name="fmc_unit" />
+          <attribute name="fmc_lastreadingtime" />
+          <attribute name="fmc_building" />
+          <order attribute="fmc_name" descending="false" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active BMS Points" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>
