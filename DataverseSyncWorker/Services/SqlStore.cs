@@ -37,12 +37,41 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options)
 
     private const string Columns = "r.id,r.object_id,r.object_name,r.object_type,r.building,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at";
     private const string Pending = "(d.current_done IS NULL OR d.current_done=0 OR (@history=1 AND d.history_done=0))";
-    public async Task<List<BmsReading>> ReadBatch(SqlConnection c, CancellationToken ct)
+    public async Task<List<BmsReading>> ReadBatch(SqlConnection c, CancellationToken ct, long? cutoffId = null)
     {
         // Anti-join catches late commits with lower identity values. Never use NOLOCK/READPAST here.
-        using var cmd = Command(c, $"SELECT TOP (@size) {Columns} FROM raw.bms_reading r LEFT JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id WHERE {Pending} AND NOT EXISTS (SELECT 1 FROM integration.dataverse_dead_letter x WHERE x.pipeline=@pipeline AND x.bms_reading_id=r.id AND x.resolved_at IS NULL) ORDER BY r.id;");
+        using var cmd = Command(c, $"SELECT TOP (@size) {Columns} FROM raw.bms_reading r LEFT JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id WHERE (@cutoff IS NULL OR r.id<=@cutoff) AND {Pending} AND NOT EXISTS (SELECT 1 FROM integration.dataverse_dead_letter x WHERE x.pipeline=@pipeline AND x.bms_reading_id=r.id AND x.resolved_at IS NULL) ORDER BY r.id;");
         cmd.Parameters.Add("@size", SqlDbType.Int).Value = options.BatchSize;
+        cmd.Parameters.Add("@cutoff", SqlDbType.BigInt).Value = cutoffId is null ? DBNull.Value : cutoffId.Value;
         return await Read(cmd, ct);
+    }
+
+    public async Task<long> MaxId(CancellationToken ct)
+    {
+        await using var c = await Open(ct);
+        using var cmd = Command(c, "SELECT COALESCE(MAX(id),0) FROM raw.bms_reading;");
+        return Convert.ToInt64(await cmd.ExecuteScalarAsync(ct));
+    }
+
+    public async Task<CutoffSummary> Summary(long cutoffId, CancellationToken ct)
+    {
+        await using var c = await Open(ct);
+        using var cmd = Command(c, $"""
+            SELECT COUNT_BIG(*),
+                COALESCE(SUM(CONVERT(bigint,CASE WHEN d.current_done=1 AND (@history=0 OR d.history_done=1) THEN 1 ELSE 0 END)),0),
+                COALESCE(SUM(CONVERT(bigint,CASE WHEN {Pending} THEN 1 ELSE 0 END)),0),
+                (SELECT COUNT_BIG(*) FROM integration.dataverse_dead_letter x WHERE x.pipeline=@pipeline AND x.resolved_at IS NULL AND x.bms_reading_id<=@cutoff),
+                (SELECT COUNT_BIG(*) FROM raw.bms_reading r2
+                    LEFT JOIN integration.dataverse_delivery d2 ON d2.pipeline=@pipeline AND d2.reading_id=r2.id
+                    WHERE r2.id<=@cutoff
+                    AND (d2.current_done IS NULL OR d2.current_done=0 OR (@history=1 AND d2.history_done=0))
+                    AND NOT EXISTS (SELECT 1 FROM integration.dataverse_dead_letter x2 WHERE x2.pipeline=@pipeline AND x2.bms_reading_id=r2.id AND x2.resolved_at IS NULL))
+            FROM raw.bms_reading r LEFT JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id
+            WHERE r.id<=@cutoff;
+            """);
+        cmd.Parameters.Add("@cutoff", SqlDbType.BigInt).Value = cutoffId;
+        await using var r = await cmd.ExecuteReaderAsync(ct); await r.ReadAsync(ct);
+        return new(r.GetInt64(0), r.GetInt64(1), r.GetInt64(2), r.GetInt64(3), r.GetInt64(4));
     }
 
     public async Task<BmsReading> Latest(SqlConnection c, string objectId, CancellationToken ct)

@@ -86,16 +86,39 @@ public static class Verification
             await using (var first = await sql.Open(CancellationToken.None))
             await using (var second = await sql.Open(CancellationToken.None))
             {
-                Assert(await sql.Lock(first,CancellationToken.None) && !await sql.Lock(second,CancellationToken.None), "SQL lock prevents concurrent pipeline writers");
+            Assert(await sql.Lock(first,CancellationToken.None) && !await sql.Lock(second,CancellationToken.None), "SQL lock prevents concurrent pipeline writers");
                 await sql.Unlock(first);
             }
+            await Exec("INSERT raw.bms_reading VALUES(30,'WATER-030','Water','WaterConsumption','C',SYSUTCDATETIME(),30,'m3','Fake Metasys COV',GETDATE()),(31,'WATER-031','Water','WaterConsumption','C',SYSUTCDATETIME(),31,'m3','Fake Metasys COV',GETDATE());");
+            options.BatchSize = 1;
+            var requestSink = new TestRequestStore();
+            var command = new CommandProcessor(requestSink, sql, engine, options, logs.CreateLogger<CommandProcessor>());
+            var commandResult = await command.TryRun(CancellationToken.None);
+            Assert(commandResult.State == "Succeeded" && requestSink.FinalStatus == SyncRequestStatuses.Succeeded,
+                $"command request reaches a terminal success state (state={commandResult.State}, final={requestSink.FinalStatus})");
+            Assert(requestSink.Delivered == 2 && requestSink.Batches == 2,
+                "command request drains multiple batches and publishes deterministic progress");
+            var emptySink = new TestRequestStore();
+            await new CommandProcessor(emptySink, sql, engine, options, logs.CreateLogger<CommandProcessor>()).TryRun(CancellationToken.None);
+            Assert(emptySink.FinalStatus == SyncRequestStatuses.Succeeded && emptySink.Delivered == 0,
+                "empty command request succeeds without duplicate delivery");
+            await Exec("INSERT raw.bms_reading VALUES(32,'WATER-032','Water','WaterConsumption','C',SYSUTCDATETIME(),32,'m3','Fake Metasys COV',GETDATE());");
+            var cutoff = await sql.MaxId(CancellationToken.None);
+            await Exec("INSERT raw.bms_reading VALUES(33,'WATER-033','Water','WaterConsumption','C',SYSUTCDATETIME(),33,'m3','Fake Metasys COV',GETDATE());");
+            await engine.Run(CancellationToken.None, cutoff);
+            Assert((await sql.Summary(cutoff, CancellationToken.None)).EligiblePendingRows == 0 &&
+                   (await sql.Summary(CancellationToken.None)).PendingRows == 1,
+                "request cutoff leaves newer SQL rows for the next request");
+            await engine.Run(CancellationToken.None);
+            options.BatchSize = 100;
+            var historyBeforeCurrentOnly = sink.History.Count;
             options.HistoryEnabled = false;
             await Exec("INSERT raw.bms_reading VALUES(22,'WATER-003','Water','WaterConsumption','C',SYSUTCDATETIME(),30,'m3','Fake Metasys COV',GETDATE());");
             await engine.Run(CancellationToken.None);
-            Assert(sink.History.Count == 3 && (await sql.Summary(CancellationToken.None)).PendingRows == 0, "current-only mode tracks history separately");
+            Assert(sink.History.Count == historyBeforeCurrentOnly && (await sql.Summary(CancellationToken.None)).PendingRows == 0, "current-only mode tracks history separately");
             options.HistoryEnabled = true;
             await engine.Run(CancellationToken.None);
-            Assert(sink.History.Count == 4 && (await sql.Summary(CancellationToken.None)).PendingRows == 0, "enabling history backfills current-only deliveries");
+            Assert(sink.History.Count == historyBeforeCurrentOnly + 1 && (await sql.Summary(CancellationToken.None)).PendingRows == 0, "enabling history backfills current-only deliveries");
             Console.WriteLine("All self-tests passed; sink was simulated, not live Dataverse.");
         }
         finally
@@ -151,5 +174,41 @@ public static class Verification
             if(FailAfterHistory) throw new TimeoutException("Simulated lost response after remote commit");
             return Task.CompletedTask;
         }
+    }
+
+    private sealed class TestRequestStore : ISyncRequestStore
+    {
+        private bool _claimed;
+        private SyncRequest _request = new(Guid.NewGuid(), Guid.NewGuid().ToString("D"), null, 0, 0, 0, "1");
+        public int? FinalStatus { get; private set; }
+        public long Delivered { get; private set; }
+        public int Batches { get; private set; }
+
+        public Task<SyncRequest?> Claim(string workerOwner, CancellationToken ct)
+        {
+            if (_claimed) return Task.FromResult<SyncRequest?>(null);
+            _claimed = true;
+            return Task.FromResult<SyncRequest?>(_request);
+        }
+        public Task<SyncRequest> Initialize(SyncRequest request, string workerOwner, long cutoffId,
+            CutoffSummary baseline, CancellationToken ct)
+        {
+            _request = request with
+            {
+                CutoffId = cutoffId,
+                BaselineDelivered = baseline.DeliveredRows,
+                BaselineDeadLetters = baseline.DeadLetterRows
+            };
+            return Task.FromResult(_request);
+        }
+        public Task Progress(SyncRequest request, string workerOwner, int batches, long delivered,
+            long quarantined, CutoffSummary summary, CancellationToken ct)
+        { Batches = batches; Delivered = delivered; return Task.CompletedTask; }
+        public Task Complete(SyncRequest request, string workerOwner, int status, int batches,
+            long delivered, long quarantined, CutoffSummary summary, string? error, CancellationToken ct)
+        { FinalStatus = status; Batches = batches; Delivered = delivered; return Task.CompletedTask; }
+        public Task Requeue(SyncRequest request, string workerOwner, int batches, long delivered,
+            long quarantined, CutoffSummary summary, CancellationToken ct)
+        { FinalStatus = SyncRequestStatuses.Queued; Batches = batches; Delivered = delivered; return Task.CompletedTask; }
     }
 }

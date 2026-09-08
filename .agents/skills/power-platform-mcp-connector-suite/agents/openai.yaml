@@ -1,0 +1,4 @@
+interface:
+  display_name: "Power Platform MCP Connector"
+  short_description: "Build and validate Copilot Studio MCP connectors"
+  default_prompt: "Use $power-platform-mcp-connector-suite. Prepare the requested custom connector and Copilot Studio MCP integration."

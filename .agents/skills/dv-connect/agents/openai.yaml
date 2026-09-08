@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Connect"
+  short_description: "Diagnose Metasys Dataverse authentication"
+  default_prompt: "Use $dv-connect. Verify the configured Metasys Dataverse connection without starting sync."

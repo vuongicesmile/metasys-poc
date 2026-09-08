@@ -8,22 +8,22 @@ public sealed class SyncEngine(SqlStore store, ReadingMapper mapper, IDataverseW
     SyncOptions options, ILogger<SyncEngine> logger)
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
-    public async Task<BatchResult> Run(CancellationToken ct)
+    public async Task<BatchResult> Run(CancellationToken ct, long? cutoffId = null)
     {
         if (!await _gate.WaitAsync(0, ct)) return new(0, 0, 0, true);
         try
         {
             await using var c = await store.Open(ct);
             if (!await store.Lock(c, ct)) return new(0, 0, 0, true);
-            try { return await RunLocked(c, ct); }
+            try { return await RunLocked(c, ct, cutoffId); }
             finally { await store.Unlock(c); }
         }
         finally { _gate.Release(); }
     }
 
-    private async Task<BatchResult> RunLocked(SqlConnection c, CancellationToken ct)
+    private async Task<BatchResult> RunLocked(SqlConnection c, CancellationToken ct, long? cutoffId)
     {
-        var batch = await store.ReadBatch(c, ct);
+        var batch = await store.ReadBatch(c, ct, cutoffId);
         if (batch.Count == 0) return new(0, 0, 0);
         var valid = new List<BmsReading>();
         foreach (var row in batch)

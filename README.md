@@ -1,14 +1,80 @@
 # Metasys COV POC 2.0
 
+## Documentation
+
+Start at the [documentation index](docs/README.md):
+
+- [Power Automate integration plan and pilot receipt](docs/plans/power-automate-sql-to-dataverse.vi.md)
+- [Power Automate trigger operating runbook](docs/runbooks/power-automate-sql-sync.vi.md)
+- [SQL-to-Dataverse operating runbook](docs/runbooks/sql-to-dataverse-runbook.vi.md)
+- [Dataverse deployment and implemented contract](docs/reference/dataverse-deployment.md)
+- [Original Plan 3.0 — historical design](docs/plans/plan-3.0-sql-to-dataverse.md)
+
 ## SQL to Dataverse (Plan 3.0)
 
 `DataverseSyncWorker` is implemented at `http://localhost:5300/swagger`.
-Run `dotnet run --project .\DataverseSyncWorker` to view SQL backlog/status.
+Double-click [START-SQL-TO-DATAVERSE.cmd](START-SQL-TO-DATAVERSE.cmd) to start
+the command worker, then run `FMC - Request SQL to Dataverse Sync` in Power
+Automate. The worker claims queued requests and drains their SQL cutoff; keep
+its window open and use Ctrl+C to stop until a production service identity is installed.
+See the [repeatable setup and operating steps (Vietnamese)](docs/runbooks/sql-to-dataverse-runbook.vi.md).
+Running `dotnet run --project .\DataverseSyncWorker` also starts the command worker.
 For this Developer environment it reuses the authenticated Azure CLI bundled by
 `rmit-fm-data`; no secret is copied into this repository. The Dataverse schema
 has been provisioned, the initial SQL backlog has been delivered, and live rows
-were reconciled. See [Dataverse deployment](dataverse/README.md) for commands,
+were reconciled. See [Dataverse deployment](docs/reference/dataverse-deployment.md) for commands,
 production identity guidance, and tests.
+
+### Run SQL to Dataverse
+
+1. Start the command worker and keep its window open:
+
+   ```powershell
+   .\START-SQL-TO-DATAVERSE.cmd
+   ```
+
+2. Insert or ingest a new row into `FM_Central.raw.bms_reading`. Do not supply
+   `id`; SQL Server generates the identity used for deterministic Dataverse
+   delivery.
+
+   ```sql
+   USE [FM_Central];
+
+   INSERT INTO raw.bms_reading
+   (
+       object_id, object_name, object_type, building,
+       reading_time, reading_value, unit, source_system
+   )
+   OUTPUT INSERTED.id, INSERTED.object_id, INSERTED.reading_time, INSERTED.reading_value
+   VALUES
+   (
+       'TEST-POWER-AUTOMATE-001', 'Power Automate Test Point',
+       'Temperature', 'Test Building', SYSUTCDATETIME(),
+       CAST(25.1234 AS DECIMAL(18,4)), 'C', 'Fake Metasys COV'
+   );
+   ```
+
+3. In Power Automate, open solution `FMCentralBms` and run
+   `FMC - Request SQL to Dataverse Sync`. The flow queues one
+   `fmc_syncrequest`; the worker claims it and writes the SQL cutoff to
+   `fmc_bmspoint` and `fmc_bmsreading`.
+
+4. Check worker and delivery state:
+
+   ```powershell
+   Invoke-RestMethod http://localhost:5300/api/dataverse-sync/status
+   dotnet run --project .\DataverseSyncWorker -- --verify
+   ```
+
+   A completed run has `pendingRows = 0` and `deadLetterRows = 0`. A successful
+   request with `deliveredRows = 0` means there was no new SQL row before its
+   cutoff. If a Power App reads the separate Silver table
+   `cr3c8_fmc_silver_bmspoint`, allow or trigger its `BMS DataFlow` refresh
+   after Bronze delivery.
+
+Power Automate queues the request; it does not connect to local SQL directly.
+The worker must therefore be running, or installed as the Windows Service
+described in the [Power Automate runbook](docs/runbooks/power-automate-sql-sync.vi.md).
 
 POC data flow:
 
@@ -80,3 +146,11 @@ SELECT TOP (100) *
 FROM FM_Central.raw.bms_reading
 ORDER BY id DESC;
 ```
+
+## Project agent skills
+
+[AGENTS.md](AGENTS.md) defines this project's Power Platform workflow and routes
+to 13 local skills in [.agents/skills](.agents/skills). They are adapted from the
+skills used by `rmit-fm-data`, including its bundled Dataverse skill set, for this
+repository's .NET/PAC tooling, `FMCentralBms` solution and SQL history contract.
+The source locations and adaptation details are recorded in `AGENTS.md`.

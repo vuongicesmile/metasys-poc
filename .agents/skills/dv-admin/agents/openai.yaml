@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Administration"
+  short_description: "Manage scoped Dataverse settings and retention"
+  default_prompt: "Use $dv-admin. Inspect the requested Dataverse setting or BMS retention behavior."

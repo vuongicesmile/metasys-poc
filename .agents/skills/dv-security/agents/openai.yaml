@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Security"
+  short_description: "Manage BMS application users and table roles"
+  default_prompt: "Use $dv-security. Inspect the BMS runtime identity and its Dataverse permissions."

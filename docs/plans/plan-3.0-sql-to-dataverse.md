@@ -1,6 +1,8 @@
 # PLAN 3.0 — FM_Central SQL Server → Dataverse
 
-> Implementation amendments: see [dataverse/README.md](dataverse/README.md).
+> Historical design. Implementation amendments: see
+> [Dataverse deployment](../reference/dataverse-deployment.md).
+> Paths and commands in the original design below are relative to the repository root.
 > Elastic history uses a deterministic GUID and built-in partition key (custom
 > alternate keys are unsupported). Per-row SQL delivery receipts replace the
 > high-watermark-only algorithm to handle out-of-order commits. Current state
@@ -375,7 +377,7 @@ metasys-poc/
 |-- sql/
 |   |-- create-bms-tables.sql
 |   `-- create-dataverse-sync-tables.sql
-`-- PLAN-3.0-SQL-TO-DATAVERSE.md
+`-- docs/plans/plan-3.0-sql-to-dataverse.md
 ```
 
 Worker có health/status HTTP endpoint riêng:

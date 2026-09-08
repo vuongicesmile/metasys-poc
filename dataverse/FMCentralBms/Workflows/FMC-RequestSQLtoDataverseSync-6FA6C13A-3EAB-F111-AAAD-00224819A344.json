@@ -1,0 +1,167 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "FmcSyncPipeline": {
+          "defaultValue": "ab191700-b99e-f111-aaa0-000d3a80bb96:FMC",
+          "type": "String",
+          "metadata": {
+            "schemaName": "fmc_SyncPipeline"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Button",
+          "runtimeConfiguration": {
+            "concurrency": {
+              "runs": 1
+            }
+          },
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "List_active_sync_requests": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "ListRecords",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "entityName": "fmc_syncrequests",
+              "$select": "fmc_syncrequestid,fmc_name,fmc_status",
+              "$filter": "@concat('fmc_pipeline eq ''', parameters('FmcSyncPipeline'), ''' and (fmc_status eq 789100000 or fmc_status eq 789100001)')",
+              "$orderby": "createdon asc",
+              "$top": 1
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runAfter": {}
+        },
+        "Initialize_request_id": {
+          "type": "InitializeVariable",
+          "runAfter": {
+            "List_active_sync_requests": [
+              "Succeeded"
+            ]
+          },
+          "inputs": {
+            "variables": [
+              {
+                "name": "requestId",
+                "type": "string",
+                "value": ""
+              }
+            ]
+          }
+        },
+        "Create_or_reuse_request": {
+          "type": "If",
+          "runAfter": {
+            "Initialize_request_id": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@length(outputs('List_active_sync_requests')?['body/value'])",
+              0
+            ]
+          },
+          "actions": {
+            "Create_sync_request": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "CreateRecord",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "entityName": "fmc_syncrequests",
+                  "item/fmc_name": "@concat('SQL Sync ', utcNow())",
+                  "item/fmc_command": "DrainPending",
+                  "item/fmc_pipeline": "@parameters('FmcSyncPipeline')",
+                  "item/fmc_correlationid": "@workflow()?['run']?['name']",
+                  "item/fmc_requestedby": "@coalesce(triggerOutputs()?['headers']?['x-ms-user-email'], triggerOutputs()?['headers']?['x-ms-user-name'], 'Power Automate')",
+                  "item/fmc_status": 789100000
+                },
+                "authentication": "@parameters('$authentication')"
+              },
+              "runAfter": {}
+            },
+            "Set_created_request_id": {
+              "type": "SetVariable",
+              "runAfter": {
+                "Create_sync_request": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "name": "requestId",
+                "value": "@outputs('Create_sync_request')?['body/fmc_syncrequestid']"
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Set_existing_request_id": {
+                "type": "SetVariable",
+                "runAfter": {},
+                "inputs": {
+                  "name": "requestId",
+                  "value": "@first(outputs('List_active_sync_requests')?['body/value'])?['fmc_syncrequestid']"
+                }
+              }
+            }
+          }
+        },
+        "Request_result": {
+          "type": "Compose",
+          "runAfter": {
+            "Create_or_reuse_request": [
+              "Succeeded"
+            ]
+          },
+          "inputs": {
+            "requestId": "@variables('requestId')",
+            "status": "QueuedOrRunning"
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

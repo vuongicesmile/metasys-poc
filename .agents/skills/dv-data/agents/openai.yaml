@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Data"
+  short_description: "Write and replay BMS data with stable identity"
+  default_prompt: "Use $dv-data. Handle the requested BMS data import or replay with delivery receipts."

@@ -78,22 +78,26 @@
       </Addresses>
     </Publisher>
     <RootComponents>
+      <RootComponent type="1" schemaName="cr3c8_fmc_silver_bmspoint" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmspoint" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmsreading" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_syncrequest" behavior="0" />
       <RootComponent type="20" id="{46639136-95aa-f111-aaad-00224819a344}" behavior="0" />
+      <RootComponent type="20" id="{5ae2d6e5-3cab-f111-aaad-00224819a344}" behavior="0" />
+      <RootComponent type="29" id="{6fa6c13a-3eab-f111-aaad-00224819a344}" behavior="0" />
     </RootComponents>
     <MissingDependencies>
       <MissingDependency>
         <Required type="181" schemaName="NonRelational Data Provider" displayName="NonRelational Data Provider" solution="NonRelationalDataProvider (9.1.0.477)" id="{1d9bde74-9ebd-4da9-8ff5-aa74945b9f74}">
           <package appName="NonRelational Data Provider Package" version="9.1.0.477">NonRelationalCustomActions (9.1.0.477)</package>
         </Required>
-        <Dependent type="1" schemaName="fmc_bmsreading" displayName="BMS Reading" />
+        <Dependent type="1" schemaName="fmc_bmsreading" displayName="[Bronze] BMS Reading" />
       </MissingDependency>
       <MissingDependency>
         <Required type="183" schemaName="NonRelational Data Provider" displayName="NonRelational Data Provider" solution="NonRelationalDataProvider (9.1.0.477)" id="{19897b6e-b2c2-461c-8f32-5a2413028030}">
           <package appName="NonRelational Data Provider Package" version="9.1.0.477">NonRelationalCustomActions (9.1.0.477)</package>
         </Required>
-        <Dependent type="1" schemaName="fmc_bmsreading" displayName="BMS Reading" />
+        <Dependent type="1" schemaName="fmc_bmsreading" displayName="[Bronze] BMS Reading" />
       </MissingDependency>
     </MissingDependencies>
   </SolutionManifest>

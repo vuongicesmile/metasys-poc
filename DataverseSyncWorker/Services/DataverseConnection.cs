@@ -35,6 +35,7 @@ public sealed class DataverseConnection(SyncOptions options) : IDisposable
                 cs["AuthType"] = "Certificate";
                 cs["Thumbprint"] = options.CertificateThumbprint;
                 cs["StoreName"] = "My";
+                cs["StoreLocation"] = options.CertificateStoreLocation;
             }
             else { cs["AuthType"] = "ClientSecret"; cs["ClientSecret"] = options.ClientSecret; }
             _client = new ServiceClient(cs.ConnectionString);

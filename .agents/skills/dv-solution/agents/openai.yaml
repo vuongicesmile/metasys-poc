@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Solution"
+  short_description: "Package and deploy the FMCentralBms solution"
+  default_prompt: "Use $dv-solution. Prepare and verify the requested FMCentralBms solution package."

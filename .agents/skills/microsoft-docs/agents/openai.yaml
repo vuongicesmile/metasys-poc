@@ -1,0 +1,4 @@
+interface:
+  display_name: "Microsoft Documentation"
+  short_description: "Verify current Microsoft platform guidance"
+  default_prompt: "Use $microsoft-docs. Verify the Microsoft guidance relevant to this Power Platform task."

@@ -4,7 +4,8 @@ using Microsoft.Xrm.Sdk;
 
 namespace DataverseSyncWorker.Services;
 
-public sealed record RuntimeSnapshot(string State, DateTime? LastRunAt = null, BatchResult? LastBatch = null, string? Error = null);
+public sealed record RuntimeSnapshot(string State, DateTime? LastRunAt = null, BatchResult? LastBatch = null,
+    string? Error = null, Guid? RequestId = null);
 public sealed class RuntimeState
 {
     private RuntimeSnapshot _snapshot = new("Starting");
@@ -12,7 +13,7 @@ public sealed class RuntimeState
     public void Set(RuntimeSnapshot value) => Volatile.Write(ref _snapshot, value);
 }
 
-public sealed class SyncWorker(SyncEngine engine, SyncOptions options, RuntimeState status,
+public sealed class SyncWorker(SyncEngine engine, CommandProcessor commands, SyncOptions options, RuntimeState status,
     ILogger<SyncWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
@@ -21,6 +22,11 @@ public sealed class SyncWorker(SyncEngine engine, SyncOptions options, RuntimeSt
         if (!options.HasCredentials)
         {
             status.Set(new("AwaitingCredentials", Error: "Configure the Dataverse application identity, then restart."));
+            return;
+        }
+        if (options.ExecutionMode == "CommandDriven")
+        {
+            await RunCommandDriven(ct);
             return;
         }
         while (!ct.IsCancellationRequested)
@@ -46,6 +52,30 @@ public sealed class SyncWorker(SyncEngine engine, SyncOptions options, RuntimeSt
                 logger.LogWarning("Sync failed ({ErrorType}); delivery remains pending", ex.GetType().Name);
             }
             try { await Task.Delay(TimeSpan.FromSeconds(options.PollIntervalSeconds), ct); }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
+        }
+    }
+
+    private async Task RunCommandDriven(CancellationToken ct)
+    {
+        status.Set(new("CommandIdle"));
+        while (!ct.IsCancellationRequested)
+        {
+            try
+            {
+                var result = await commands.TryRun(ct);
+                status.Set(new(result.State == "Idle" ? "CommandIdle" : result.State,
+                    DateTime.UtcNow, RequestId: result.RequestId));
+                if (result.Found && result.State is not ("Requeued" or "RequeuedBusy")) continue;
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
+            catch (Exception ex)
+            {
+                status.Set(new("CommandFailed", DateTime.UtcNow,
+                    Error: "Command polling failed. Check Dataverse connectivity and worker logs."));
+                logger.LogWarning("Command polling failed ({ErrorType})", ex.GetType().Name);
+            }
+            try { await Task.Delay(TimeSpan.FromSeconds(options.CommandPollIntervalSeconds), ct); }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
         }
     }

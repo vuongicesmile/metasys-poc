@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>0</isdefault>
+    <savedqueryid>{7f458ede-3cab-f111-aaad-00224819a344}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_syncrequestid">
+          <cell name="fmc_name" width="260" />
+          <cell name="fmc_status" width="140" />
+          <cell name="fmc_requestedcutoffid" width="140" />
+          <cell name="fmc_startedat" width="140" />
+          <cell name="fmc_completedat" width="140" />
+          <cell name="fmc_deliveredrows" width="140" />
+          <cell name="fmc_pendingafter" width="140" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_syncrequest">
+          <attribute name="fmc_syncrequestid" />
+          <attribute name="fmc_name" />
+          <attribute name="fmc_status" />
+          <attribute name="fmc_requestedcutoffid" />
+          <attribute name="fmc_startedat" />
+          <attribute name="fmc_completedat" />
+          <attribute name="fmc_deliveredrows" />
+          <attribute name="fmc_pendingafter" />
+          <filter type="and">
+            <condition attribute="fmc_status" operator="eq" value="789100004" />
+          </filter>
+          <order attribute="createdon" descending="true" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Failed Sync Requests" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

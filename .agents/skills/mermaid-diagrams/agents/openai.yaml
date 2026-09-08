@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mermaid Diagrams"
+  short_description: "Diagram Metasys flows and Dataverse boundaries"
+  default_prompt: "Use $mermaid-diagrams. Draw the requested Metasys data flow as an editable Mermaid diagram."

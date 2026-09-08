@@ -1,12 +1,13 @@
 using DataverseSyncWorker.Models;
 using DataverseSyncWorker.Services;
 
-var commands = new[] { "--provision", "--run-once", "--self-test", "--verify" };
+var commands = new[] { "--provision", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once" };
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     Args = args.Where(a => !commands.Contains(a)).ToArray(),
     ContentRootPath = AppContext.BaseDirectory
 });
+builder.Host.UseWindowsService(options => options.ServiceName = "FMCentralDataverseSync");
 var options = builder.Configuration.GetSection("Dataverse").Get<SyncOptions>() ?? new();
 options.Validate();
 builder.Services.AddSingleton(options);
@@ -15,6 +16,9 @@ builder.Services.AddSingleton<SqlStore>();
 builder.Services.AddSingleton<DataverseConnection>();
 builder.Services.AddSingleton<IDataverseWriter, DataverseWriter>();
 builder.Services.AddSingleton<SyncEngine>();
+builder.Services.AddSingleton<SyncRequestStore>();
+builder.Services.AddSingleton<ISyncRequestStore>(services => services.GetRequiredService<SyncRequestStore>());
+builder.Services.AddSingleton<CommandProcessor>();
 builder.Services.AddSingleton<RuntimeState>();
 builder.Services.AddHostedService<SyncWorker>();
 builder.Services.AddEndpointsApiExplorer();
@@ -22,8 +26,22 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 if (args.Contains("--self-test")) { await Verification.SelfTest(app.Services); return; }
-if (args.Contains("--provision")) { await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>()).Run(); return; }
+if (args.Contains("--provision")) { await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).Run(); return; }
 if (args.Contains("--verify")) { await Verification.Reconcile(app.Services); return; }
+if (args.Contains("--enqueue"))
+{
+    if (!options.HasCredentials) throw new InvalidOperationException("Dataverse credentials required.");
+    var queued = await app.Services.GetRequiredService<SyncRequestStore>().Enqueue(Environment.UserName, CancellationToken.None);
+    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new { requestId = queued.Id, created = queued.Created }));
+    return;
+}
+if (args.Contains("--process-command-once"))
+{
+    if (!options.HasCredentials) throw new InvalidOperationException("Dataverse credentials required.");
+    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(
+        await app.Services.GetRequiredService<CommandProcessor>().TryRun(CancellationToken.None)));
+    return;
+}
 if (args.Contains("--run-once"))
 {
     if (!options.HasCredentials) throw new InvalidOperationException("Dataverse credentials required.");

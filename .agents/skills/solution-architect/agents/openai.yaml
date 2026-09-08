@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solution Architect"
+  short_description: "Document Metasys architecture and delivery plans"
+  default_prompt: "Use $solution-architect. Document the requested Metasys architecture using the current implementation."

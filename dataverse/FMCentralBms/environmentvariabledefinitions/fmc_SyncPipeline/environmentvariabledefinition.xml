@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="fmc_SyncPipeline">
+  <defaultvalue>ab191700-b99e-f111-aaa0-000d3a80bb96:FMC</defaultvalue>
+  <description default="Expected Dataverse organization ID and SourceId used to coalesce synchronization requests.">
+    <label description="Expected Dataverse organization ID and SourceId used to coalesce synchronization requests." languagecode="1033" />
+  </description>
+  <displayname default="FM Central Sync Pipeline">
+    <label description="FM Central Sync Pipeline" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

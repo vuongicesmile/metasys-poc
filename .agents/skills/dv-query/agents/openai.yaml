@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Query"
+  short_description: "Read BMS records and reconcile SQL delivery"
+  default_prompt: "Use $dv-query. Check live BMS delivery status and explain any reconciliation gaps."

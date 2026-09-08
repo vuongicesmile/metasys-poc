@@ -1,12 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <EntityRelationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityRelationship Name="business_unit_cr3c8_fmc_silver_bmspoint" />
   <EntityRelationship Name="business_unit_fmc_bmsreading" />
+  <EntityRelationship Name="lk_cr3c8_fmc_silver_bmspoint_createdby" />
+  <EntityRelationship Name="lk_cr3c8_fmc_silver_bmspoint_modifiedby" />
   <EntityRelationship Name="lk_fmc_bmspoint_createdby" />
   <EntityRelationship Name="lk_fmc_bmspoint_modifiedby" />
   <EntityRelationship Name="lk_fmc_bmsreading_createdby" />
   <EntityRelationship Name="lk_fmc_bmsreading_modifiedby" />
+  <EntityRelationship Name="lk_fmc_syncrequest_createdby" />
+  <EntityRelationship Name="lk_fmc_syncrequest_modifiedby" />
   <EntityRelationship Name="organization_fmc_bmspoint" />
+  <EntityRelationship Name="organization_fmc_syncrequest" />
+  <EntityRelationship Name="owner_cr3c8_fmc_silver_bmspoint" />
   <EntityRelationship Name="owner_fmc_bmsreading" />
+  <EntityRelationship Name="team_cr3c8_fmc_silver_bmspoint" />
   <EntityRelationship Name="team_fmc_bmsreading" />
+  <EntityRelationship Name="user_cr3c8_fmc_silver_bmspoint" />
   <EntityRelationship Name="user_fmc_bmsreading" />
 </EntityRelationships>

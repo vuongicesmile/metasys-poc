@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Overview"
+  short_description: "Orient Metasys Dataverse tasks and tooling"
+  default_prompt: "Use $dv-overview. Orient this Metasys Dataverse task and select the relevant workflow."

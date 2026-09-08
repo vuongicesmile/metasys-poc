@@ -1,0 +1,4 @@
+interface:
+  display_name: "Power Apps Code App"
+  short_description: "Scaffold a Code App with current Microsoft tools"
+  default_prompt: "Use $power-apps-code-app-scaffold. Build the requested Power Apps Code App for the Metasys POC."

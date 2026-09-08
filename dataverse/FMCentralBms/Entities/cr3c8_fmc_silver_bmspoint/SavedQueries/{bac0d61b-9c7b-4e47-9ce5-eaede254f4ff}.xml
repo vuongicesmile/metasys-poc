@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{bac0d61b-9c7b-4e47-9ce5-eaede254f4ff}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="cr3c8_fmc_bmspointid" select="1" icon="1" preview="1">
+        <row name="result" id="cr3c8_fmc_silver_bmspointid">
+          <cell name="cr3c8_fmc_bmspointid" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>1</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="cr3c8_fmc_silver_bmspoint">
+          <attribute name="cr3c8_fmc_silver_bmspointid" />
+          <attribute name="cr3c8_fmc_bmspointid" />
+          <attribute name="createdon" />
+          <order attribute="cr3c8_fmc_bmspointid" descending="false" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="fmc_silver_bmspoint Advanced Find View" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

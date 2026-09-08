@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dataverse Metadata"
+  short_description: "Manage FMCentralBms schema, forms and views"
+  default_prompt: "Use $dv-metadata. Inspect the FMCentralBms schema and implement the requested metadata change."
