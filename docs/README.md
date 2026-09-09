@@ -8,6 +8,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | Runbook | [Migration/seed Building và Equipment](runbooks/bms-relations-migration.vi.md) | Chạy Provision, Preview, Apply, Verify và hiểu C# qua cách làm quen thuộc từ Python |
 | Demo guideline | [Trình bày demo BMS từng phần](runbooks/demo-guideline.vi.md) | Chuẩn bị màn hình, lời thoại, thao tác demo 20 phút và phương án dự phòng |
 | Plan đề xuất | [Mở rộng Building và Equipment cho BMS](plans/plan.md) | Thiết kế 2 bảng mới, mapping dữ liệu cũ và kiểm thử quan hệ Dataverse |
+| Plan/hướng dẫn | [Thiết kế Dataverse plug-in và bài đầu tiên](plans/dataverse-plugins.vi.md) | Chọn rule phù hợp dữ liệu BMS; tạo, build, đăng ký, test và đóng gói plug-in C# |
 | Plan/receipt | [Power Automate → SQL-to-Dataverse](plans/power-automate-sql-to-dataverse.vi.md) | Kiến trúc, quyết định và trạng thái triển khai pilot |
 | Runbook | [Power Automate trigger → SQL sync](runbooks/power-automate-sql-sync.vi.md) | Chạy flow, bật worker và theo dõi request |
 | Plan lịch sử | [Plan 3.0](plans/plan-3.0-sql-to-dataverse.md) | Tra cứu thiết kế ban đầu; một số chi tiết đã được thay thế |
