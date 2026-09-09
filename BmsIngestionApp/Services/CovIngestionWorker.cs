@@ -24,8 +24,21 @@ public sealed class CovIngestionWorker(
                 Timeout = Timeout.InfiniteTimeSpan
             };
 
-            var requestedObjects = new[] { "WATER-001", "WATER-002", "TEMP-001" };
             logger.LogInformation("Connecting to Fake Metasys at {BaseUrl}", httpClient.BaseAddress);
+
+            var buildings = await httpClient.GetFromJsonAsync<BmsBuilding[]>("api/metasys/buildings", AppSettings.JsonOptions, stoppingToken)
+                ?? throw new InvalidOperationException("Fake Metasys returned an empty building catalog response.");
+            var equipment = await httpClient.GetFromJsonAsync<BmsEquipment[]>("api/metasys/equipment", AppSettings.JsonOptions, stoppingToken)
+                ?? throw new InvalidOperationException("Fake Metasys returned an empty equipment catalog response.");
+            var points = await httpClient.GetFromJsonAsync<CovPoint[]>("api/metasys/objects", AppSettings.JsonOptions, stoppingToken)
+                ?? throw new InvalidOperationException("Fake Metasys returned an empty point catalog response.");
+            if (runtimeOptions.SqlEnabled)
+            {
+                var catalogRepository = new BmsReadingRepository(settings.Sql.ConnectionString);
+                await catalogRepository.PersistCatalogAsync(buildings, equipment, stoppingToken);
+                status.CatalogPersisted(buildings.Length, equipment.Length);
+            }
+            var requestedObjects = points.Select(p => p.ObjectId).ToArray();
 
             using var subscriptionResponse = await httpClient.PostAsJsonAsync(
                 "api/metasys/subscriptions",
@@ -95,3 +108,5 @@ public sealed class CovIngestionWorker(
         }
     }
 }
+
+file sealed record CovPoint(string ObjectId);

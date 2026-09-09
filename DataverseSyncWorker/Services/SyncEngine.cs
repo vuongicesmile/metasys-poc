@@ -23,6 +23,13 @@ public sealed class SyncEngine(SqlStore store, ReadingMapper mapper, IDataverseW
 
     private async Task<BatchResult> RunLocked(SqlConnection c, CancellationToken ct, long? cutoffId)
     {
+        // Catalog is part of every synchronization command. Parent rows are always
+        // available before equipment and point lookup writes, even with no readings pending.
+        var catalog = await store.ReadCatalog(c, ct);
+        await writer.WriteBuildings(catalog.Buildings.Select(mapper.Building).ToArray(), ct);
+        await writer.WriteEquipment(catalog.Equipment.Select(mapper.Equipment).ToArray(), ct);
+        logger.LogInformation("Catalog synchronized: {Buildings} buildings, {Equipment} equipment",
+            catalog.Buildings.Count, catalog.Equipment.Count);
         var batch = await store.ReadBatch(c, ct, cutoffId);
         if (batch.Count == 0) return new(0, 0, 0);
         var valid = new List<BmsReading>();

@@ -33,6 +33,56 @@
             </column>
           </columns>
         </tab>
+        <tab name="fmc_bmsrelations" id="{59479616-06e0-8e33-8b53-c733aa89da45}" showlabel="true" expanded="true">
+          <labels>
+            <label description="BMS Details and Relationships" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_bmsrelation_details" id="{908bdd40-5d2f-8e2e-a073-c2a48ff0f336}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="BMS Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{4581f5ad-917f-847e-b578-4c9bf10efbcb}">
+                        <labels>
+                          <label description="Object ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_objectid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_objectid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{3265a396-7f9c-8482-aa4f-1c76d1a3b3cf}">
+                        <labels>
+                          <label description="Equipment" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_equipmentid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="fmc_equipmentid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{192ee4df-62d4-8675-b425-918a97d687e2}">
+                        <labels>
+                          <label description="Source Building" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_building" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_building" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{6b0f2a14-b880-8489-a9c1-bf5d3ba2e944}">
+                        <labels>
+                          <label description="Unit" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_unit" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_unit" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
       </tabs>
     </form>
     <IsCustomizable>1</IsCustomizable>

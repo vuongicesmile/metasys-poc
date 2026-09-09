@@ -16,6 +16,37 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID('raw.bms_building', 'U') IS NULL
+BEGIN
+    CREATE TABLE raw.bms_building
+    (
+        building_code VARCHAR(50) NOT NULL CONSTRAINT PK_raw_bms_building PRIMARY KEY,
+        name NVARCHAR(200) NOT NULL,
+        source_building VARCHAR(100) NOT NULL,
+        description NVARCHAR(2000) NULL,
+        source_updated_at DATETIME2 NOT NULL,
+        ingested_at DATETIME2 NOT NULL CONSTRAINT DF_raw_bms_building_ingested_at DEFAULT SYSUTCDATETIME()
+    );
+END
+GO
+
+IF OBJECT_ID('raw.bms_equipment', 'U') IS NULL
+BEGIN
+    CREATE TABLE raw.bms_equipment
+    (
+        equipment_code VARCHAR(100) NOT NULL CONSTRAINT PK_raw_bms_equipment PRIMARY KEY,
+        name NVARCHAR(200) NOT NULL,
+        equipment_type VARCHAR(50) NOT NULL,
+        building_code VARCHAR(50) NOT NULL,
+        description NVARCHAR(2000) NULL,
+        source_updated_at DATETIME2 NOT NULL,
+        ingested_at DATETIME2 NOT NULL CONSTRAINT DF_raw_bms_equipment_ingested_at DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT FK_raw_bms_equipment_building FOREIGN KEY(building_code)
+            REFERENCES raw.bms_building(building_code)
+    );
+END
+GO
+
 IF OBJECT_ID('raw.bms_reading', 'U') IS NULL
 BEGIN
     CREATE TABLE raw.bms_reading
@@ -26,6 +57,7 @@ BEGIN
         object_name VARCHAR(200) NULL,
         object_type VARCHAR(100) NULL,
         building VARCHAR(100) NULL,
+        equipment_code VARCHAR(100) NULL,
         reading_time DATETIME2 NOT NULL,
         reading_value DECIMAL(18,4) NULL,
         unit VARCHAR(50) NULL,
@@ -34,6 +66,24 @@ BEGIN
             CONSTRAINT DF_raw_bms_reading_ingested_at DEFAULT GETDATE()
     );
 END
+GO
+
+IF COL_LENGTH('raw.bms_reading', 'equipment_code') IS NULL
+    ALTER TABLE raw.bms_reading ADD equipment_code VARCHAR(100) NULL;
+GO
+
+-- Deterministic compatibility backfill for the five POC points. Catalog rows are
+-- ingested from FakeMetasysApi; this only fills the relationship on old readings.
+UPDATE raw.bms_reading
+SET equipment_code = CASE object_id
+    WHEN 'WATER-001' THEN 'EQ-A-WM-001'
+    WHEN 'WATER-002' THEN 'EQ-B-WM-002'
+    WHEN 'TEMP-001' THEN 'EQ-A-TS-001'
+    WHEN 'TEST-POWER-AUTOMATE-001' THEN 'EQ-TEST-RIG-001'
+    WHEN 'TEST-POWER-AUTOMATE-002' THEN 'EQ-TEST-RIG-001'
+END
+WHERE equipment_code IS NULL
+  AND object_id IN ('WATER-001','WATER-002','TEMP-001','TEST-POWER-AUTOMATE-001','TEST-POWER-AUTOMATE-002');
 GO
 
 -- Non-destructive compatibility migration for an earlier wide-table POC.

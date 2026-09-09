@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{2b09585b-c7e9-410b-891e-f38551a9968e}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{61ab3073-4671-4a3e-8f8b-58b483a9ff13}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{48a49d67-c32f-4cf2-87cb-82d8f7718731}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{440f24e6-1791-44c0-8afa-072dcc18e65a}">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="fmc_name" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_bmsrelations" id="{9552333b-f424-8438-9f4c-9f7457999419}" showlabel="true" expanded="true">
+          <labels>
+            <label description="BMS Details and Relationships" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_bmsrelation_details" id="{89378a49-e5e3-87e8-891e-3802add7b92a}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="BMS Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{669dbcf0-8e65-8be3-8922-a9a6b080090c}">
+                        <labels>
+                          <label description="Building Code" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_buildingcode" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_buildingcode" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{5fa2458c-0b58-8086-86d7-167d269d605e}">
+                        <labels>
+                          <label description="Source Building" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_sourcebuilding" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sourcebuilding" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{f9c2d5b9-0585-8229-a544-5801b32855f2}">
+                        <labels>
+                          <label description="Description" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_description" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_description" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{b16f15e4-3807-8b10-9936-8a4e98b2e526}" showlabel="true">
+                        <labels>
+                          <label description="BMS Equipment" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_bmsrelatedrecords" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+                          <parameters>
+                            <TargetEntityType>fmc_bmsequipment</TargetEntityType>
+                            <ViewId>{cde799a9-b744-48d4-a45f-acef4de36dab}</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_bmsbuilding_bmsequipment</RelationshipName>
+                            <RecordsPerPage>10</RecordsPerPage>
+                            <EnableQuickFind>false</EnableQuickFind>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

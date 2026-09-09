@@ -9,7 +9,7 @@ using Microsoft.Xrm.Sdk.Query;
 namespace DataverseSyncWorker.Services;
 
 /// <summary>Explicit deployment command; never runs as part of ordinary synchronization.</summary>
-public sealed class DataverseProvisioner(DataverseConnection connection, SyncOptions options)
+public sealed partial class DataverseProvisioner(DataverseConnection connection, SyncOptions options)
 {
     public const string Solution = "FMCentralBms";
     public async Task Run()

@@ -6,6 +6,7 @@ public sealed class MetasysPoint
     public string ObjectName { get; init; } = "";
     public string ObjectType { get; init; } = "";
     public string Building { get; init; } = "";
+    public string EquipmentCode { get; init; } = "";
     public decimal Value { get; set; }
     public string Unit { get; init; } = "";
     public DateTime Timestamp { get; set; }
@@ -16,6 +17,7 @@ public sealed class MetasysPoint
         ObjectName = ObjectName,
         ObjectType = ObjectType,
         Building = Building,
+        EquipmentCode = EquipmentCode,
         Value = Value,
         Unit = Unit,
         Timestamp = Timestamp

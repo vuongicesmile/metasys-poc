@@ -16,9 +16,10 @@ public static class Verification
 
     public static async Task SelfTest(IServiceProvider services)
     {
+        await BmsRelationshipVerification.SelfTest();
         var options = new SyncOptions();
         var mapper = new ReadingMapper(options);
-        var row = new BmsReading(1, "WATER-001", "Water", "WaterConsumption", "A", DateTime.UtcNow,
+        var row = new BmsReading(1, "WATER-001", "Water", "WaterConsumption", "A", "EQ-A-WM-001", DateTime.UtcNow,
             350.1234m, "m3", "Fake Metasys COV", new DateTime(2026, 9, 7, 14, 0, 0));
         var mapped = mapper.History(row, row.ReadingTime)!;
         Assert(mapper.ReadingId(1) == mapper.ReadingId(1) && mapper.ReadingId(1) != mapper.ReadingId(2), "deterministic distinct IDs");
@@ -44,7 +45,11 @@ public static class Verification
                 using var schema = new SqlCommand("""
                     EXEC('CREATE SCHEMA raw');
                     EXEC('CREATE SCHEMA integration');
-                    CREATE TABLE raw.bms_reading(id bigint PRIMARY KEY,object_id varchar(100) NOT NULL,object_name varchar(200),object_type varchar(100),building varchar(100),reading_time datetime2 NOT NULL,reading_value decimal(18,4),unit varchar(50),source_system varchar(100) NOT NULL,ingested_at datetime2);
+                    CREATE TABLE raw.bms_building(building_code varchar(50) PRIMARY KEY,name nvarchar(200) NOT NULL,source_building varchar(100) NOT NULL,description nvarchar(2000),source_updated_at datetime2 NOT NULL,ingested_at datetime2 NOT NULL DEFAULT SYSUTCDATETIME());
+                    CREATE TABLE raw.bms_equipment(equipment_code varchar(100) PRIMARY KEY,name nvarchar(200) NOT NULL,equipment_type varchar(50) NOT NULL,building_code varchar(50) NOT NULL,description nvarchar(2000),source_updated_at datetime2 NOT NULL,ingested_at datetime2 NOT NULL DEFAULT SYSUTCDATETIME(),CONSTRAINT FK_test_equipment_building FOREIGN KEY(building_code) REFERENCES raw.bms_building(building_code));
+                    CREATE TABLE raw.bms_reading(id bigint PRIMARY KEY,object_id varchar(100) NOT NULL,object_name varchar(200),object_type varchar(100),building varchar(100),equipment_code varchar(100),reading_time datetime2 NOT NULL,reading_value decimal(18,4),unit varchar(50),source_system varchar(100) NOT NULL,ingested_at datetime2);
+                    INSERT raw.bms_building(building_code,name,source_building,source_updated_at) VALUES('BLDG-A','Building A','Building A',SYSUTCDATETIME());
+                    INSERT raw.bms_equipment(equipment_code,name,equipment_type,building_code,source_updated_at) VALUES('EQ-A-WM-001','Main Water Meter A','WaterMeter','BLDG-A',SYSUTCDATETIME());
                     """, c);
                 await schema.ExecuteNonQueryAsync();
                 var migration = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "sql", "create-dataverse-sync-tables.sql"));
@@ -63,20 +68,26 @@ public static class Verification
                 await using var c = await sql.Open(CancellationToken.None);
                 using var cmd = new SqlCommand(command, c); await cmd.ExecuteNonQueryAsync();
             }
-            await Exec("INSERT raw.bms_reading VALUES(20,'WATER-001','Water','WaterConsumption','A',SYSUTCDATETIME(),350,'m3','Fake Metasys COV',GETDATE());");
+            await Exec("INSERT raw.bms_reading VALUES(20,'WATER-001','Water','WaterConsumption','A','EQ-A-WM-001',SYSUTCDATETIME(),350,'m3','Fake Metasys COV',GETDATE());");
             sink.FailAfterHistory = true;
             try { await engine.Run(CancellationToken.None); throw new InvalidOperationException("Expected transport failure"); }
             catch (TimeoutException) { }
+            Assert(sink.Buildings.Count == 1 && sink.Equipment.Count == 1,
+                "one sync run upserts SQL building and equipment catalogs before readings");
+            Assert(((EntityReference)sink.Equipment.Values.Single()["fmc_buildingid"]).Id == sink.Buildings.Keys.Single(),
+                "equipment lookup targets the deterministic building ID");
+            Assert(((EntityReference)sink.Points.Values.Single()["fmc_equipmentid"]).Id == sink.Equipment.Keys.Single(),
+                "point lookup targets the deterministic equipment ID");
             Assert((await sql.Summary(CancellationToken.None)).DeliveredRows == 0, "partial Dataverse failure does not advance SQL delivery");
             sink.FailAfterHistory = false;
             await engine.Run(CancellationToken.None);
             Assert(sink.History.Count == 1 && (await sql.Summary(CancellationToken.None)).DeliveredRows == 1, "replay after partial failure is idempotent");
             Assert((await engine.Run(CancellationToken.None)).Read == 0, "acknowledged row is not resent");
-            await Exec("INSERT raw.bms_reading VALUES(10,'WATER-001','Water','WaterConsumption','A',DATEADD(minute,-1,SYSUTCDATETIME()),340,'m3','Fake Metasys COV',GETDATE());");
+            await Exec("INSERT raw.bms_reading VALUES(10,'WATER-001','Water','WaterConsumption','A','EQ-A-WM-001',DATEADD(minute,-1,SYSUTCDATETIME()),340,'m3','Fake Metasys COV',GETDATE());");
             await engine.Run(CancellationToken.None);
             Assert(sink.History.Count == 2, "late commit below the high watermark is delivered");
             Assert((decimal)sink.Points.Values.Single()["fmc_currentvalue"] == 350m, "old replay cannot regress current value");
-            await Exec("INSERT raw.bms_reading VALUES(21,'WATER-002','Water','WaterConsumption','B',SYSUTCDATETIME(),100000000001,'m3','Fake Metasys COV',GETDATE());");
+            await Exec("INSERT raw.bms_reading VALUES(21,'WATER-002','Water','WaterConsumption','B',NULL,SYSUTCDATETIME(),100000000001,'m3','Fake Metasys COV',GETDATE());");
             var bad = await engine.Run(CancellationToken.None);
             Assert(bad.Quarantined == 1 && (await sql.Summary(CancellationToken.None)).DeadLetterRows == 1, "invalid row recorded in dead-letter");
             await Exec("UPDATE raw.bms_reading SET reading_value=12 WHERE id=21;");
@@ -89,7 +100,7 @@ public static class Verification
             Assert(await sql.Lock(first,CancellationToken.None) && !await sql.Lock(second,CancellationToken.None), "SQL lock prevents concurrent pipeline writers");
                 await sql.Unlock(first);
             }
-            await Exec("INSERT raw.bms_reading VALUES(30,'WATER-030','Water','WaterConsumption','C',SYSUTCDATETIME(),30,'m3','Fake Metasys COV',GETDATE()),(31,'WATER-031','Water','WaterConsumption','C',SYSUTCDATETIME(),31,'m3','Fake Metasys COV',GETDATE());");
+            await Exec("INSERT raw.bms_reading VALUES(30,'WATER-030','Water','WaterConsumption','C',NULL,SYSUTCDATETIME(),30,'m3','Fake Metasys COV',GETDATE()),(31,'WATER-031','Water','WaterConsumption','C',NULL,SYSUTCDATETIME(),31,'m3','Fake Metasys COV',GETDATE());");
             options.BatchSize = 1;
             var requestSink = new TestRequestStore();
             var command = new CommandProcessor(requestSink, sql, engine, options, logs.CreateLogger<CommandProcessor>());
@@ -102,9 +113,9 @@ public static class Verification
             await new CommandProcessor(emptySink, sql, engine, options, logs.CreateLogger<CommandProcessor>()).TryRun(CancellationToken.None);
             Assert(emptySink.FinalStatus == SyncRequestStatuses.Succeeded && emptySink.Delivered == 0,
                 "empty command request succeeds without duplicate delivery");
-            await Exec("INSERT raw.bms_reading VALUES(32,'WATER-032','Water','WaterConsumption','C',SYSUTCDATETIME(),32,'m3','Fake Metasys COV',GETDATE());");
+            await Exec("INSERT raw.bms_reading VALUES(32,'WATER-032','Water','WaterConsumption','C',NULL,SYSUTCDATETIME(),32,'m3','Fake Metasys COV',GETDATE());");
             var cutoff = await sql.MaxId(CancellationToken.None);
-            await Exec("INSERT raw.bms_reading VALUES(33,'WATER-033','Water','WaterConsumption','C',SYSUTCDATETIME(),33,'m3','Fake Metasys COV',GETDATE());");
+            await Exec("INSERT raw.bms_reading VALUES(33,'WATER-033','Water','WaterConsumption','C',NULL,SYSUTCDATETIME(),33,'m3','Fake Metasys COV',GETDATE());");
             await engine.Run(CancellationToken.None, cutoff);
             Assert((await sql.Summary(cutoff, CancellationToken.None)).EligiblePendingRows == 0 &&
                    (await sql.Summary(CancellationToken.None)).PendingRows == 1,
@@ -113,7 +124,7 @@ public static class Verification
             options.BatchSize = 100;
             var historyBeforeCurrentOnly = sink.History.Count;
             options.HistoryEnabled = false;
-            await Exec("INSERT raw.bms_reading VALUES(22,'WATER-003','Water','WaterConsumption','C',SYSUTCDATETIME(),30,'m3','Fake Metasys COV',GETDATE());");
+            await Exec("INSERT raw.bms_reading VALUES(22,'WATER-003','Water','WaterConsumption','C',NULL,SYSUTCDATETIME(),30,'m3','Fake Metasys COV',GETDATE());");
             await engine.Run(CancellationToken.None);
             Assert(sink.History.Count == historyBeforeCurrentOnly && (await sql.Summary(CancellationToken.None)).PendingRows == 0, "current-only mode tracks history separately");
             options.HistoryEnabled = true;
@@ -140,11 +151,27 @@ public static class Verification
         Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(summary));
         await using var c = await sql.Open(CancellationToken.None);
         using var cmd = sql.Command(c, """
-            SELECT TOP(25) r.id,r.object_id,r.object_name,r.object_type,r.building,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at
+            SELECT TOP(25) r.id,r.object_id,r.object_name,r.object_type,r.building,r.equipment_code,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at
             FROM raw.bms_reading r JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id
             WHERE d.history_done=1 ORDER BY r.id DESC;
             """);
         var samples = await SqlStore.Read(cmd,CancellationToken.None);
+        var catalog = await sql.ReadCatalog(c, CancellationToken.None);
+        foreach (var building in catalog.Buildings)
+        {
+            var actual = await client.RetrieveAsync("fmc_bmsbuilding", mapper.BuildingId(building.BuildingCode),
+                new ColumnSet("fmc_buildingcode"));
+            Assert(actual.GetAttributeValue<string>("fmc_buildingcode") == building.BuildingCode,
+                $"live building {building.BuildingCode}");
+        }
+        foreach (var equipment in catalog.Equipment)
+        {
+            var actual = await client.RetrieveAsync("fmc_bmsequipment", mapper.EquipmentId(equipment.EquipmentCode),
+                new ColumnSet("fmc_equipmentcode", "fmc_buildingid"));
+            Assert(actual.GetAttributeValue<string>("fmc_equipmentcode") == equipment.EquipmentCode &&
+                   actual.GetAttributeValue<EntityReference>("fmc_buildingid")?.Id == mapper.BuildingId(equipment.BuildingCode),
+                $"live equipment {equipment.EquipmentCode} -> {equipment.BuildingCode}");
+        }
         foreach (var r in samples)
         {
             if (mapper.History(r,DateTime.UtcNow) is null) continue;
@@ -161,11 +188,53 @@ public static class Verification
         Console.WriteLine($"Reconciled up to {samples.Count} history samples. Pending={summary.PendingRows}, dead-letter={summary.DeadLetterRows}. Current state is eventually consistent while source ingestion runs.");
     }
 
+    public static async Task VerifyRelationships(IServiceProvider services)
+    {
+        var sql = services.GetRequiredService<SqlStore>();
+        var mapper = services.GetRequiredService<ReadingMapper>();
+        var client = services.GetRequiredService<DataverseConnection>().Get();
+        await using var connection = await sql.Open(CancellationToken.None);
+        using var cmd = new SqlCommand("""
+            SELECT object_id,MAX(equipment_code) equipment_code
+            FROM raw.bms_reading WHERE equipment_code IS NOT NULL
+            GROUP BY object_id ORDER BY object_id;
+            """, connection);
+        var mappings = new List<(string ObjectId,string EquipmentCode)>();
+        await using (var reader = await cmd.ExecuteReaderAsync())
+            while (await reader.ReadAsync()) mappings.Add((reader.GetString(0), reader.GetString(1)));
+        var query = new QueryExpression("fmc_bmspoint")
+            { ColumnSet = new ColumnSet("fmc_objectid", "fmc_equipmentid") };
+        query.Criteria.AddCondition("fmc_objectid", ConditionOperator.In, mappings.Select(m => (object)m.ObjectId).ToArray());
+        var equipment = query.AddLink("fmc_bmsequipment", "fmc_equipmentid", "fmc_bmsequipmentid");
+        equipment.EntityAlias = "equipment";
+        equipment.Columns = new ColumnSet("fmc_equipmentcode", "fmc_buildingid");
+        var building = equipment.AddLink("fmc_bmsbuilding", "fmc_buildingid", "fmc_bmsbuildingid");
+        building.EntityAlias = "building";
+        building.Columns = new ColumnSet("fmc_buildingcode");
+        var rows = (await client.RetrieveMultipleAsync(query)).Entities;
+        Assert(rows.Count == mappings.Count, $"live joined point count {mappings.Count}");
+        foreach (var row in rows)
+        {
+            var objectId = row.GetAttributeValue<string>("fmc_objectid");
+            var expected = mappings.Single(m => m.ObjectId == objectId);
+            var equipmentCode = (string)row.GetAttributeValue<AliasedValue>("equipment.fmc_equipmentcode").Value;
+            var buildingCode = (string)row.GetAttributeValue<AliasedValue>("building.fmc_buildingcode").Value;
+            Assert(equipmentCode == expected.EquipmentCode,
+                $"live relationship {objectId} -> {equipmentCode} -> {buildingCode}");
+        }
+    }
+
     private sealed class TestWriter : IDataverseWriter
     {
+        public Dictionary<Guid,Entity> Buildings { get; } = [];
+        public Dictionary<Guid,Entity> Equipment { get; } = [];
         public Dictionary<Guid,Entity> Points { get; } = [];
         public Dictionary<(Guid,string),Entity> History { get; } = [];
         public bool FailAfterHistory { get; set; }
+        public Task WriteBuildings(IReadOnlyList<Entity> buildings,CancellationToken ct)
+        { foreach(var b in buildings) Buildings[b.Id]=b; return Task.CompletedTask; }
+        public Task WriteEquipment(IReadOnlyList<Entity> equipment,CancellationToken ct)
+        { foreach(var e in equipment) Equipment[e.Id]=e; return Task.CompletedTask; }
         public Task WritePoints(IReadOnlyList<Entity> points,CancellationToken ct)
         { foreach(var p in points) Points[p.Id]=p; return Task.CompletedTask; }
         public Task WriteHistory(IReadOnlyList<Entity> rows,CancellationToken ct)

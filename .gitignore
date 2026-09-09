@@ -8,3 +8,4 @@ obj/
 *.key
 dataverse/*.zip
 appsettings.Local.json
+.artifacts/

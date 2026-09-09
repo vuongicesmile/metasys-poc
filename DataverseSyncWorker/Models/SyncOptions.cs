@@ -53,8 +53,13 @@ public sealed class SyncOptions
 }
 
 public sealed record BmsReading(long Id, string ObjectId, string? ObjectName,
-    string? ObjectType, string? Building, DateTime ReadingTime, decimal? ReadingValue,
+    string? ObjectType, string? Building, string? EquipmentCode, DateTime ReadingTime, decimal? ReadingValue,
     string? Unit, string SourceSystem, DateTime? IngestedAt);
+
+public sealed record BmsBuilding(string BuildingCode, string Name, string SourceBuilding,
+    string? Description, DateTime SourceUpdatedAt);
+public sealed record BmsEquipment(string EquipmentCode, string Name, string EquipmentType,
+    string BuildingCode, string? Description, DateTime SourceUpdatedAt);
 
 public sealed record SyncSummary(long SourceRows, long DeliveredRows, long PendingRows,
     long DeadLetterRows, long LastSuccessfulId);

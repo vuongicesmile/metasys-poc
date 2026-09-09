@@ -8,6 +8,8 @@ public sealed class IngestionStatusSnapshot
     public string? SubscriptionId { get; init; }
     public long EventsReceived { get; init; }
     public long RowsInserted { get; init; }
+    public int BuildingsUpserted { get; init; }
+    public int EquipmentUpserted { get; init; }
     public DateTime? StartedAt { get; init; }
     public DateTime? LastEventAt { get; init; }
     public CovEvent? LastEvent { get; init; }

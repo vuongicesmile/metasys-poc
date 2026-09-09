@@ -6,12 +6,20 @@ namespace DataverseSyncWorker.Services;
 
 public interface IDataverseWriter
 {
+    Task WriteBuildings(IReadOnlyList<Entity> buildings, CancellationToken ct);
+    Task WriteEquipment(IReadOnlyList<Entity> equipment, CancellationToken ct);
     Task WritePoints(IReadOnlyList<Entity> points, CancellationToken ct);
     Task WriteHistory(IReadOnlyList<Entity> readings, CancellationToken ct);
 }
 
 public sealed class DataverseWriter(DataverseConnection connection) : IDataverseWriter
 {
+    public Task WriteBuildings(IReadOnlyList<Entity> buildings, CancellationToken ct) => WriteStandard(buildings, ct);
+    public Task WriteEquipment(IReadOnlyList<Entity> equipment, CancellationToken ct) => WriteStandard(equipment, ct);
+    private async Task WriteStandard(IReadOnlyList<Entity> rows, CancellationToken ct)
+    {
+        foreach (var row in rows) await Execute(new UpsertRequest { Target = row }, ct);
+    }
     public async Task WritePoints(IReadOnlyList<Entity> points, CancellationToken ct)
     {
         foreach (var point in points)

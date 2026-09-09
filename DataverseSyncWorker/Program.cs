@@ -1,6 +1,8 @@
 using DataverseSyncWorker.Models;
 using DataverseSyncWorker.Services;
 
+var (relationCommand, remainingArgs) = BmsRelationCommand.Parse(args);
+args = remainingArgs;
 var commands = new[] { "--provision", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once" };
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -24,6 +26,51 @@ builder.Services.AddHostedService<SyncWorker>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
+
+// Maintenance exits before app.RunAsync: it never starts the hosted sync worker.
+if (relationCommand is not null)
+{
+    if (relationCommand.Mode == "--self-test-bms-relations")
+    {
+        await BmsRelationshipVerification.SelfTest();
+        return;
+    }
+    var manifest = BmsRelationManifest.Load(relationCommand.ManifestPath, options.SourceId);
+    var connection = app.Services.GetRequiredService<DataverseConnection>();
+    var provisioner = new DataverseProvisioner(connection, options);
+    if (relationCommand.Mode == "--bms-relations-status")
+        await provisioner.PrintBmsRelationStatus(manifest);
+    else if (relationCommand.Mode == "--provision-bms-relations")
+    {
+        await provisioner.PrintBmsRelationStatus(manifest);
+        await provisioner.ProvisionBmsRelations();
+    }
+    else
+    {
+        await provisioner.ReadBmsRelationMetadata(true);
+        var seeder = new BmsRelationshipSeeder(new DataverseBmsRelationStore(connection.Get()), options);
+        if (relationCommand.Mode == "--verify-bms-relations")
+        {
+            await provisioner.VerifyBmsRelationUi();
+            await Verification.VerifyRelationships(app.Services);
+        }
+        else
+        {
+            var plan = await seeder.Plan(manifest);
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(plan, BmsRelationManifest.Json));
+            if (plan.Errors.Length > 0) throw new InvalidOperationException("Seed preflight failed; no writes made.");
+            if (relationCommand.Apply)
+            {
+                var receiptPath = relationCommand.ReceiptPath ?? Path.Combine(Environment.CurrentDirectory,
+                    ".artifacts", "bms-relations", "receipts", $"seed-{DateTime.UtcNow:yyyyMMddTHHmmssfffZ}-{Guid.NewGuid():N}.json");
+                var receipt = await seeder.Apply(manifest, receiptPath);
+                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(receipt, BmsRelationManifest.Json));
+            }
+            else Console.WriteLine("DRY RUN: no cloud writes. Use --apply to apply this manifest.");
+        }
+    }
+    return;
+}
 
 if (args.Contains("--self-test")) { await Verification.SelfTest(app.Services); return; }
 if (args.Contains("--provision")) { await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).Run(); return; }

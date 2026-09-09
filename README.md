@@ -42,22 +42,23 @@ production identity guidance, and tests.
 
    INSERT INTO raw.bms_reading
    (
-       object_id, object_name, object_type, building,
+       object_id, object_name, object_type, building, equipment_code,
        reading_time, reading_value, unit, source_system
    )
    OUTPUT INSERTED.id, INSERTED.object_id, INSERTED.reading_time, INSERTED.reading_value
    VALUES
    (
        'TEST-POWER-AUTOMATE-001', 'Power Automate Test Point',
-       'Temperature', 'Test Building', SYSUTCDATETIME(),
+       'Temperature', 'Test Building', 'EQ-TEST-RIG-001', SYSUTCDATETIME(),
        CAST(25.1234 AS DECIMAL(18,4)), 'C', 'Fake Metasys COV'
    );
    ```
 
 3. In Power Automate, open solution `FMCentralBms` and run
    `FMC - Request SQL to Dataverse Sync`. The flow queues one
-   `fmc_syncrequest`; the worker claims it and writes the SQL cutoff to
-   `fmc_bmspoint` and `fmc_bmsreading`.
+   `fmc_syncrequest`; the worker claims it, upserts SQL catalog into
+   `fmc_bmsbuilding` and `fmc_bmsequipment`, updates Point lookups, then writes
+   the SQL reading cutoff to `fmc_bmspoint` and `fmc_bmsreading`.
 
 4. Check worker and delivery state:
 
@@ -79,8 +80,8 @@ described in the [Power Automate runbook](docs/runbooks/power-automate-sql-sync.
 POC data flow:
 
 ```text
-Fake Metasys API -> COV over SSE -> .NET ingestion -> SQL Server
-                                             FM_Central.raw.bms_reading
+Fake Metasys API -> catalog + COV over SSE -> .NET ingestion -> SQL Server
+                                    raw.bms_building / raw.bms_equipment / raw.bms_reading
 ```
 
 ## Prerequisites
@@ -110,6 +111,8 @@ The API listens on `http://localhost:5100` and exposes:
 - OpenAPI JSON: `http://localhost:5100/swagger/v1/swagger.json`
 
 - `GET /api/metasys/objects`
+- `GET /api/metasys/buildings`
+- `GET /api/metasys/equipment`
 - `GET /api/metasys/objects/{objectId}`
 - `POST /api/metasys/subscriptions`
 - `GET /api/metasys/subscriptions/{subscriptionId}/stream`
@@ -135,7 +138,8 @@ For an API/SSE-only smoke test that does not connect to SQL Server:
 dotnet run --project .\BmsIngestionApp -- --no-sql
 ```
 
-The simulator updates the three in-memory BMS points every three seconds. Only
+The simulator updates the five in-memory BMS points every three seconds. Ingestion
+upserts the 3-building/4-equipment catalog at startup. Only
 actual value changes produce COV events, and each received event is inserted as
 one row when SQL persistence is enabled.
 
@@ -145,6 +149,9 @@ one row when SQL persistence is enabled.
 SELECT TOP (100) *
 FROM FM_Central.raw.bms_reading
 ORDER BY id DESC;
+
+SELECT * FROM FM_Central.raw.bms_building ORDER BY building_code;
+SELECT * FROM FM_Central.raw.bms_equipment ORDER BY equipment_code;
 ```
 
 ## Project agent skills

@@ -35,7 +35,7 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options)
         await cmd.ExecuteNonQueryAsync();
     }
 
-    private const string Columns = "r.id,r.object_id,r.object_name,r.object_type,r.building,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at";
+    private const string Columns = "r.id,r.object_id,r.object_name,r.object_type,r.building,r.equipment_code,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at";
     private const string Pending = "(d.current_done IS NULL OR d.current_done=0 OR (@history=1 AND d.history_done=0))";
     public async Task<List<BmsReading>> ReadBatch(SqlConnection c, CancellationToken ct, long? cutoffId = null)
     {
@@ -81,6 +81,25 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options)
         return (await Read(cmd, ct)).Single();
     }
 
+    public async Task<(List<BmsBuilding> Buildings, List<BmsEquipment> Equipment)> ReadCatalog(SqlConnection c, CancellationToken ct)
+    {
+        var buildings = new List<BmsBuilding>();
+        using (var cmd = new SqlCommand("SELECT building_code,name,source_building,description,source_updated_at FROM raw.bms_building ORDER BY building_code;", c))
+        await using (var reader = await cmd.ExecuteReaderAsync(ct))
+            while (await reader.ReadAsync(ct))
+                buildings.Add(new(reader.GetString(0), reader.GetString(1), reader.GetString(2),
+                    reader.IsDBNull(3) ? null : reader.GetString(3), reader.GetDateTime(4)));
+        var equipment = new List<BmsEquipment>();
+        using (var cmd = new SqlCommand("SELECT equipment_code,name,equipment_type,building_code,description,source_updated_at FROM raw.bms_equipment ORDER BY equipment_code;", c))
+        await using (var reader = await cmd.ExecuteReaderAsync(ct))
+            while (await reader.ReadAsync(ct))
+                equipment.Add(new(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3),
+                    reader.IsDBNull(4) ? null : reader.GetString(4), reader.GetDateTime(5)));
+        if (equipment.Any(e => !buildings.Any(b => b.BuildingCode == e.BuildingCode)))
+            throw new InvalidOperationException("SQL equipment catalog refers to a missing building.");
+        return (buildings, equipment);
+    }
+
     internal static async Task<List<BmsReading>> Read(SqlCommand cmd, CancellationToken ct)
     {
         var rows = new List<BmsReading>();
@@ -88,8 +107,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options)
         while (await r.ReadAsync(ct))
         {
             string? S(int i) => r.IsDBNull(i) ? null : r.GetString(i);
-            rows.Add(new(r.GetInt64(0), r.GetString(1), S(2), S(3), S(4), r.GetDateTime(5),
-                r.IsDBNull(6) ? null : r.GetDecimal(6), S(7), r.GetString(8), r.IsDBNull(9) ? null : r.GetDateTime(9)));
+            rows.Add(new(r.GetInt64(0), r.GetString(1), S(2), S(3), S(4), S(5), r.GetDateTime(6),
+                r.IsDBNull(7) ? null : r.GetDecimal(7), S(8), r.GetString(9), r.IsDBNull(10) ? null : r.GetDateTime(10)));
         }
         return rows;
     }

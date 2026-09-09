@@ -1,0 +1,22 @@
+{
+  "version": "20260909_bms_relations_v1",
+  "sourceId": "FMC",
+  "buildings": [
+    { "code": "BLDG-A", "name": "Building A", "sourceBuilding": "Building A", "description": "Building in the Fake Metasys BMS fixture." },
+    { "code": "BLDG-B", "name": "Building B", "sourceBuilding": "Building B", "description": "Building in the Fake Metasys BMS fixture." },
+    { "code": "BLDG-TEST", "name": "Test Building", "sourceBuilding": "Test Building", "description": "Building for existing POC test points." }
+  ],
+  "equipment": [
+    { "code": "EQ-A-WM-001", "name": "Main Water Meter A", "type": "WaterMeter", "buildingCode": "BLDG-A", "description": "Synthetic equipment for WATER-001; not a verified physical asset." },
+    { "code": "EQ-B-WM-002", "name": "Secondary Water Meter B", "type": "WaterMeter", "buildingCode": "BLDG-B", "description": "Synthetic equipment for WATER-002; not a verified physical asset." },
+    { "code": "EQ-A-TS-001", "name": "Room Temperature Sensor A", "type": "TemperatureSensor", "buildingCode": "BLDG-A", "description": "Synthetic equipment for TEMP-001; not a verified physical asset." },
+    { "code": "EQ-TEST-RIG-001", "name": "BMS Relationship Test Rig", "type": "TestRig", "buildingCode": "BLDG-TEST", "description": "Synthetic test rig grouping two existing test points to demonstrate 1:N." }
+  ],
+  "pointMappings": [
+    { "objectId": "WATER-001", "equipmentCode": "EQ-A-WM-001" },
+    { "objectId": "WATER-002", "equipmentCode": "EQ-B-WM-002" },
+    { "objectId": "TEMP-001", "equipmentCode": "EQ-A-TS-001" },
+    { "objectId": "TEST-POWER-AUTOMATE-001", "equipmentCode": "EQ-TEST-RIG-001" },
+    { "objectId": "TEST-POWER-AUTOMATE-002", "equipmentCode": "EQ-TEST-RIG-001" }
+  ]
+}

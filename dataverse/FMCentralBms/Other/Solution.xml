@@ -79,6 +79,8 @@
     </Publisher>
     <RootComponents>
       <RootComponent type="1" schemaName="cr3c8_fmc_silver_bmspoint" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_bmsbuilding" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_bmsequipment" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmspoint" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmsreading" behavior="0" />
       <RootComponent type="1" schemaName="fmc_syncrequest" behavior="0" />

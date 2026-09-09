@@ -29,6 +29,16 @@ app.MapGet("/api/metasys/objects", (MetasysPointStore store) => Results.Ok(store
     .WithSummary("List all BMS points")
     .Produces<IReadOnlyList<MetasysPoint>>();
 
+app.MapGet("/api/metasys/buildings", (MetasysPointStore store) => Results.Ok(store.GetBuildings()))
+    .WithTags("Metasys Catalog")
+    .WithSummary("List BMS buildings")
+    .Produces<IReadOnlyList<BmsBuilding>>();
+
+app.MapGet("/api/metasys/equipment", (MetasysPointStore store) => Results.Ok(store.GetEquipment()))
+    .WithTags("Metasys Catalog")
+    .WithSummary("List BMS equipment")
+    .Produces<IReadOnlyList<BmsEquipment>>();
+
 app.MapGet("/api/metasys/objects/{objectId}", (string objectId, MetasysPointStore store) =>
 {
     var point = store.Get(objectId);

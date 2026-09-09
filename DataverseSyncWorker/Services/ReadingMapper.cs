@@ -19,6 +19,8 @@ public sealed class ReadingMapper(SyncOptions options)
 
     public Guid ReadingId(long id) => StableGuid($"metasys-reading|{options.SourceId}|{id}");
     public Guid PointId(string objectId) => StableGuid($"metasys-point|{options.SourceId}|{objectId}");
+    public Guid BuildingId(string code) => StableGuid($"metasys-building|{options.SourceId}|{code}");
+    public Guid EquipmentId(string code) => StableGuid($"metasys-equipment|{options.SourceId}|{code}");
     public static string Partition(string objectId) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(objectId)));
 
     public DateTime ReadingUtc(BmsReading r) => r.SourceSystem == "Fake Metasys COV"
@@ -49,8 +51,27 @@ public sealed class ReadingMapper(SyncOptions options)
         e["fmc_lastreadingtime"] = ReadingUtc(r);
         e["fmc_sourcesystem"] = r.SourceSystem;
         e["fmc_lastsqlid"] = r.Id.ToString(CultureInfo.InvariantCulture);
+        if (!string.IsNullOrWhiteSpace(r.EquipmentCode))
+            e["fmc_equipmentid"] = new EntityReference("fmc_bmsequipment", EquipmentId(r.EquipmentCode));
         return e;
     }
+
+    public Entity Building(BmsBuilding row) => new("fmc_bmsbuilding", BuildingId(row.BuildingCode))
+    {
+        ["fmc_name"] = row.Name,
+        ["fmc_buildingcode"] = row.BuildingCode,
+        ["fmc_sourcebuilding"] = row.SourceBuilding,
+        ["fmc_description"] = row.Description
+    };
+
+    public Entity Equipment(BmsEquipment row) => new("fmc_bmsequipment", EquipmentId(row.EquipmentCode))
+    {
+        ["fmc_name"] = row.Name,
+        ["fmc_equipmentcode"] = row.EquipmentCode,
+        ["fmc_equipmenttype"] = new OptionSetValue(BmsRelationManifest.TypeValue(row.EquipmentType)),
+        ["fmc_buildingid"] = new EntityReference("fmc_bmsbuilding", BuildingId(row.BuildingCode)),
+        ["fmc_description"] = row.Description
+    };
 
     public Entity? History(BmsReading r, DateTime utcNow)
     {

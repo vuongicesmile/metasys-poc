@@ -21,6 +21,13 @@ delivered 183 rows in two batches to cutoff 7404 with zero pending/dead-letter;
 production-readiness claim. The exported
 unmanaged solution is checked out at `dataverse/FMCentralBms`.
 
+The Building/Equipment extension was verified on 2026-09-09. Request
+`c99f3d86-1fac-f111-aaad-00224819a344` succeeded at SQL cutoff 23377 with zero
+quarantined rows. Live verification passed for 3 Buildings, 4 Equipment, all 5
+Point → Equipment → Building joins, and 25 retained history samples. Ingestion
+continued after that cutoff, so later rows correctly remained pending for the
+next request.
+
 Local development reuses the signed-in Azure CLI bundled by `rmit-fm-data` via
 `scripts/get-dataverse-token.py`. No access token or refresh token is stored in
 this repository. Run the worker directly:
@@ -52,9 +59,13 @@ The command verifies the organization ID before writes and creates/reuses:
 - Publisher `FMCentralBmsPublisher`, prefix `fmc`.
 - Unmanaged solution `FMCentralBms`.
 - Standard table `fmc_bmspoint`, with `fmc_bmspoint_objectid` alternate key.
+- Standard table `fmc_bmsbuilding`, with `fmc_bmsbuilding_buildingcode` alternate key.
+- Standard table `fmc_bmsequipment`, with `fmc_bmsequipment_equipmentcode` alternate key.
+- Relationships `fmc_bmsbuilding_bmsequipment` and `fmc_bmsequipment_bmspoint`.
 - Elastic table `fmc_bmsreading`, using its built-in GUID + partition key.
 - Security role `FM Central BMS Integration`, with organization-level Create,
-  Read and Write on the two BMS tables and `fmc_syncrequest`.
+  Read and Write on BMS tables and requests, plus Append/Append To needed by the
+  Building/Equipment/Point lookups.
 - Security role `FM Central BMS Sync Requestor`, with Create/Read on requests.
 
 Assign the runtime application user that role. If provisioning used the same app,
@@ -105,6 +116,9 @@ Default binding is loopback; do not expose these endpoints externally without au
   Elastic partial failures leave the batch pending and safe to replay. Validation
   errors are quarantined individually. Permanent remote schema/permission errors
   block sync until corrected/restarted instead of silently discarding readings.
+- Each command/run first reads `raw.bms_building` and `raw.bms_equipment`, then
+  upserts Building → Equipment before Point/history writes. Point payloads carry
+  the deterministic `fmc_equipmentid` lookup from `raw.bms_reading.equipment_code`.
 - Latest point means greatest `reading_time`, with SQL `id` breaking ties. Old
   backfill/replay uses the source's current latest value, not the replayed value.
 - History TTL is calculated from reading time. Rows older than retention are

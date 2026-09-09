@@ -15,5 +15,6 @@
 
   <ItemGroup>
     <Content Include="..\sql\create-dataverse-sync-tables.sql" Link="sql\create-dataverse-sync-tables.sql" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\config\bms-relations.seed.json" Link="config\bms-relations.seed.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,8 @@ public sealed class IngestionStatusTracker
     private string? _subscriptionId;
     private long _eventsReceived;
     private long _rowsInserted;
+    private int _buildingsUpserted;
+    private int _equipmentUpserted;
     private DateTime? _startedAt;
     private DateTime? _lastEventAt;
     private CovEvent? _lastEvent;
@@ -63,6 +65,11 @@ public sealed class IngestionStatusTracker
         }
     }
 
+    public void CatalogPersisted(int buildings, int equipment)
+    {
+        lock (_sync) { _buildingsUpserted = buildings; _equipmentUpserted = equipment; }
+    }
+
     public void Failed(Exception exception)
     {
         lock (_sync)
@@ -84,6 +91,8 @@ public sealed class IngestionStatusTracker
                 SubscriptionId = _subscriptionId,
                 EventsReceived = _eventsReceived,
                 RowsInserted = _rowsInserted,
+                BuildingsUpserted = _buildingsUpserted,
+                EquipmentUpserted = _equipmentUpserted,
                 StartedAt = _startedAt,
                 LastEventAt = _lastEventAt,
                 LastEvent = _lastEvent,
