@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{4e2cf907-5c8b-4fa5-9bfb-55faf81fd889}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{bee2e98a-5383-4ca7-aef8-87ecc9f23be9}" IsUserDefined="1" labelid="{3a1ae281-31f3-478c-90db-3f30a1283482}">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{a5203b65-e146-4cf6-82f9-e652f9592fff}" labelid="{f72406ab-1ef3-4a9e-8729-c8812765b74e}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{83ef7330-3116-431b-93d4-d9e1e13c3555}" labelid="{3d9b4ce0-2436-48f6-b737-c2638c11988b}">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="fmc_name" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_bmsrelations" id="{fd2e8ecf-422f-889f-b26b-749a95411d6b}" showlabel="true" expanded="true" labelid="{f49c3272-dbdf-432c-8aa7-5b05893a71cb}">
+          <labels>
+            <label description="BMS Details and Relationships" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_bmsrelation_details" id="{5a40c369-2c16-8458-af14-acb565e2ab66}" showlabel="false" showbar="false" columns="1" labelid="{d32dcaa2-fff9-4bb2-b19c-c756a0e4fd17}">
+                  <labels>
+                    <label description="BMS Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{1e3c5b45-b19f-8338-880f-adaeaea04e66}" labelid="{7b7d26a6-7ba4-49d9-ada0-178b53e4d894}">
+                        <labels>
+                          <label description="Equipment Code" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_equipmentcode" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_equipmentcode" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{103bbe97-47d0-889a-b0b6-f770cc49aed8}" labelid="{af19791f-a4b0-4f68-abf2-7e8ec760e9f7}">
+                        <labels>
+                          <label description="Equipment Type" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_equipmenttype" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_equipmenttype" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{bddf10f1-36d6-8d92-9f8f-ae50becf48b1}" labelid="{14afd7f2-f4a5-4d67-95cd-c65347274770}">
+                        <labels>
+                          <label description="Building" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_buildingid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="fmc_buildingid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{55fcdd93-5c3b-8561-88f9-640586918bf8}" labelid="{6d3873b2-1e9d-4131-b67a-871e9d8d083b}">
+                        <labels>
+                          <label description="Description" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_description" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_description" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{00f40921-4ddb-80f3-8bf6-38e601fd9928}" showlabel="true" labelid="{b258f1d8-f2fa-40b6-8659-48c451052f6f}">
+                        <labels>
+                          <label description="BMS Points" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_bmsrelatedrecords" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+                          <parameters>
+                            <TargetEntityType>fmc_bmspoint</TargetEntityType>
+                            <ViewId>{cf1c6bb8-f53b-4c81-8038-ad370ed44287}</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_bmsequipment_bmspoint</RelationshipName>
+                            <RecordsPerPage>10</RecordsPerPage>
+                            <EnableQuickFind>false</EnableQuickFind>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <formLibraries>
+        <Library name="fmc_/scripts/EquipmentPluginTest.js" libraryUniqueId="{4d664e98-1a0d-42c8-9014-d8df1a16e5f7}" />
+      </formLibraries>
+      <events>
+        <event name="onload" application="false" active="false">
+          <Handlers>
+            <Handler libraryName="fmc_/scripts/EquipmentPluginTest.js" passExecutionContext="true" functionName="FMC.EquipmentPluginTest.onLoad" enabled="true" parameters="" handlerUniqueId="{c7c8a982-5128-4c14-a239-85e922edb60d}" />
+          </Handlers>
+        </event>
+      </events>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Equipment - Plugin Test" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="Developer-only UI test for RequireEquipmentBuilding. Does not change table requirements." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

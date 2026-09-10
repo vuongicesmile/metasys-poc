@@ -3,10 +3,12 @@ using DataverseSyncWorker.Services;
 
 var (relationCommand, remainingArgs) = BmsRelationCommand.Parse(args);
 args = remainingArgs;
-var commands = new[] { "--provision", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once" };
+var commands = new[] { "--provision", "--register-plugin", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once" };
+var hostArgs = args.Where(a => !commands.Contains(a) &&
+    !a.StartsWith("--plugin-path=", StringComparison.OrdinalIgnoreCase)).ToArray();
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
-    Args = args.Where(a => !commands.Contains(a)).ToArray(),
+    Args = hostArgs,
     ContentRootPath = AppContext.BaseDirectory
 });
 builder.Host.UseWindowsService(options => options.ServiceName = "FMCentralDataverseSync");
@@ -74,6 +76,13 @@ if (relationCommand is not null)
 
 if (args.Contains("--self-test")) { await Verification.SelfTest(app.Services); return; }
 if (args.Contains("--provision")) { await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).Run(); return; }
+if (args.Contains("--register-plugin"))
+{
+    var pluginPath = args.FirstOrDefault(a => a.StartsWith("--plugin-path=", StringComparison.OrdinalIgnoreCase))?.Split('=', 2)[1]
+        ?? Path.Combine(Environment.CurrentDirectory, "plugins", "FMCentralBms.Plugins", "bin", "Release", "net48", "FMCentralBms.Plugins.dll");
+    await new DataversePluginProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).Register(pluginPath);
+    return;
+}
 if (args.Contains("--verify")) { await Verification.Reconcile(app.Services); return; }
 if (args.Contains("--enqueue"))
 {

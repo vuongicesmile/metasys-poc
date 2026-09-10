@@ -1,10 +1,13 @@
 # Thiết kế Dataverse plug-in cho BMS và hướng dẫn plug-in đầu tiên
 
-Ngày: 2026-09-09. Trạng thái: đề xuất và hướng dẫn thực hành; mẫu C# đã build
-local thành công, chưa đăng ký hoặc kiểm thử plug-in trên Dataverse.
+Ngày: 2026-09-10. Trạng thái: đã triển khai và kiểm thử trên Developer
+environment; plug-in nằm trong solution source và deployment receipt ở mục 11.
 
 Tài liệu nói về **Dataverse plug-in C#**. Mục tiêu đầu tiên là bảo vệ quan hệ
 Equipment → Building khi dữ liệu được ghi từ form, API hoặc worker hiện tại.
+
+Để tự làm lại với giải thích từng dòng code và từng ô đăng ký, dùng
+[runbook từng bước từ local đến Dataverse](../runbooks/dataverse-plugin-step-by-step.vi.md).
 
 ## 1. Dữ liệu và code đang có
 
@@ -220,6 +223,18 @@ pac tool prt
 
 Trong PRT, đăng nhập bằng tài khoản developer đã có và kiểm tra lại URL tổ chức;
 PRT có phiên kết nối riêng. Tài khoản cần quyền đăng ký plug-in.
+
+Repo hiện có command đăng ký idempotent dùng `DataverseConnection`, nên lần
+triển khai này không phụ thuộc PRT interactive:
+
+```powershell
+dotnet run --project .\DataverseSyncWorker -c Release --no-launch-profile -- `
+  --register-plugin `
+  --plugin-path=..\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
+```
+
+Command chỉ chạy khi truyền `--register-plugin`; worker startup bình thường
+không tự đăng ký hoặc thay đổi plug-in.
 
 Chọn **Register → Register New Assembly**, chọn DLL đã build,
 isolation **Sandbox**, location **Database**, rồi đăng ký class
@@ -480,13 +495,38 @@ Một lần triển khai chỉ hoàn tất khi có:
 - Một sync request có reading mới chạy thành công; verify không phát hiện hồi quy do plug-in.
 - Assembly và steps nằm trong solution; có export/source diff và kết quả test của lần triển khai.
 
-## 11. Đã kiểm chứng trong lần chuẩn bị hướng dẫn
+## 11. Deployment receipt — Developer environment (2026-09-10)
 
-- Đọc code, solution export, Fake API live và SQL local bằng thao tác chỉ đọc.
-- `pac plugin init` chạy được với PAC 2.11.2.
-- Code C# trong phần 5 build thành công với `net48`: 0 warnings, 0 errors.
-- 7 kiểm tra handler local pass: Create thiếu/null/có Building; Update bỏ qua/null/có Building; bỏ qua table khác. Context được mô phỏng, không gọi Dataverse.
-- 10 khối lệnh PowerShell parse thành công; code C# trong tài liệu khớp bản đã build và các liên kết file local tồn tại.
-- Bản build thử nằm trong `.artifacts/plugin-guide/FMCentralBms.Plugins`, là artifact local được Git ignore.
-- Chưa thêm project vào `MetasysPoc.sln`; chưa đăng ký plug-in, thay đổi cloud settings, chạy API mutation test hoặc sync.
-- Hướng dẫn đăng ký/test/deploy ở trên là các bước thực hành tiếp theo, chưa phải deployment receipt.
+- Đã thêm project `plugins/FMCentralBms.Plugins` vào `MetasysPoc.sln`; giữ
+  strong-name key và build target `net48` theo supported framework.
+- `dotnet build .\MetasysPoc.sln -c Release --no-restore`: pass, 0 warnings,
+  0 errors. 7 local handler checks cũng pass, không gọi Dataverse.
+- Đã đăng ký bằng worker command `--register-plugin` vào đúng Developer
+  organization `https://org06cbc9ec.crm5.dynamics.com/`, solution
+  `FMCentralBms` / publisher `FMCentralBmsPublisher`.
+- Assembly live: `FMCentralBms.Plugins`, ID
+  `a5233bd0-bbac-f111-aaad-00224819a344`, version `1.0.0.0`, Sandbox/Database.
+  Plugin type live: `FMCentralBms.Plugins.RequireEquipmentBuilding`, ID
+  `00c79fe3-bbac-f111-aaad-00224819a344`.
+- Hai live steps đúng plan: Create ID
+  `00029f22-bcac-f111-aaad-00224819a344` và Update ID
+  `27894c29-bcac-f111-aaad-00224819a344`; cả hai `PreValidation`/synchronous/
+  order 10/server/enabled. Update chỉ filter `fmc_buildingid`.
+- API mutation test pass: Create thiếu Building bị từ chối với
+  `BMS-EQUIPMENT-001`; Create có Building pass; clear lookup bị từ chối; đổi
+  tên không gửi lookup pass và giữ nguyên Building. Record demo đã được xóa.
+- Đã export/unpack unmanaged solution từ live environment và merge assembly,
+  two step definitions và root components vào `dataverse/FMCentralBms`.
+  Source XML và DLL đã được so khớp với export.
+- Sync receipt `475ba7a0-bcac-f111-aaad-00224819a344` hoàn tất `Succeeded` tại
+  cutoff `81773`: `54578` delivered, `546` batches, `0` quarantined,
+  `PendingAfter=0`, `DeadLetterAfter=0`.
+- `--verify` sau sync: `SourceRows=81773`, `DeliveredRows=81773`,
+  `PendingRows=0`, `DeadLetterRows=0`; live Building/Equipment relationships
+  pass và 25 retained-history samples pass.
+
+Giới hạn còn lại: receipt này chỉ chứng minh Developer environment và dữ liệu
+POC hiện tại. Chưa import managed solution sang Test/UAT/Production, chưa cấu
+hình production application identity/capacity, và simulator không chứng minh
+quyền truy cập tới Johnson Controls Metasys thật. Pending có thể phát sinh lại
+nếu ingestion tiếp tục tạo reading mới sau cutoff.

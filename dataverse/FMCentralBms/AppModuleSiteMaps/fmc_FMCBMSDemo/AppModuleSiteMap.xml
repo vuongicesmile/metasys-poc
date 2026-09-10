@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppModuleSiteMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SiteMapUniqueName>fmc_FMCBMSDemo</SiteMapUniqueName>
+  <EnableCollapsibleGroups>False</EnableCollapsibleGroups>
+  <ShowHome>True</ShowHome>
+  <ShowPinned>True</ShowPinned>
+  <ShowRecents>True</ShowRecents>
+  <SiteMap>
+    <Area Id="fmc_bms" ShowGroups="true">
+      <Titles>
+        <Title LCID="1033" Title="FMC BMS Demo" />
+      </Titles>
+      <Group Id="fmc_catalog">
+        <Titles>
+          <Title LCID="1033" Title="BMS Catalog" />
+        </Titles>
+        <SubArea Id="fmc_buildings" Entity="fmc_bmsbuilding">
+          <Titles>
+            <Title LCID="1033" Title="BMS Buildings" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="fmc_equipment" Entity="fmc_bmsequipment">
+          <Titles>
+            <Title LCID="1033" Title="BMS Equipment" />
+          </Titles>
+        </SubArea>
+      </Group>
+    </Area>
+  </SiteMap>
+  <LocalizedNames>
+    <LocalizedName description="fmc_FMCBMSDemo" languagecode="1033" />
+  </LocalizedNames>
+</AppModuleSiteMap>

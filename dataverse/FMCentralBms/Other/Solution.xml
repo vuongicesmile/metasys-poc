@@ -87,6 +87,12 @@
       <RootComponent type="20" id="{46639136-95aa-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="20" id="{5ae2d6e5-3cab-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="29" id="{6fa6c13a-3eab-f111-aaad-00224819a344}" behavior="0" />
+      <RootComponent type="61" schemaName="fmc_/scripts/EquipmentPluginTest.js" behavior="0" />
+      <RootComponent type="62" schemaName="fmc_FMCBMSDemo" behavior="0" />
+      <RootComponent type="80" schemaName="fmc_FMCBMSDemo" behavior="0" />
+      <RootComponent type="91" id="{a5233bd0-bbac-f111-aaad-00224819a344}" schemaName="FMCentralBms.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" behavior="0" />
+      <RootComponent type="92" id="{00029f22-bcac-f111-aaad-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{27894c29-bcac-f111-aaad-00224819a344}" behavior="0" />
     </RootComponents>
     <MissingDependencies>
       <MissingDependency>
@@ -100,6 +106,18 @@
           <package appName="NonRelational Data Provider Package" version="9.1.0.477">NonRelationalCustomActions (9.1.0.477)</package>
         </Required>
         <Dependent type="1" schemaName="fmc_bmsreading" displayName="[Bronze] BMS Reading" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="61" schemaName="msdyn_/Images/AppModule_Default_Icon.png" displayName="msdyn_/Images/AppModule_Default_Icon.png" solution="AppModuleWebResources (2.5)">
+          <package appName="AppModule Web Resources Package" version="2.5">AppModuleWebResources (2.5)</package>
+        </Required>
+        <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="SettingDefinition" displayName="AppChannel" solution="msdyn_AppFrameworkInfraExtensions (1.0.0.19)" id.uniquename="AppChannel">
+          <package appName="PowerAppsAppFramework Package" version="1.0.0.25">PowerAppsAppFramework_Anchor (1.0.0.25)</package>
+        </Required>
+        <Dependent type="AppSetting" displayName="parentappmoduleid.uniquename=fmc_FMCBMSDemo,settingdefinitionid.uniquename=AppChannel" id.parentappmoduleid.uniquename="fmc_FMCBMSDemo" id.settingdefinitionid.uniquename="AppChannel" />
       </MissingDependency>
     </MissingDependencies>
   </SolutionManifest>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppModule>
+  <UniqueName>fmc_FMCBMSDemo</UniqueName>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <WebResourceId>953b9fac-1e5e-e611-80d6-00155ded156f</WebResourceId>
+  <OptimizedFor></OptimizedFor>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+  <FormFactor>1</FormFactor>
+  <ClientType>4</ClientType>
+  <NavigationType>0</NavigationType>
+  <AppModuleComponents>
+    <AppModuleComponent type="1" schemaName="fmc_bmsbuilding" />
+    <AppModuleComponent type="1" schemaName="fmc_bmsequipment" />
+    <AppModuleComponent type="1" schemaName="fmc_bmspoint" />
+    <AppModuleComponent type="26" id="{a5c8a313-03ac-f111-aaad-00224819a344}" />
+    <AppModuleComponent type="26" id="{f8848442-2db4-4c2d-89d7-095f44b73650}" />
+    <AppModuleComponent type="26" id="{c7edcc0d-3262-4d05-96ce-23e3426146f7}" />
+    <AppModuleComponent type="26" id="{13ecfc4f-a0ef-4ceb-bc4d-4468275b6b1f}" />
+    <AppModuleComponent type="26" id="{d44eb125-29d6-4ae6-ab51-5a188d893ba4}" />
+    <AppModuleComponent type="26" id="{0a0e8888-048c-437c-b53b-5d7c3b5187db}" />
+    <AppModuleComponent type="26" id="{0e400437-cbb3-4e19-9ea0-5ec9f37d6335}" />
+    <AppModuleComponent type="26" id="{3a697912-3d08-4e8f-8cb9-751af926563f}" />
+    <AppModuleComponent type="26" id="{d82e545c-03e2-4952-b79d-782d113f3e84}" />
+    <AppModuleComponent type="26" id="{e6023389-3293-46bd-b353-7ccaa20226e7}" />
+    <AppModuleComponent type="26" id="{cde799a9-b744-48d4-a45f-acef4de36dab}" />
+    <AppModuleComponent type="26" id="{cf1c6bb8-f53b-4c81-8038-ad370ed44287}" />
+    <AppModuleComponent type="26" id="{11ba4d38-6d15-42f5-9ae8-dfa86c6bf278}" />
+    <AppModuleComponent type="60" id="{4e2cf907-5c8b-4fa5-9bfb-55faf81fd889}" />
+    <AppModuleComponent type="60" id="{16116cbe-739c-40c0-820f-985ae43ca22d}" />
+    <AppModuleComponent type="60" id="{77e328e8-a2ce-49b9-8ef2-dd3cd4e60dd7}" />
+    <AppModuleComponent type="60" id="{2b09585b-c7e9-410b-891e-f38551a9968e}" />
+    <AppModuleComponent type="62" schemaName="fmc_FMCBMSDemo" />
+  </AppModuleComponents>
+  <AppModuleRoleMaps>
+    <Role id="{627090ff-40a3-4053-8790-584edc5be201}" />
+    <Role id="{119f245c-3cc8-4b62-b31c-d1a046ced15d}" />
+  </AppModuleRoleMaps>
+  <LocalizedNames>
+    <LocalizedName description="FMC BMS Demo" languagecode="1033" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description description="Developer BMS catalog and UI plugin testing. No SQL sync is triggered by this app." languagecode="1033" />
+  </Descriptions>
+  <appsettings>
+    <appsetting settingdefinitionid.uniquename="AppChannel">
+      <iscustomizable>1</iscustomizable>
+      <value>1</value>
+    </appsetting>
+  </appsettings>
+</AppModule>

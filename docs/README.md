@@ -5,7 +5,9 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| Runbook | [FMC BMS Demo — test plugin bằng UI](runbooks/bms-demo-app.vi.md) | Mở model-driven app, chọn form Plugin Test, Save thiếu Building để xem lỗi server |
 | Runbook | [Migration/seed Building và Equipment](runbooks/bms-relations-migration.vi.md) | Chạy Provision, Preview, Apply, Verify và hiểu C# qua cách làm quen thuộc từ Python |
+| Runbook | [Tự tạo và deploy Dataverse plug-in từng bước](runbooks/dataverse-plugin-step-by-step.vi.md) | Copy source/DLL nào, giải thích từng dòng C#, đăng ký PRT/SDK, tạo steps, test, update và tự làm rule tương tự |
 | Demo guideline | [Trình bày demo BMS từng phần](runbooks/demo-guideline.vi.md) | Chuẩn bị màn hình, lời thoại, thao tác demo 20 phút và phương án dự phòng |
 | Plan đề xuất | [Mở rộng Building và Equipment cho BMS](plans/plan.md) | Thiết kế 2 bảng mới, mapping dữ liệu cũ và kiểm thử quan hệ Dataverse |
 | Plan/hướng dẫn | [Thiết kế Dataverse plug-in và bài đầu tiên](plans/dataverse-plugins.vi.md) | Chọn rule phù hợp dữ liệu BMS; tạo, build, đăng ký, test và đóng gói plug-in C# |

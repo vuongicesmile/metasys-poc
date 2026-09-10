@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8faf8">
+  <meta name="description" content="Học Dataverse plug-in bằng code thật, giải thích từng dòng và thử payload tương tác. FMCentral BMS Developer Handbook.">
+  <title>Plugin Handbook · FMCentral BMS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%23197654'/%3E%3Cpath d='m16 12-8 8 8 8m8-16 8 8-8 8' fill='none' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="content.js"></script>
+  <script defer src="rule-model.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#article">Đến nội dung bài học</a>
+  <header class="topbar">
+    <button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Mở mục lục" aria-expanded="false">☰</button>
+    <a class="brand" href="#bai-1" aria-label="FMCentral BMS · Bài đầu tiên">
+      <span class="brand-symbol" aria-hidden="true">&lt;/&gt;</span>
+      <span>FMCentral<span class="brand-sub">DEVELOPER HANDBOOK</span></span>
+    </a>
+    <div class="header-divider"></div><span class="header-section">Dataverse plug-ins</span>
+    <div class="top-actions">
+      <span class="version-chip">C# · .NET Framework 4.8</span>
+      <button class="icon-btn" id="theme-toggle" aria-label="Chuyển giao diện tối" title="Chuyển giao diện tối">◐</button>
+      <button class="button outline small" id="download-guide">Tải tài liệu <span aria-hidden="true">↓</span></button>
+    </div>
+  </header>
+  <aside class="sidebar" id="sidebar" aria-label="Mục lục">
+    <div class="sidebar-heading">PLUGIN HANDBOOK <span>01</span></div>
+    <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Tìm trong hướng dẫn…" aria-label="Tìm trong hướng dẫn"><kbd>/</kbd></label>
+    <nav id="navigation" aria-label="Các bài học"></nav>
+    <p id="no-results" hidden>Không tìm thấy bài. Thử “DLL”, “step” hoặc “Update”.</p>
+    <div class="sidebar-footer">
+      <span class="tiny-label">BỐI CẢNH DỰ ÁN</span>
+      <strong>FMCentralBms</strong>
+      <span>Developer environment · POC</span>
+      <button class="text-button" id="view-receipt">Xem deployment receipt ↗</button>
+    </div>
+  </aside>
+  <main class="main" id="main">
+    <div class="breadcrumb"><span>Hướng dẫn</span><span aria-hidden="true">/</span><span id="breadcrumb-current">Bắt đầu</span></div>
+    <div class="reading-progress"><div id="reading-progress"></div></div>
+    <div class="lesson-grid">
+      <section class="lesson">
+        <div class="eyebrow"><span class="green-dot"></span><span id="lesson-category">NỀN TẢNG</span><span class="chapter-count" id="chapter-count">BÀI 01 / 13</span></div>
+        <h1 id="lesson-title">Từ dòng code<br>đến Dataverse.</h1>
+        <p class="lesson-lead" id="lesson-lead"></p>
+        <button class="button outline mobile-lab-button" id="jump-lab">Mở code & ví dụ tương tác ↓</button>
+        <div id="lesson-intro"></div>
+        <article id="article" class="prose" aria-label="Nội dung chi tiết"></article>
+        <div class="lesson-pagination">
+          <button class="pagination-button" id="previous"><span>← Bài trước</span><strong id="previous-title"></strong></button>
+          <button class="pagination-button next" id="next"><span>Bài tiếp theo →</span><strong id="next-title"></strong></button>
+        </div>
+        <footer class="content-footer">Nội dung từ source của metasys-poc <span>·</span> Tiếng Việt <span>·</span> 10.09.2026</footer>
+      </section>
+      <aside class="inspector" aria-label="Code và ví dụ tương tác">
+        <div class="inspector-heading"><span class="lab-icon" aria-hidden="true">⌘</span><div><strong>Đọc. Thử. Hiểu.</strong><span>Ví dụ ngay cạnh bài học</span></div><span class="local-tag">LOCAL LAB</span></div>
+        <div class="tabs" role="tablist" aria-label="Chế độ ví dụ">
+          <button role="tab" id="tab-code" aria-controls="panel-code" aria-selected="true" data-tab="code">Đọc code</button>
+          <button role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab">Thử payload</button>
+          <button role="tab" id="tab-step" aria-controls="panel-step" aria-selected="false" data-tab="step">Tạo step</button>
+        </div>
+        <section id="panel-code" role="tabpanel" aria-labelledby="tab-code">
+          <label class="file-select-label" for="code-file">FILE / VÍ DỤ</label>
+          <select id="code-file" aria-label="Chọn file hoặc code example"></select>
+          <div class="code-window">
+            <div class="code-toolbar"><span><i class="file-dot"></i><span id="code-language">C#</span></span><span><button id="download-code" class="code-action">Tải file ↓</button><button id="copy-code" class="code-action">Copy code</button></span></div>
+            <div id="code-lines" class="code-lines" aria-label="Code có số dòng"></div>
+            <div class="code-status"><span id="code-origin"></span><span id="line-count"></span></div>
+          </div>
+          <div class="line-explanation" id="line-explanation" aria-live="polite"><span class="tiny-label">GIẢI THÍCH TỪNG DÒNG</span><p>Chọn một dòng code để xem ý nghĩa và tác dụng của nó.</p></div>
+          <button class="button green full" id="open-lab">Thử rule với một payload <span aria-hidden="true">→</span></button>
+        </section>
+        <section id="panel-lab" role="tabpanel" aria-labelledby="tab-lab" hidden>
+          <div class="lab-disclosure"><span class="green-dot"></span>Mô phỏng trong trình duyệt · không gọi Dataverse</div>
+          <label class="field" for="scenario">Chọn tình huống
+            <select id="scenario">
+              <option value="create-valid">Create · có Building</option>
+              <option value="create-missing">Create · thiếu Building</option>
+              <option value="create-null">Create · Building bằng null</option>
+              <option value="update-name">Update · chỉ đổi tên</option>
+              <option value="update-clear">Update · xóa Building</option>
+              <option value="update-valid">Update · có Building</option>
+              <option value="other-table">Create · table khác</option>
+            </select>
+          </label>
+          <div class="fields-row">
+            <label class="field" for="message">Message<select id="message"><option>Create</option><option>Update</option></select></label>
+            <label class="field" for="table">Table<select id="table"><option>fmc_bmsequipment</option><option>fmc_bmspoint</option></select></label>
+          </div>
+          <div class="editor-label"><label for="payload">Target.Attributes <span>JSON có thể sửa</span></label><button class="text-button" id="reset-payload">Khôi phục mẫu</button></div>
+          <textarea id="payload" class="payload-editor" spellcheck="false" aria-describedby="payload-hint"></textarea>
+          <p class="field-hint" id="payload-hint">Lookup biểu diễn theo SDK: logicalName + id. Phần này không compile hoặc thực thi C#.</p>
+          <button class="button green full" id="run-payload">Chạy mô phỏng <span aria-hidden="true">▶</span></button>
+          <div id="lab-result" class="lab-result" aria-live="polite"></div>
+          <div class="lab-footnote">Kết quả cho biết rule sẽ làm gì. Dataverse thật còn kiểm tra schema, quyền và Building có tồn tại.</div>
+        </section>
+        <section id="panel-step" role="tabpanel" aria-labelledby="tab-step" hidden>
+          <div class="lab-disclosure"><span class="green-dot"></span>Bản nháp registration · không ghi cloud</div>
+          <label class="field" for="step-message">Message<select id="step-message"><option>Create</option><option>Update</option></select></label>
+          <label class="field" for="step-table">Primary Entity<input id="step-table" value="fmc_bmsequipment" spellcheck="false"></label>
+          <label class="field" for="step-filter">Filtering Attributes<input id="step-filter" value="" placeholder="Trống với Create" spellcheck="false"></label>
+          <div class="fields-row">
+            <label class="field" for="step-stage">Stage<select id="step-stage"><option value="10">PreValidation · 10</option><option value="20">PreOperation · 20</option><option value="40">PostOperation · 40</option></select></label>
+            <label class="field" for="step-mode">Mode<select id="step-mode"><option value="0">Synchronous · 0</option><option value="1">Asynchronous · 1</option></select></label>
+          </div>
+          <label class="field" for="step-order">Execution Order<input id="step-order" type="number" min="1" value="10"></label>
+          <div id="step-result" class="step-result" aria-live="polite"></div>
+          <div class="code-window mini-code"><div class="code-toolbar"><span>Registration checklist</span><button class="code-action" id="copy-step">Copy</button></div><pre id="step-preview"></pre></div>
+          <p class="field-hint">Dùng các giá trị này trong PRT. Đăng ký thật theo bài 06–08; SDK helper hiện chỉ hỗ trợ rule Equipment → Building.</p>
+        </section>
+        <div class="inspector-footer"><span aria-hidden="true">↳</span> Source thật · ví dụ có thể thao tác · không cần đăng nhập <button class="text-button mobile-back-button" id="back-to-lesson">↑ Quay lại bài học</button></div>
+      </aside>
+    </div>
+  </main>
+  <dialog id="source-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-top"><div><span class="tiny-label">TÀI LIỆU / SOURCE THAM KHẢO</span><h2 id="dialog-title"></h2></div><button id="close-dialog" class="icon-btn" aria-label="Đóng tài liệu">×</button></div>
+    <div id="dialog-content" class="prose"></div>
+    <div class="dialog-bottom"><button class="button outline" id="download-resource">Tải file ↓</button><button class="button green" id="close-dialog-bottom">Đóng</button></div>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p>Hãy bật JavaScript để xem docs tương tác. Bản Markdown nằm tại docs/runbooks/dataverse-plugin-step-by-step.vi.md trong repo.</p></noscript>
+</body>
+</html>
