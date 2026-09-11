@@ -5,6 +5,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| Runbook | [Tracing plugin Equipment](runbooks/dataverse-plugin-tracing.vi.md) | Build bản tracing, bật logging và đọc START/SKIP/BLOCK/PASS |
 | Runbook | [FMC BMS Demo — test plugin bằng UI](runbooks/bms-demo-app.vi.md) | Mở model-driven app, chọn form Plugin Test, Save thiếu Building để xem lỗi server |
 | Runbook | [Migration/seed Building và Equipment](runbooks/bms-relations-migration.vi.md) | Chạy Provision, Preview, Apply, Verify và hiểu C# qua cách làm quen thuộc từ Python |
 | Runbook | [Tự tạo và deploy Dataverse plug-in từng bước](runbooks/dataverse-plugin-step-by-step.vi.md) | Copy source/DLL nào, giải thích từng dòng C#, đăng ký PRT/SDK, tạo steps, test, update và tự làm rule tương tự |

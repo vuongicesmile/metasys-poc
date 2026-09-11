@@ -42,7 +42,7 @@ try{
   assert.match(await page.locator('#step-result').innerText(),/PostOperation/);
   await page.locator('#step-mode').selectOption('0');
   await page.locator('.nav-link[href="#bai-4"]').click();
-  await page.locator('.code-line[data-line="31"]').click();
+  await page.locator('.code-line[data-line="40"]').click();
   assert.match(await page.locator('#line-explanation').innerText(),/Update.*fmc_buildingid/);
   await page.getByRole('button',{name:'Copy code',exact:true}).click();
   await page.locator('#toast').waitFor({state:'visible'});

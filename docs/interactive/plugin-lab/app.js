@@ -85,10 +85,10 @@
     $('breadcrumb-current').textContent=chapter.nav;
     document.title=chapter.nav+' · Plugin Handbook';
     $('lesson-intro').innerHTML=current===1?
-      '<div class="quick-facts"><span><b>13</b> bài thực hành</span><span><b>47</b> dòng C# được giải thích</span><span><b>7</b> tình huống để thử</span></div>'+
+      '<div class="quick-facts"><span><b>13</b> bài thực hành</span><span><b>58</b> dòng C# được giải thích</span><span><b>7</b> tình huống để thử</span></div>'+
       '<div class="roadmap" aria-label="Quy trình: viết code, build DLL, đăng ký steps, kiểm thử"><div><em>&lt;/&gt;</em><strong>Viết code</strong><small>Local .cs</small></div><div><em>◇</em><strong>Build DLL</strong><small>net48</small></div><div><em>↗</em><strong>Đăng ký</strong><small>Assembly + steps</small></div><div><em>✓</em><strong>Kiểm thử</strong><small>API + worker</small></div></div>'+
       '<div class="learning-note"><strong>Bài học dùng source thật của dự án.</strong><p>Rule mẫu: Equipment cần có Building. Đổi tên vẫn được; chủ động xóa Building sẽ bị chặn.</p></div>':
-      current===4?'<div class="learning-note"><strong>Đọc code có người dẫn đường.</strong><p>Click dòng 9 để hiểu IPlugin, dòng 31 để hiểu Update, hoặc dòng 41 để hiểu cách chặn request.</p></div>':
+      current===4?'<div class="learning-note"><strong>Đọc code có người dẫn đường.</strong><p>Click dòng 9 để hiểu IPlugin, dòng 40 để hiểu Update, hoặc dòng 51 để hiểu cách chặn request.</p></div>':
       current===12?'<div class="learning-note"><strong>Bài tập mở rộng · chưa deploy.</strong><p>Code mới được build để kiểm tra cú pháp. Việc đăng ký và bật rule thật là bước thực hành riêng.</p></div>':'';
     $('article').innerHTML=chapter.html;
     $('code-file').innerHTML=chapter.snippets.map(key=>'<option value="'+key+'">'+esc(D.snippets[key].title)+'</option>').join('');

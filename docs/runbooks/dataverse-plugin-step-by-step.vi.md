@@ -176,8 +176,11 @@ namespace FMCentralBms.Plugins
     {
         public void Execute(IServiceProvider serviceProvider)
         {
+            var trace = (ITracingService)serviceProvider.GetService(typeof(ITracingService));
             var context = (IPluginExecutionContext)serviceProvider.GetService(
                 typeof(IPluginExecutionContext));
+            trace?.Trace("RequireEquipmentBuilding START Message={0}; Stage={1}; Mode={2}; Depth={3}; CorrelationId={4}; OperationId={5}",
+                context.MessageName, context.Stage, context.Mode, context.Depth, context.CorrelationId, context.OperationId);
 
             bool isCreate = string.Equals(context.MessageName, "Create",
                 StringComparison.OrdinalIgnoreCase);
@@ -185,29 +188,37 @@ namespace FMCentralBms.Plugins
                 StringComparison.OrdinalIgnoreCase);
 
             if ((!isCreate && !isUpdate) || context.Stage != 10 || context.Mode != 0)
+            {
+                trace?.Trace("RequireEquipmentBuilding SKIP: unsupported message, stage or mode.");
                 return;
+            }
 
             if (!context.InputParameters.Contains("Target") ||
                 !(context.InputParameters["Target"] is Entity target) ||
                 target.LogicalName != "fmc_bmsequipment")
+            {
+                trace?.Trace("RequireEquipmentBuilding SKIP: missing/invalid Target or different table.");
                 return;
+            }
 
             // Update payloads contain only the columns sent by the caller. An omitted
             // lookup means "leave it unchanged"; an explicit null clears the lookup.
             if (isUpdate && !target.Contains("fmc_buildingid"))
+            {
+                trace?.Trace("RequireEquipmentBuilding SKIP: Update omitted fmc_buildingid; lookup unchanged.");
                 return;
+            }
 
             if (target.GetAttributeValue<EntityReference>("fmc_buildingid") == null)
             {
-                var trace = (ITracingService)serviceProvider.GetService(
-                    typeof(ITracingService));
-                trace?.Trace("RequireEquipmentBuilding blocked {0}; CorrelationId={1}",
-                    context.MessageName, context.CorrelationId);
+                trace?.Trace("RequireEquipmentBuilding BLOCK BMS-EQUIPMENT-001: Building missing/null; LookupIncluded={0}; CorrelationId={1}",
+                    target.Contains("fmc_buildingid"), context.CorrelationId);
 
                 throw new InvalidPluginExecutionException(
                     "BMS-EQUIPMENT-001: Equipment phai thuoc mot Building. " +
                     "Hay chon Building truoc khi luu.");
             }
+            trace?.Trace("RequireEquipmentBuilding PASS: Building supplied; validation completed.");
         }
     }
 }
@@ -223,17 +234,17 @@ Số dòng dưới đây tính từ `using System;` là dòng 1, bao gồm dòng
 | 6–8 | XML comment cho người đọc/editor. | Không thực thi business logic. |
 | 9 | `public`: truy cập từ ngoài assembly; `sealed`: không cho kế thừa; `: IPlugin`: triển khai interface plugin. | Dataverse có entry point theo contract `IPlugin`. `sealed` là lựa chọn thiết kế của mẫu, không phải nút deploy. |
 | 11–12 | Hàm `Execute` nhận service provider từ Dataverse. `void` nghĩa là không trả object kết quả. | Dataverse gọi hàm này khi step khớp request. |
-| 13–14 | Xin context của lần gọi hiện tại, ép kiểu thành `IPluginExecutionContext`. | Lấy message, stage, mode, payload và correlation ID. `var` để compiler suy ra kiểu, không phải biến dynamic. |
-| 16–19 | Tạo hai biến bool xác định Create hoặc Update. | `OrdinalIgnoreCase` so sánh tên không phân biệt chữ hoa/thường. |
-| 21–22 | Không phải Create/Update, hoặc stage khác 10, hoặc mode khác 0 thì thoát handler. | Logic được viết cho PreValidation synchronous. Đăng ký nhầm Stage 20 thì code này sẽ bỏ qua. |
-| 24 | Kiểm tra input có `Target`. | Không truy cập một key không tồn tại. |
-| 25 | Kiểm tra Target là `Entity`, đồng thời đặt tên biến `target`. | Handler này đọc payload record; không xử lý mọi loại message. |
-| 26–27 | Table phải đúng `fmc_bmsequipment`, nếu khác thì thoát. | Dùng logical name, không dùng nhãn “Equipment” trên UI. |
-| 29–32 | Nếu Update không gửi `fmc_buildingid`, không kiểm tra cột này. | Update thường chỉ gửi vài cột; thiếu key không có nghĩa là xóa lookup. |
-| 34–35 | Đọc lookup dưới dạng `EntityReference`; nếu null thì vi phạm. | Reference chứa logical name + GUID Building. Thiếu key cũng cho null nên Create thiếu Building bị chặn. |
-| 36–39 | Xin tracing service và ghi message/correlation ID. | Hỗ trợ tìm lỗi khi trace logging được bật. `?.` chỉ gọi nếu service khác null; `{0}`, `{1}` được thay bằng hai giá trị phía sau. |
-| 41–43 | Ném exception với mã lỗi nghiệp vụ. | Request bị từ chối; caller nhận thông báo để sửa dữ liệu. Dấu `+` nối hai chuỗi thành một thông báo. |
-| 44–47 | Đóng khối if, hàm, class và namespace. | Dấu `{}` xác định phạm vi code; dòng trống giúp dễ đọc. |
+| 13–17 | Xin tracing service và context; ghi START với message, stage, mode, depth, correlation ID và operation ID. | Lấy message, stage, mode, payload và correlation ID. `var` để compiler suy ra kiểu, không phải biến dynamic. |
+| 19–22 | Tạo hai biến bool xác định Create hoặc Update. | `OrdinalIgnoreCase` so sánh tên không phân biệt chữ hoa/thường. |
+| 24–28 | Không phải Create/Update, hoặc stage khác 10, hoặc mode khác 0 thì thoát handler. | Logic được viết cho PreValidation synchronous. Đăng ký nhầm Stage 20 thì code này sẽ bỏ qua. |
+| 30 | Kiểm tra input có `Target`. | Không truy cập một key không tồn tại. |
+| 31 | Kiểm tra Target là `Entity`, đồng thời đặt tên biến `target`. | Handler này đọc payload record; không xử lý mọi loại message. |
+| 32–36 | Table phải đúng `fmc_bmsequipment`, nếu khác thì thoát. | Dùng logical name, không dùng nhãn “Equipment” trên UI. |
+| 38–44 | Nếu Update không gửi `fmc_buildingid`, không kiểm tra cột này. | Update thường chỉ gửi vài cột; thiếu key không có nghĩa là xóa lookup. |
+| 46–47 | Đọc lookup dưới dạng `EntityReference`; nếu null thì vi phạm. | Reference chứa logical name + GUID Building. Thiếu key cũng cho null nên Create thiếu Building bị chặn. |
+| 48–49 | Ghi BLOCK với mã lỗi, trạng thái có/thiếu lookup và correlation ID. | Hỗ trợ tìm lỗi khi trace logging được bật. `?.` chỉ gọi nếu service khác null; `{0}`, `{1}` được thay bằng hai giá trị phía sau. |
+| 51–53 | Ném exception với mã lỗi nghiệp vụ. | Request bị từ chối; caller nhận thông báo để sửa dữ liệu. Dấu `+` nối hai chuỗi thành một thông báo. |
+| 54–58 | Ghi PASS khi Building được cung cấp, rồi đóng các khối. | Dấu `{}` xác định phạm vi code; dòng trống giúp dễ đọc. |
 
 Cú pháp `!` nghĩa là “không”, `&&` là “và”, `||` là “hoặc”, `!=` là “khác”,
 `==` là “bằng”. C# đánh giá `||` từ trái sang phải và dừng khi đủ điều kiện;
@@ -258,6 +269,8 @@ Ví dụ quan trọng nhất về Update:
 sánh giá trị cũ/mới, phải thiết kế thêm Pre Image và chọn các cột cần đọc.
 Rule hiện tại không cần truy vấn thêm và không tự gọi `Update` trong plugin.
 [Microsoft: execution context and plug-in code](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/write-plug-in).
+
+> Source tracing cập nhật local ngày 2026-09-11, version `1.0.0.1`; chưa phải bằng chứng DLL cloud đã update. Xem [cách xem trace](dataverse-plugin-tracing.vi.md).
 
 ## 5. Build: từ code thành đúng DLL để upload
 

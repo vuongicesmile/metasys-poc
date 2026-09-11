@@ -41,7 +41,7 @@ const titles = [
   ['NỀN TẢNG','Bắt đầu ở đây','Từ dòng code<br>đến Dataverse.','Một hướng dẫn thực hành để bạn hiểu code, tự đăng ký plug-in và kiểm chứng kết quả. Đọc từng bước, thử ví dụ ngay bên cạnh.'],
   ['NỀN TẢNG','Tooling & môi trường','Chuẩn bị đúng.<br>Bắt đầu tự tin.','Kiểm tra .NET, PAC và đúng Developer organization trước khi đưa code lên cloud.'],
   ['NỀN TẢNG','Tạo project local','Một project.<br>Những file cần biết.','Phân biệt source code, cấu hình build, signing key và file được sinh ra. Biết chính xác mình cần copy gì.'],
-  ['VIẾT & BUILD','Hiểu từng dòng C#','47 dòng code.<br>Hiểu đến từng dòng.','Chọn một dòng ở khung bên phải để xem ý nghĩa. Theo dõi cách context và Target dẫn tới quyết định cho phép hoặc từ chối.'],
+  ['VIẾT & BUILD','Hiểu từng dòng C#','58 dòng code.<br>Hiểu đến từng dòng.','Chọn một dòng ở khung bên phải để xem ý nghĩa. Theo dõi cách context và Target dẫn tới quyết định cho phép hoặc từ chối.'],
   ['VIẾT & BUILD','Build & chọn DLL','Code đã sẵn sàng.<br>Chọn đúng DLL.','Compile, ký assembly và xác định chính xác file Release để upload. Bản DLL mới và bản export cũ có vai trò khác nhau.'],
   ['ĐƯA LÊN DATAVERSE','Đăng ký assembly','Đưa code lên<br>Dataverse.','Mở Plug-in Registration Tool, chọn DLL và đăng ký assembly trong Sandbox. Đây là bước upload code.'],
   ['ĐƯA LÊN DATAVERSE','Đăng ký hai steps','Khi nào plugin<br>được gọi?','Message, table, filter, stage và mode quyết định lúc code chạy. Thử thay từng ô trong tab “Tạo step”.'],

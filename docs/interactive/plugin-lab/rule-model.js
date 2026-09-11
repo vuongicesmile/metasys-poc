@@ -12,19 +12,19 @@
     if (!['create','update'].includes(msg) || table!==equipment)
       return answer('skip','Không khớp step','Hai steps của bài chỉ nhận Create/Update trên fmc_bmsequipment.',[],['Request','Không có step phù hợp']);
     if (msg==='update' && filter && !own(attributes,field))
-      return answer('skip','Giữ nguyên Building','Update không gửi fmc_buildingid nên không khớp Filtering Attributes. Plugin không được gọi.',[31,32],['Update','Filter không khớp','Giữ lookup']);
+      return answer('skip','Giữ nguyên Building','Update không gửi fmc_buildingid nên không khớp Filtering Attributes. Plugin không được gọi.',[40,43],['Update','Filter không khớp','Giữ lookup']);
     if (stage!==10 || mode!==0)
-      return answer('skip','Handler thoát ở guard','Code yêu cầu Stage 10 và Mode 0. Cấu hình hiện tại không khớp.',[21,22],['Context','Guard','return']);
+      return answer('skip','Handler thoát ở guard','Code yêu cầu Stage 10 và Mode 0. Cấu hình hiện tại không khớp.',[24,27],['Context','Guard','return']);
     if (msg==='update' && !own(attributes,field))
-      return answer('skip','Bỏ qua cột không được gửi','Kể cả khi bỏ filter, guard trong code vẫn cho Update không gửi Building đi tiếp.',[31,32],['Update','Target thiếu key','return']);
+      return answer('skip','Bỏ qua cột không được gửi','Kể cả khi bỏ filter, guard trong code vẫn cho Update không gửi Building đi tiếp.',[40,43],['Update','Target thiếu key','return']);
     const building=attributes[field];
     if (building==null)
-      return answer('block','Request bị chặn','BMS-EQUIPMENT-001: Equipment phai thuoc mot Building. Hay chon Building truoc khi luu.',[34,41,42,43],['Target','Building = null','throw']);
+      return answer('block','Request bị chặn','BMS-EQUIPMENT-001: Equipment phai thuoc mot Building. Hay chon Building truoc khi luu.',[46,51,52,53],['Target','Building = null','throw']);
     if (typeof building!=='object' || Array.isArray(building) ||
       typeof building.logicalName!=='string' ||
       typeof building.id!=='string' || !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(building.id))
-      return answer('invalid','Lookup chưa đúng kiểu','Trong mô phỏng SDK, Building cần object { logicalName, id } với id là GUID. Không dùng chuỗi hoặc @odata.bind tại đây.',[34],['JSON','EntityReference chưa hợp lệ']);
-    return answer('pass','Rule cho request tiếp tục','Building reference khác null nên plugin không ném exception. Dataverse thật vẫn kiểm tra quyền, schema và record được tham chiếu.',[34,44,45],['Target','Có Building','Tiếp tục']);
+      return answer('invalid','Lookup chưa đúng kiểu','Trong mô phỏng SDK, Building cần object { logicalName, id } với id là GUID. Không dùng chuỗi hoặc @odata.bind tại đây.',[46],['JSON','EntityReference chưa hợp lệ']);
+    return answer('pass','Rule cho request tiếp tục','Building reference khác null nên plugin không ném exception. Dataverse thật vẫn kiểm tra quyền, schema và record được tham chiếu.',[46,55,56],['Target','Có Building','Tiếp tục']);
   }
   function checkStep({message,table,filter,stage,mode,rank}) {
     const issues=[];
