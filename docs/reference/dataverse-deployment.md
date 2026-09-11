@@ -21,6 +21,15 @@ delivered 183 rows in two batches to cutoff 7404 with zero pending/dead-letter;
 production-readiness claim. The exported
 unmanaged solution is checked out at `dataverse/FMCentralBms`.
 
+On 2026-09-11, unbound action `fmc_RequestBmsSync`, main-operation plug-in
+`FMCentralBms.Plugins.RequestBmsSync`, business-event catalogs, active-key
+coalescing, flow `FMC - App Request BMS Sync Event`, and the **Power Automate
+Demo** page were deployed to the same Developer environment. Test request
+`671d5a8a-b2ad-f111-aaad-00224819a344` was returned for both the original call
+and an idempotent retry; both corresponding flow runs succeeded. See the
+[implementation receipt](../plans/custom-api-request-bms-sync.vi.md) and
+[UI test runbook](../runbooks/custom-api-bms-sync-demo.vi.md).
+
 The Building/Equipment extension was verified on 2026-09-09. Request
 `c99f3d86-1fac-f111-aaad-00224819a344` succeeded at SQL cutoff 23377 with zero
 quarantined rows. Live verification passed for 3 Buildings, 4 Equipment, all 5
@@ -63,6 +72,8 @@ The command verifies the organization ID before writes and creates/reuses:
 - Standard table `fmc_bmsequipment`, with `fmc_bmsequipment_equipmentcode` alternate key.
 - Relationships `fmc_bmsbuilding_bmsequipment` and `fmc_bmsequipment_bmspoint`.
 - Elastic table `fmc_bmsreading`, using its built-in GUID + partition key.
+- Standard table `fmc_syncrequest`, with correlation alternate key and
+  `fmc_syncrequest_activekey` to prevent concurrent active requests per pipeline.
 - Security role `FM Central BMS Integration`, with organization-level Create,
   Read and Write on BMS tables and requests, plus Append/Append To needed by the
   Building/Equipment/Point lookups.

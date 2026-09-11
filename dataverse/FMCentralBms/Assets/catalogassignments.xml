@@ -1,0 +1,6 @@
+<catalogassignments>
+  <catalogassignment catalogid.uniquename="fmc_BmsAppEvents" object.uniquename="fmc_RequestBmsSync" objectidtype="customapi">
+    <iscustomizable>1</iscustomizable>
+    <name>Request BMS Sync</name>
+  </catalogassignment>
+</catalogassignments>

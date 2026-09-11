@@ -6,6 +6,9 @@ Start at the [documentation index](docs/README.md):
 
 - [Power Automate integration plan and pilot receipt](docs/plans/power-automate-sql-to-dataverse.vi.md)
 - [Power Automate trigger operating runbook](docs/runbooks/power-automate-sql-sync.vi.md)
+- [Custom API + Power Automate UI demo](docs/runbooks/custom-api-bms-sync-demo.vi.md)
+- [Custom API implementation receipt](docs/plans/custom-api-request-bms-sync.vi.md)
+- [Interactive Custom API lab](docs/interactive/custom-api-lab/index.html)
 - [SQL-to-Dataverse operating runbook](docs/runbooks/sql-to-dataverse-runbook.vi.md)
 - [Dataverse deployment and implemented contract](docs/reference/dataverse-deployment.md)
 - [Original Plan 3.0 — historical design](docs/plans/plan-3.0-sql-to-dataverse.md)
@@ -13,6 +16,9 @@ Start at the [documentation index](docs/README.md):
 ## SQL to Dataverse (Plan 3.0)
 
 `DataverseSyncWorker` is implemented at `http://localhost:5300/swagger`.
+The `FMC BMS Demo` model-driven app also exposes **Power Automate Demo**. Its
+**Request BMS Sync** button calls `fmc_RequestBmsSync`, queues/reuses one
+`fmc_syncrequest`, and raises the `FMC - App Request BMS Sync Event` cloud flow.
 Double-click [START-SQL-TO-DATAVERSE.cmd](START-SQL-TO-DATAVERSE.cmd) to start
 the command worker, then run `FMC - Request SQL to Dataverse Sync` in Power
 Automate. The worker claims queued requests and drains their SQL cutoff; keep

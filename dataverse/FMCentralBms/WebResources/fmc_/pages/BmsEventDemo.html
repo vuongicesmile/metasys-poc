@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Power Automate Demo</title>
+  <script src="../../ClientGlobalContext.js.aspx" type="text/javascript"></script>
+  <style>
+    :root{font-family:Segoe UI,Arial,sans-serif;color:#183447;background:#f3f6fa}
+    *{box-sizing:border-box}body{margin:0;padding:40px 24px}main{max-width:850px;margin:auto}
+    .label{color:#176a66;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+    h1{font-size:36px;letter-spacing:-1px;margin:14px 0}p{line-height:1.7;color:#536877}
+    .card{background:white;border:1px solid #dee7ed;border-radius:20px;padding:30px;margin:24px 0;box-shadow:0 8px 25px #17344908}
+    .steps{display:flex;gap:16px;margin:24px 0}.step{flex:1;border-top:3px solid #19968b;padding:14px 0;font-weight:600}.step small{display:block;color:#647785;font-weight:400;margin-top:8px}
+    button,.link{font:600 15px Segoe UI,Arial,sans-serif;border-radius:9px;padding:13px 20px;display:inline-block}
+    button{background:#136d65;color:white;border:0;cursor:pointer}button:hover{background:#095b54}button:disabled{opacity:.55;cursor:wait}
+    .link{color:#136d65;text-decoration:none;margin-left:8px;border:1px solid #d6e3e3}a:hover{text-decoration:underline}
+    #status{border-radius:9px;padding:16px;background:#f0f5f8;margin-top:24px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+    #status[data-state="accepted"]{background:#e8f6ee;color:#175638}#status[data-state="error"]{background:#fff0ed;color:#923521}
+    .foot{font-size:13px}.detail{font-family:Consolas,monospace;font-size:13px}
+    @media(max-width:600px){body{padding:20px 14px}h1{font-size:29px}.card{padding:20px}.steps{flex-direction:column;gap:0}.link{margin:10px 0 0}}
+  </style>
+</head>
+<body>
+<main>
+  <span class="label">FMC BMS · Event demo</span>
+  <h1>Một lần bấm, một yêu cầu sync.</h1>
+  <p>Bấm nút để gọi Custom API, queue yêu cầu sync và phát event cho Power Automate. Không cần điền thông tin.</p>
+  <section class="card" aria-label="Thử gửi event">
+    <div class="steps">
+      <div class="step">01 · Bấm nút<small>Trong FMC BMS Demo</small></div>
+      <div class="step">02 · Queue request<small>Dataverse Custom API</small></div>
+      <div class="step">03 · Flow nhận event<small>Xem kết quả trong Run history</small></div>
+    </div>
+    <button id="send" type="button">Request BMS Sync</button>
+    <a id="flow" class="link" target="_blank" rel="noopener noreferrer" href="https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d13bfe37-ca87-412b-9531-d3ed381b5b21/details">Xem Power Automate ↗</a>
+    <div id="status" role="status" aria-live="polite">Sẵn sàng. Mỗi lần bấm sẽ tạo một lần gọi event.</div>
+  </section>
+  <p class="foot">Custom API queue hoặc reuse một <strong>fmc_syncrequest</strong>. Flow <strong>FMC - App Request BMS Sync Event</strong> ghi nhận action trong lịch sử chạy. Worker chỉ sync SQL khi đang chạy.</p>
+  <p class="detail">Custom API: fmc_RequestBmsSync</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  const button = document.getElementById('send');
+  const status = document.getElementById('status');
+  button.addEventListener('click', async function () {
+    if (button.disabled) return;
+    button.disabled = true;
+    status.dataset.state = 'sending';
+    status.textContent = 'Đang gửi event…';
+    const id = crypto.randomUUID();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      if (typeof GetGlobalContext !== 'function') throw new Error('Hãy mở trang này từ app FMC BMS Demo trong Dataverse.');
+      const base = GetGlobalContext().getClientUrl();
+      const response = await fetch(base + '/api/data/v9.2/fmc_RequestBmsSync', {
+        method: 'POST', credentials: 'same-origin', signal: controller.signal,
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'OData-Version': '4.0', 'OData-MaxVersion': '4.0'},
+        body: JSON.stringify({ClientRequestId: id})
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error?.message || ('Dataverse HTTP ' + response.status));
+      }
+      const result = await response.json();
+      status.dataset.state = 'accepted';
+      status.textContent = 'Dataverse đã nhận yêu cầu.\nRequest ID: ' + result.RequestId + '\nTạo mới: ' + result.Created + '\nStatus: ' + result.Status + '\nMã lần bấm: ' + id + '\nMở “Xem Power Automate” → Run history → lần chạy mới nhất → Demo_received để kiểm tra event. Nếu worker đang tắt, request sẽ nằm ở Queued.';
+    } catch (error) {
+      status.dataset.state = 'error';
+      status.textContent = error.name === 'AbortError'
+        ? 'Chưa xác định được kết quả sau 30 giây. Kiểm tra Run history trước khi gửi lại.\nMã lần bấm: ' + id
+        : 'Gửi event chưa thành công: ' + error.message + '\nNếu lỗi mạng, kiểm tra Run history trước khi gửi lại.\nMã lần bấm: ' + id;
+    } finally {
+      clearTimeout(timeout);
+      button.disabled = false;
+    }
+  });
+}());
+</script>
+</body>
+</html>

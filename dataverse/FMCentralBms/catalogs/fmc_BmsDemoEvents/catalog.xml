@@ -1,0 +1,10 @@
+<catalog uniquename="fmc_BmsDemoEvents">
+  <description default="Business events exposed by the FMC BMS Demo solution.">
+    <label description="Business events exposed by the FMC BMS Demo solution." languagecode="1033" />
+  </description>
+  <displayname default="FMC BMS Demo">
+    <label description="FMC BMS Demo" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>FMC BMS Demo Events</name>
+</catalog>

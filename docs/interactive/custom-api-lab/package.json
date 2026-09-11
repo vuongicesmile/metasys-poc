@@ -1,0 +1,20 @@
+{
+  "name": "fmc-custom-api-handbook",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node server.mjs",
+    "test": "node --test verify.mjs",
+    "test:browser": "node verify-browser.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "highlight.js": "11.11.1",
+    "marked": "15.0.12",
+    "playwright": "1.63.0"
+  }
+}

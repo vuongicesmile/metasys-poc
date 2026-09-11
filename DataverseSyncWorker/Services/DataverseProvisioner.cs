@@ -107,6 +107,16 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
                     KeyAttributes = ["fmc_correlationid"]
                 }
             });
+        if (!(requestMeta.Keys ?? []).Any(k => k.LogicalName == "fmc_syncrequest_activekey"))
+            await client.ExecuteAsync(new CreateEntityKeyRequest
+            {
+                EntityName = "fmc_syncrequest", SolutionUniqueName = Solution,
+                EntityKey = new EntityKeyMetadata
+                {
+                    SchemaName = "fmc_syncrequest_activekey", DisplayName = new Label("Active Sync Pipeline", 1033),
+                    KeyAttributes = ["fmc_activekey"]
+                }
+            });
         // Elastic uses its built-in primary GUID + partitionid key only.
         await ConfigureDefaultView(client, "fmc_bmspoint", "Active BMS Points",
             ["fmc_objectid", "fmc_name", "fmc_objecttype", "fmc_currentvalue", "fmc_unit", "fmc_lastreadingtime", "fmc_building"]);
@@ -295,6 +305,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
         yield return Text("fmc_command", "Command", 50);
         yield return Text("fmc_pipeline", "Pipeline", 150);
         yield return Text("fmc_correlationid", "Correlation ID", 100);
+        yield return Text("fmc_activekey", "Active Pipeline Key", 200);
         yield return Text("fmc_requestedby", "Requested By", 200);
         yield return Text("fmc_requestedcutoffid", "Requested Cutoff SQL ID", 20);
         yield return Text("fmc_workerowner", "Worker Owner", 200);

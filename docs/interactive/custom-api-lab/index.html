@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8faf8">
+  <meta name="description" content="Học Dataverse Custom API bằng source thật, giải thích từng dòng và simulator tương tác chạy local.">
+  <title>Custom API Handbook · FMCentral BMS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%23245fc7'/%3E%3Cpath d='M10 20h20M20 10v20' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="content.js"></script>
+  <script defer src="api-model.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#article">Đến nội dung bài học</a>
+  <header class="topbar">
+    <button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Mở mục lục" aria-expanded="false">☰</button>
+    <a class="brand" href="#bai-1" aria-label="FMCentral BMS · Bài đầu tiên"><span class="brand-symbol" aria-hidden="true">API</span><span>FMCentral<span class="brand-sub">DEVELOPER HANDBOOK</span></span></a>
+    <div class="header-divider"></div><span class="header-section">Dataverse Custom API</span>
+    <div class="top-actions"><span class="version-chip">C# · Web API · Power Automate</span><button class="icon-btn" id="theme-toggle" aria-label="Chuyển giao diện tối" title="Chuyển giao diện tối">◐</button><button class="button outline small" id="download-guide">Tải tài liệu <span aria-hidden="true">↓</span></button></div>
+  </header>
+  <aside class="sidebar" id="sidebar" aria-label="Mục lục">
+    <div class="sidebar-heading">CUSTOM API LAB <span>01</span></div>
+    <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Tìm contract, DLL, Flow…" aria-label="Tìm trong hướng dẫn"><kbd>/</kbd></label>
+    <nav id="navigation" aria-label="Các bài học"></nav>
+    <p id="no-results" hidden>Không tìm thấy bài. Thử “idempotency”, “DLL” hoặc “Power Automate”.</p>
+    <div class="sidebar-footer"><span class="tiny-label">SOURCE THẬT</span><strong>fmc_RequestBmsSync</strong><span>Developer environment · POC</span><button class="text-button" id="view-receipt">Xem implementation receipt ↗</button></div>
+  </aside>
+  <main class="main" id="main">
+    <div class="breadcrumb"><span>Hướng dẫn</span><span aria-hidden="true">/</span><span id="breadcrumb-current">Bắt đầu</span></div>
+    <div class="reading-progress"><div id="reading-progress"></div></div>
+    <div class="lesson-grid">
+      <section class="lesson">
+        <div class="eyebrow"><span class="green-dot"></span><span id="lesson-category">NỀN TẢNG</span><span class="chapter-count" id="chapter-count">BÀI 01 / 13</span></div>
+        <h1 id="lesson-title">Từ nút bấm<br>đến queue.</h1>
+        <p class="lesson-lead" id="lesson-lead"></p>
+        <button class="button outline mobile-lab-button" id="jump-lab">Mở code & simulator ↓</button>
+        <div id="lesson-intro"></div>
+        <article id="article" class="prose" aria-label="Nội dung chi tiết"></article>
+        <div class="lesson-pagination"><button class="pagination-button" id="previous"><span>← Bài trước</span><strong id="previous-title"></strong></button><button class="pagination-button next" id="next"><span>Bài tiếp theo →</span><strong id="next-title"></strong></button></div>
+        <footer class="content-footer">Sinh từ source metasys-poc <span>·</span> Tiếng Việt <span>·</span> 11.09.2026</footer>
+      </section>
+      <aside class="inspector" aria-label="Code và ví dụ tương tác">
+        <div class="inspector-heading"><span class="lab-icon" aria-hidden="true">POST</span><div><strong>Đọc. Thử. Hiểu.</strong><span>Source thật ngay cạnh bài học</span></div><span class="local-tag">LOCAL LAB</span></div>
+        <div class="tabs" role="tablist" aria-label="Chế độ ví dụ"><button role="tab" id="tab-code" aria-controls="panel-code" aria-selected="true" data-tab="code">Đọc code</button><button role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab">Thử request</button><button role="tab" id="tab-contract" aria-controls="panel-contract" aria-selected="false" data-tab="contract">Thiết kế contract</button></div>
+        <section id="panel-code" role="tabpanel" aria-labelledby="tab-code">
+          <label class="file-select-label" for="code-file">FILE / VÍ DỤ</label><select id="code-file" aria-label="Chọn file hoặc code example"></select>
+          <div class="code-window"><div class="code-toolbar"><span><i class="file-dot"></i><span id="code-language">C#</span></span><span><button id="download-code" class="code-action">Tải file ↓</button><button id="copy-code" class="code-action">Copy code</button></span></div><div id="code-lines" class="code-lines" aria-label="Code có số dòng"></div><div class="code-status"><span id="code-origin"></span><span id="line-count"></span></div></div>
+          <div class="line-explanation" id="line-explanation" aria-live="polite"><span class="tiny-label">GIẢI THÍCH TỪNG DÒNG</span><p>Chọn một dòng để xem ý nghĩa và tác dụng.</p></div>
+          <button class="button green full" id="open-lab">Thử một API request <span aria-hidden="true">→</span></button>
+        </section>
+        <section id="panel-lab" role="tabpanel" aria-labelledby="tab-lab" hidden>
+          <div class="lab-disclosure"><span class="green-dot"></span>Mô phỏng trong browser · không gọi Dataverse</div>
+          <label class="field" for="scenario">Tình huống<select id="scenario"><option value="new">Request mới</option><option value="retry">Retry cùng ClientRequestId</option><option value="active">Pipeline đã có request active</option><option value="race">Hai caller cùng create</option><option value="invalid">ClientRequestId không hợp lệ</option><option value="optional">Không gửi ClientRequestId</option></select></label>
+          <label class="field" for="client-request-id">ClientRequestId<input id="client-request-id" spellcheck="false"></label>
+          <div class="contract-grid"><label class="field" for="same-correlation">Correlation<select id="same-correlation"><option value="false">Chưa tồn tại</option><option value="true">Đã tồn tại</option></select></label><label class="field" for="active-request">Pipeline<select id="active-request"><option value="false">Không có active request</option><option value="true">Có Queued/Running</option></select></label></div>
+          <label class="field" for="race"><span>Race condition</span><select id="race"><option value="false">Không</option><option value="true">Caller khác thắng active key</option></select></label>
+          <button class="button green full" id="run-request">Chạy mô phỏng <span aria-hidden="true">▶</span></button><div id="lab-result" class="lab-result" aria-live="polite"></div><p class="lab-footnote">GUID và Request ID là dữ liệu mẫu. Simulator chỉ mô hình hóa các nhánh của handler.</p>
+        </section>
+        <section id="panel-contract" role="tabpanel" aria-labelledby="tab-contract" hidden>
+          <div class="lab-disclosure"><span class="green-dot"></span>Contract designer · không ghi cloud</div>
+          <label class="field" for="api-name">Unique Name<input id="api-name" value="fmc_RequestBmsSync" spellcheck="false"></label>
+          <div class="contract-grid"><label class="field" for="api-kind">Operation<select id="api-kind"><option value="action">Action · POST</option><option value="function">Function · GET</option></select></label><label class="field" for="api-binding">Binding<select id="api-binding"><option value="0">Global · 0</option><option value="1">Entity · 1</option><option value="2">Entity Collection · 2</option></select></label></div>
+          <label class="field" for="api-processing">Allowed processing<select id="api-processing"><option value="1">Async Only · 1</option><option value="0">None · 0</option><option value="2">Sync and Async · 2</option></select></label>
+          <label class="field" for="api-privilege">Execute privilege<input id="api-privilege" value="prvCreatefmc_syncrequest" spellcheck="false"></label>
+          <label class="field" for="api-input">Inputs<input id="api-input" value="ClientRequestId:String?" spellcheck="false"></label>
+          <label class="field" for="api-output">Outputs<textarea id="api-output" class="payload-editor contract-preview" spellcheck="false">RequestId:Guid
+Created:Boolean
+Status:Integer
+Message:String</textarea></label>
+          <div id="contract-result" class="step-result" aria-live="polite"></div><div class="code-window mini-code"><div class="code-toolbar"><span>Contract preview</span><button class="code-action" id="copy-contract">Copy</button></div><pre id="contract-preview"></pre></div>
+        </section>
+        <div class="inspector-footer"><span aria-hidden="true">↳</span> Source thật · simulator local · không cần đăng nhập <button class="text-button mobile-back-button" id="back-to-lesson">↑ Quay lại bài học</button></div>
+      </aside>
+    </div>
+  </main>
+  <dialog id="source-dialog" aria-labelledby="dialog-title"><div class="dialog-top"><div><span class="tiny-label">TÀI LIỆU / SOURCE THAM KHẢO</span><h2 id="dialog-title"></h2></div><button id="close-dialog" class="icon-btn" aria-label="Đóng tài liệu">×</button></div><div id="dialog-content" class="prose"></div><div class="dialog-bottom"><button class="button outline" id="download-resource">Tải file ↓</button><button class="button green" id="close-dialog-bottom">Đóng</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p>Hãy bật JavaScript hoặc đọc docs/runbooks/custom-api-step-by-step.vi.md.</p></noscript>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <AppModuleSiteMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SiteMapUniqueName>fmc_FMCBMSDemo</SiteMapUniqueName>
   <EnableCollapsibleGroups>False</EnableCollapsibleGroups>
@@ -22,6 +22,11 @@
         <SubArea Id="fmc_equipment" Entity="fmc_bmsequipment">
           <Titles>
             <Title LCID="1033" Title="BMS Equipment" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="fmc_eventdemo" Url="$webresource:fmc_/pages/BmsEventDemo.html" Client="All">
+          <Titles>
+            <Title LCID="1033" Title="Power Automate Demo" />
           </Titles>
         </SubArea>
       </Group>

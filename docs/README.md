@@ -5,6 +5,10 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| Plan/receipt | [Custom API Request BMS Sync](plans/custom-api-request-bms-sync.vi.md) | Contract, kiến trúc, source và receipt của Custom API/business event đã deploy |
+| Runbook | [Test Custom API + Power Automate bằng UI](runbooks/custom-api-bms-sync-demo.vi.md) | Bấm Request BMS Sync trong app, đọc kết quả và kiểm tra Flow run history |
+| Interactive lab | [Custom API lab](interactive/custom-api-lab/index.html) | 13 bài chi tiết, source thật có giải thích từng dòng, simulator idempotency và contract designer chạy local |
+| Runbook | [Custom API từ local đến Model-driven app](runbooks/custom-api-step-by-step.vi.md) | Bản Markdown đầy đủ cho lab: code, DLL, provisioning, UI, Flow, test và troubleshooting |
 | Runbook | [Tracing plugin Equipment](runbooks/dataverse-plugin-tracing.vi.md) | Build bản tracing, bật logging và đọc START/SKIP/BLOCK/PASS |
 | Runbook | [FMC BMS Demo — test plugin bằng UI](runbooks/bms-demo-app.vi.md) | Mở model-driven app, chọn form Plugin Test, Save thiếu Building để xem lỗi server |
 | Runbook | [Migration/seed Building và Equipment](runbooks/bms-relations-migration.vi.md) | Chạy Provision, Preview, Apply, Verify và hiểu C# qua cách làm quen thuộc từ Python |

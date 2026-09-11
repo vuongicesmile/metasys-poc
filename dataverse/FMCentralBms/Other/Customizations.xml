@@ -9,7 +9,12 @@
   <EntityRelationships />
   <OrganizationSettings />
   <optionsets />
+  <WebResources />
   <CustomControls />
+  <SolutionPluginAssemblies />
+  <SdkMessageProcessingSteps />
+  <AppModuleSiteMaps />
+  <AppModules />
   <EntityDataProviders />
   <connectionreferences>
     <connectionreference connectionreferencelogicalname="fmc_sharedcommondataserviceforapps">

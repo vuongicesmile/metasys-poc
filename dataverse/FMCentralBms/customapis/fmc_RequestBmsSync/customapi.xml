@@ -1,0 +1,19 @@
+<customapi uniquename="fmc_RequestBmsSync">
+  <allowedcustomprocessingsteptype>1</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Queues or reuses one SQL-to-Dataverse synchronization request.">
+    <label description="Queues or reuses one SQL-to-Dataverse synchronization request." languagecode="1033" />
+  </description>
+  <displayname default="Request BMS Sync">
+    <label description="Request BMS Sync" languagecode="1033" />
+  </displayname>
+  <executeprivilegename>prvCreatefmc_syncrequest</executeprivilegename>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>fmc_RequestBmsSync</name>
+  <plugintypeid>
+    <plugintypeexportkey>44a65cba-b0ad-f111-aaad-00224819a344</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>1</workflowsdkstepenabled>
+</customapi>

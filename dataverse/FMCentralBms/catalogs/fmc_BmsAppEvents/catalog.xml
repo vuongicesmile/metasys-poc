@@ -1,0 +1,13 @@
+<catalog uniquename="fmc_BmsAppEvents">
+  <description default="Events raised by commands in the FMC BMS Demo app.">
+    <label description="Events raised by commands in the FMC BMS Demo app." languagecode="1033" />
+  </description>
+  <displayname default="App Events">
+    <label description="App Events" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>FMC BMS App Events</name>
+  <parentcatalogid>
+    <uniquename>fmc_BmsDemoEvents</uniquename>
+  </parentcatalogid>
+</catalog>

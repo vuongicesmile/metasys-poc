@@ -1,12 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PluginAssembly FullName="FMCentralBms.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginAssemblyId="a5233bd0-bbac-f111-aaad-00224819a344" CustomizationLevel="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Description>FMCentralBms Equipment-to-Building validation plug-in.</Description>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PluginAssembly FullName="FMCentralBms.Plugins, Version=1.0.0.2, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginAssemblyId="a5233bd0-bbac-f111-aaad-00224819a344" CustomizationLevel="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Description>FMCentralBms validation and sync-command plug-ins.</Description>
   <IsolationMode>2</IsolationMode>
   <SourceType>0</SourceType>
   <IntroducedVersion>1.0</IntroducedVersion>
   <FileName>/PluginAssemblies/FMCentralBmsPlugins-A5233BD0-BBAC-F111-AAAD-00224819A344/FMCentralBmsPlugins.dll</FileName>
   <PluginTypes>
-    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequireEquipmentBuilding, FMCentralBms.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="00c79fe3-bbac-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequireEquipmentBuilding">
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequestBmsSync, FMCentralBms.Plugins, Version=1.0.0.2, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="44a65cba-b0ad-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequestBmsSync">
+      <FriendlyName>Request BMS Sync</FriendlyName>
+    </PluginType>
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequireEquipmentBuilding, FMCentralBms.Plugins, Version=1.0.0.2, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="00c79fe3-bbac-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequireEquipmentBuilding">
       <FriendlyName>Require Equipment Building</FriendlyName>
     </PluginType>
   </PluginTypes>

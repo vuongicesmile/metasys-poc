@@ -1,0 +1,13 @@
+@charset "UTF-8";
+@import url("../plugin-lab/styles.css");
+
+:root{--green:#245fc7;--green-dark:#19489d;--tint:#eaf1ff;--code:#101927;--code-text:#dbe8ff}
+body.dark{--green:#81adff;--green-dark:#a7c4ff;--tint:#1b2b49;--code:#080e18;--code-text:#dbe8ff}
+.brand-symbol{background:linear-gradient(145deg,#245fc7,#6146c6)}
+.lab-icon{font-size:17px;font-weight:800}
+.contract-preview{min-height:180px}
+.contract-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.status-pills span{padding:3px 7px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-size:9px}
+.line-explanation p{white-space:normal}
+@media(max-width:420px){.contract-grid{grid-template-columns:1fr}}

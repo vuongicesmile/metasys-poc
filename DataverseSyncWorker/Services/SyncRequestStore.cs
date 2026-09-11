@@ -25,8 +25,23 @@ public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions
         "fmc_baselinedeadletters", "fmc_batches", "fmc_status", "fmc_workerowner",
         "fmc_leaseexpiresat", "fmc_startedat");
 
-    public async Task<(Guid Id, bool Created)> Enqueue(string requestedBy, CancellationToken ct)
+    public async Task<(Guid Id, bool Created)> Enqueue(string requestedBy, CancellationToken ct,
+        string? clientRequestId = null)
     {
+        var correlation = string.IsNullOrWhiteSpace(clientRequestId)
+            ? Guid.NewGuid().ToString("D")
+            : Guid.TryParse(clientRequestId, out var parsed) ? parsed.ToString("D")
+            : throw new ArgumentException("Client request ID must be a GUID string.", nameof(clientRequestId));
+        if (!string.IsNullOrWhiteSpace(clientRequestId))
+        {
+            var sameRequest = new QueryExpression("fmc_syncrequest")
+            {
+                ColumnSet = new ColumnSet("fmc_syncrequestid"), TopCount = 1
+            };
+            sameRequest.Criteria.AddCondition("fmc_correlationid", ConditionOperator.Equal, correlation);
+            var existing = (await connection.Get().RetrieveMultipleAsync(sameRequest, ct)).Entities.FirstOrDefault();
+            if (existing is not null) return (existing.Id, false);
+        }
         var query = new QueryExpression("fmc_syncrequest")
         {
             ColumnSet = new ColumnSet("fmc_syncrequestid"), TopCount = 1
@@ -38,17 +53,26 @@ public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions
         var active = (await connection.Get().RetrieveMultipleAsync(query, ct)).Entities.FirstOrDefault();
         if (active is not null) return (active.Id, false);
 
-        var correlation = Guid.NewGuid().ToString("D");
-        var id = await connection.Get().CreateAsync(new Entity("fmc_syncrequest")
+        try
         {
-            ["fmc_name"] = $"SQL Sync {DateTime.UtcNow:O}",
-            ["fmc_command"] = "DrainPending",
-            ["fmc_pipeline"] = options.Pipeline,
-            ["fmc_correlationid"] = correlation,
-            ["fmc_requestedby"] = requestedBy,
-            ["fmc_status"] = new OptionSetValue(SyncRequestStatuses.Queued)
-        }, ct);
-        return (id, true);
+            var id = await connection.Get().CreateAsync(new Entity("fmc_syncrequest")
+            {
+                ["fmc_name"] = $"SQL Sync {DateTime.UtcNow:O}",
+                ["fmc_command"] = "DrainPending",
+                ["fmc_pipeline"] = options.Pipeline,
+                ["fmc_activekey"] = options.Pipeline,
+                ["fmc_correlationid"] = correlation,
+                ["fmc_requestedby"] = requestedBy,
+                ["fmc_status"] = new OptionSetValue(SyncRequestStatuses.Queued)
+            }, ct);
+            return (id, true);
+        }
+        catch (FaultException<OrganizationServiceFault>)
+        {
+            var winner = (await connection.Get().RetrieveMultipleAsync(query, ct)).Entities.FirstOrDefault();
+            if (winner is null) throw;
+            return (winner.Id, false);
+        }
     }
 
     public async Task<SyncRequest?> Claim(string workerOwner, CancellationToken ct)
@@ -137,6 +161,7 @@ public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions
             ["fmc_deadletterafter"] = summary.DeadLetterRows,
             ["fmc_completedat"] = DateTime.UtcNow,
             ["fmc_errormessage"] = error,
+            ["fmc_activekey"] = null,
             ["fmc_workerowner"] = null,
             ["fmc_leaseexpiresat"] = null
         }, renewLease: false, ct);

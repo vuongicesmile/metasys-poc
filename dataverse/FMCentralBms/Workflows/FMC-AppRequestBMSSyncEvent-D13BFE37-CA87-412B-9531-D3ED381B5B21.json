@@ -1,0 +1,62 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "actions": {
+        "Demo_received": {
+          "runAfter": {},
+          "type": "Compose",
+          "inputs": {
+            "receivedAt": "@utcNow()",
+            "message": "Button -> Custom API -> Power Automate: OK",
+            "event": "@triggerBody()",
+            "demoOnly": true
+          }
+        }
+      },
+      "triggers": {
+        "When_BMS_demo_requested": {
+          "inputs": {
+            "host": {
+              "operationId": "BusinessEventsTrigger",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "catalog": "eef0e546-6cbf-49a7-acc3-0d6b1c3f940f",
+              "category": "31f00635-c05c-4de8-9619-f63fef619d9b",
+              "subscriptionRequest/entityname": "none",
+              "subscriptionRequest/sdkmessagename": "fmc_RequestBmsSync"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "type": "OpenApiConnectionWebhook"
+        }
+      },
+      "contentVersion": "1.0.0.0",
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
