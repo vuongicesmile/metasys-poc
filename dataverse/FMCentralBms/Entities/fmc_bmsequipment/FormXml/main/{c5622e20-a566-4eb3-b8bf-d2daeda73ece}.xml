@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{c5622e20-a566-4eb3-b8bf-d2daeda73ece}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab id="d9db7648-fe7c-4a6c-a058-45c2be69baae" name="tab_0" expanded="true" visible="true">
+          <labels>
+            <label description="Thông tin thiết bị" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section id="ba12a543-fd26-4cb5-9120-383d2dd6bc2b" name="section_0_0" showlabel="true" visible="true" columns="11">
+                  <labels>
+                    <label description="Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="c7dbdd68-2553-4419-8ad5-f06060e1449a" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="2a6c5af5-ddea-4250-a752-e7c92e2c811e" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_name" disabled="false" isrequired="true" />
+                      </cell>
+                      <cell id="9e6b3c7e-f1e9-4589-a7c3-54072bc2078f" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Code" languagecode="1033" />
+                        </labels>
+                        <control id="3e7bc412-5be4-4374-8f63-c63376ebf6be" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_equipmentcode" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="cdeeb3fc-a8b8-4ed9-a710-925c9cdab7de" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Equipment Type" languagecode="1033" />
+                        </labels>
+                        <control id="50fb6ab2-7821-48e5-85e8-9e234b38ce2e" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_equipmenttype" disabled="false" isrequired="false" />
+                      </cell>
+                      <cell id="4d08b10f-af2f-4a57-bd33-d98d64078cbd" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Building" languagecode="1033" />
+                        </labels>
+                        <control id="ca29e582-32dd-48b7-b7ba-743635a738ae" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="fmc_buildingid" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="bd2f2ef8-3c51-4cda-9f6f-091484b86e23" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Description" languagecode="1033" />
+                        </labels>
+                        <control id="d1219552-0e6d-428e-816c-13cd118d1207" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_description" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+                <section id="c19d964a-7849-45db-827f-aaf3e7698286" name="section_grid_fmc_bmsequipment_bmspoint" showlabel="true" visible="true" columns="1">
+                  <labels>
+                    <label description="Điểm thuộc thiết bị" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="f8f53235-7a9e-4eba-a481-34d3c83fd6db" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Điểm thuộc thiết bị" languagecode="1033" />
+                        </labels>
+                        <control id="79b252b1-e372-460c-a4f5-0d45eb24f9f6" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}" disabled="false" isrequired="false">
+                          <parameters>
+                            <TargetEntityType>fmc_bmspoint</TargetEntityType>
+                            <ViewId>1907b68d-d7fc-424d-b8c8-0971c57ef24a</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_bmsequipment_bmspoint</RelationshipName>
+                            <ChartGridMode>Grid</ChartGridMode>
+                            <RecordsPerPage>10</RecordsPerPage>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{8bdf2020-0b49-429d-8101-59d31217089e}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{24e4c116-c61c-41a7-bfbc-911cb45f612b}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{44442101-b6d3-46bf-948d-d27b1c7f529b}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{a601cd3c-82c1-4c98-ba6b-77fddf83d673}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{7e3bb025-b0ee-488f-b500-35be48b3435f}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{e6b85830-b07e-4b1c-b285-380668a8c137}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{25d499e7-5419-42cc-a585-e3557fc9f725}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{151fd665-4f92-44b6-b487-9b364adc7791}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Thiết bị BMS - Demo" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

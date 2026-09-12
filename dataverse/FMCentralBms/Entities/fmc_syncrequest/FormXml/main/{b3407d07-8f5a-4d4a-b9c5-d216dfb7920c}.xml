@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{b3407d07-8f5a-4d4a-b9c5-d216dfb7920c}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab id="bacca442-d1da-4cd2-ad45-0552d24bcb3d" name="tab_0" expanded="true" visible="true">
+          <labels>
+            <label description="Trạng thái đồng bộ" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section id="67e15571-0dcd-424a-849f-eeac71c1ed79" name="section_0_0" showlabel="true" visible="true" columns="11">
+                  <labels>
+                    <label description="Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="1f20c498-e231-4afd-98bf-e0decd820a74" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="1ace1a40-2c42-450a-8b4d-6bb810f1edd4" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_name" disabled="true" isrequired="true" />
+                      </cell>
+                      <cell id="7d3cec74-1539-4351-ac22-003a4d64228a" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Sync Status" languagecode="1033" />
+                        </labels>
+                        <control id="fc18a40d-a3b8-4134-add9-e6ccc7bca3f2" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_status" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="f669396f-dd51-48f4-89a4-528be8d65079" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Pipeline" languagecode="1033" />
+                        </labels>
+                        <control id="e22999ec-ecb2-46ef-b580-02468703630b" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_pipeline" disabled="true" isrequired="false" />
+                      </cell>
+                      <cell id="3aa9ff6d-ac62-4b88-a513-c891bd4832d6" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Command" languagecode="1033" />
+                        </labels>
+                        <control id="f2781656-7de0-43cc-8f13-89d2d82e1fc2" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_command" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="24114520-12e1-4de6-8082-6fb748acbe31" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Requested By" languagecode="1033" />
+                        </labels>
+                        <control id="22f9f62c-25c4-4fa9-bddf-8dc665cecc6b" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_requestedby" disabled="true" isrequired="false" />
+                      </cell>
+                      <cell id="db129101-5efa-4a24-9274-cdc5e305b3d0" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Requested Cutoff SQL ID" languagecode="1033" />
+                        </labels>
+                        <control id="0da90972-9121-4090-839a-c09ed24f3a03" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_requestedcutoffid" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="3711f17f-fd98-4f5c-a712-d9a3fd6105ed" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Claim Attempts" languagecode="1033" />
+                        </labels>
+                        <control id="4b8b4736-984a-458d-9c6b-eeedeb0eae45" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_attempts" disabled="true" isrequired="false" />
+                      </cell>
+                      <cell id="f9510ec7-1fa0-4579-9e67-801c7fb5bfd2" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Started At" languagecode="1033" />
+                        </labels>
+                        <control id="b4ace8bf-5767-423e-88f8-b8b1ec3715fb" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="fmc_startedat" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="4004f60a-597f-4689-b48c-f6e8b825facf" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Completed At" languagecode="1033" />
+                        </labels>
+                        <control id="e164d81e-813b-4679-9875-48f14691d623" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="fmc_completedat" disabled="true" isrequired="false" />
+                      </cell>
+                      <cell id="54cd53f6-45fc-4433-a607-c1d488360399" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Error Message" languagecode="1033" />
+                        </labels>
+                        <control id="06199052-fe11-430c-8ce8-20bc6ec953d1" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_errormessage" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{95782b36-dd11-471d-ad87-774f6ba8fc3f}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{197c5647-31be-4b3d-b536-1b596ce45ed1}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{6e56f12e-091a-497c-a7fe-6dbff166c405}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{0df1920b-4df7-4e73-984e-58b6fdf3b770}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{a7eaf39f-efbc-4b86-95d7-6aeb4390a301}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{2d998a6c-58ef-4901-85a5-6b54a19378be}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{71fd8174-9553-46ea-a013-bd121f1ec7ea}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{ec68e9af-b95e-412e-9877-059e78b381bc}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Yêu cầu đồng bộ - Demo" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

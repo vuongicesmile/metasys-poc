@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{ee6941bd-20aa-4e47-9e89-2dae37f337bf}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab id="ce19408a-b041-4ca4-a1b0-9cbfae1476e8" name="tab_0" expanded="true" visible="true">
+          <labels>
+            <label description="Dòng import" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section id="203f57dc-00cf-4bb1-b027-696d2eec28ff" name="section_0_0" showlabel="true" visible="true" columns="11">
+                  <labels>
+                    <label description="Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="1a5d11ad-4630-444b-ad91-a8bc869496f0" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="b69d047c-213e-4242-b01c-9e55a0498b84" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_name" disabled="true" isrequired="true" />
+                      </cell>
+                      <cell id="40e1b967-e23b-4ba6-ad84-8b3de45c2a8c" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="SPO File" languagecode="1033" />
+                        </labels>
+                        <control id="71cf6c41-2e58-420f-a0e4-efff477d87ec" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="fmc_fileid" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="cf352249-0bf4-4d06-82f9-011f590af878" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Ordinal" languagecode="1033" />
+                        </labels>
+                        <control id="d48f1849-75f3-422b-b104-bb95669cfb50" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_ordinal" disabled="true" isrequired="false" />
+                      </cell>
+                      <cell id="ad26bdba-9062-497a-ad1b-4e035770dd70" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Code" languagecode="1033" />
+                        </labels>
+                        <control id="8fd44910-1a18-4d91-80c7-1bf38adf9329" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_code" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="bfa705fd-1a14-4484-8c4e-b7cf2925a1ef" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Building Name" languagecode="1033" />
+                        </labels>
+                        <control id="42611d1f-3431-48f6-a99f-a7745cf35070" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_buildingname" disabled="true" isrequired="false" />
+                      </cell>
+                      <cell id="c3ae3ad9-4e8f-43ff-8189-033f86bc0a8b" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Floor Count" languagecode="1033" />
+                        </labels>
+                        <control id="7652cd71-db30-4deb-b6bf-3986b5fe1aee" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_floorcount" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="2ffcc080-3ec2-4934-adbe-eda78d0dc3a0" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Source ETag" languagecode="1033" />
+                        </labels>
+                        <control id="2348178b-5cbd-4a8e-9b59-2fa170da5762" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sourceetag" disabled="true" isrequired="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{a9be991a-c2c9-42d1-beac-0cb4b100083b}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{7406efc8-cd7f-4a19-a2ad-a282e9a76b1c}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{dcb5cf99-a4ab-4afb-a119-120c5dd31fba}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{af0771e4-5c74-4ddd-a4fc-80143df0a39b}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{0a19572d-4ca5-41c9-bdf3-b2cf994b1e29}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{88467bb2-f1e5-48d0-b9cf-a5c6ff42a512}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{6d9e43ef-83c3-4be4-95e4-ea1825f5dd51}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{7a5a8df8-9997-48f3-8427-099912d331a1}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Dòng import SharePoint - Demo" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

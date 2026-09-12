@@ -21,6 +21,16 @@ delivered 183 rows in two batches to cutoff 7404 with zero pending/dead-letter;
 production-readiness claim. The exported
 unmanaged solution is checked out at `dataverse/FMCentralBms`.
 
+On 2026-09-12, the existing `FMC BMS Demo` model-driven app was rebuilt and
+published as a complete Vietnamese demo shell. The live build created ten
+focused views, eight main/Quick Create forms, a responsive `Trung tâm vận hành
+BMS` page, Vietnamese navigation, a generated app icon, and the `FMC BMS Demo
+Operator` / `FMC BMS Demo Viewer` roles. Builder verification passed 109/109
+components, and a separate live download confirmed eight app tables and one
+deployed generative page. The app ID remains
+`d19f4897-d227-4df3-8361-988f97c53e89`; the operating guide is
+[FMC BMS Demo model-driven app](../runbooks/model-driven-app-demo.vi.md).
+
 On 2026-09-11, unbound action `fmc_RequestBmsSync`, main-operation plug-in
 `FMCentralBms.Plugins.RequestBmsSync`, business-event catalogs, active-key
 coalescing, flow `FMC - App Request BMS Sync Event`, and the **Power Automate

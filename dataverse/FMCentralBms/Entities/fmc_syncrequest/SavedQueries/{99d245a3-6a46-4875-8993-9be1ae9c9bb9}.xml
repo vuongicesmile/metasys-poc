@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>0</isdefault>
+    <savedqueryid>{99d245a3-6a46-4875-8993-9be1ae9c9bb9}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_syncrequestid">
+          <cell name="fmc_name" width="100" />
+          <cell name="fmc_status" width="100" />
+          <cell name="fmc_requestedby" width="100" />
+          <cell name="fmc_requestedcutoffid" width="100" />
+          <cell name="fmc_deliveredrows" width="100" />
+          <cell name="fmc_pendingafter" width="100" />
+          <cell name="fmc_quarantinedrows" width="100" />
+          <cell name="fmc_completedat" width="100" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_syncrequest">
+          <attribute name="fmc_name" />
+          <attribute name="fmc_status" />
+          <attribute name="fmc_requestedby" />
+          <attribute name="fmc_requestedcutoffid" />
+          <attribute name="fmc_deliveredrows" />
+          <attribute name="fmc_pendingafter" />
+          <attribute name="fmc_quarantinedrows" />
+          <attribute name="fmc_completedat" />
+          <order attribute="createdon" descending="true" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Yêu cầu đồng bộ gần đây" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

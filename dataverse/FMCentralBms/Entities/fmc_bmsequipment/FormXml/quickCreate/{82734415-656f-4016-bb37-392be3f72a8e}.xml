@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{82734415-656f-4016-bb37-392be3f72a8e}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab id="6cf01db3-063b-4d09-996d-768736e7dc20" name="tab_0" expanded="true" visible="true">
+          <labels>
+            <label description="Tạo thiết bị" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section id="bf8bb843-7e9a-48f2-ab5d-f2efb05b6cbc" name="section_0_0" showlabel="true" visible="true" columns="1">
+                  <labels>
+                    <label description="Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="78fd1761-92c0-48e3-b25f-7fb214a5045d" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="9a8c66f7-571d-4290-babc-cb45fcda9081" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_name" disabled="false" isrequired="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="2febf4f4-b7fb-4fd8-be14-1894c28e780e" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Code" languagecode="1033" />
+                        </labels>
+                        <control id="5ab30961-a98f-4b02-9f82-b92d47506118" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_equipmentcode" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="ba155589-5119-402c-9269-773e155327ba" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Equipment Type" languagecode="1033" />
+                        </labels>
+                        <control id="6ea671c9-f7fc-4634-98fb-d789e853026c" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_equipmenttype" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="2741ffd6-f1e7-48d1-b3f6-8992acd10f31" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Building" languagecode="1033" />
+                        </labels>
+                        <control id="1687d0a7-aa7c-4303-abfc-34e9df138968" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="fmc_buildingid" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="6fb0237c-8150-442b-ba4e-9384f214b9e9" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Description" languagecode="1033" />
+                        </labels>
+                        <control id="146b6904-36f5-4ecb-b890-86e3bc36f58f" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_description" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Tạo nhanh thiết bị BMS" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

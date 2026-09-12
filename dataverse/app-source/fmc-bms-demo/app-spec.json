@@ -1,0 +1,1353 @@
+{
+  "schemaVersion": 2,
+  "solution": {
+    "uniqueName": "FMCentralBms",
+    "displayName": "FM Central BMS",
+    "publisherPrefix": "fmc",
+    "description": "End-to-end BMS synchronization and SharePoint file intake demo."
+  },
+  "app": {
+    "name": "FMC BMS Demo",
+    "description": "Demo tiếng Việt cho nhập catalog, Bronze-to-Silver, SQL sync và tiếp nhận file SharePoint.",
+    "uniqueName": "fmc_FMCBMSDemo",
+    "newLook": true,
+    "headerNavigationRefresh": true
+  },
+  "entities": [
+    {
+      "schemaName": "fmc_bmsbuilding",
+      "displayName": "BMS Building",
+      "pluralName": "BMS Buildings",
+      "description": "Building catalog synchronized from BMS and available for controlled demo entry.",
+      "existing": true,
+      "quickCreate": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        {
+          "schemaName": "fmc_buildingcode",
+          "displayName": "Code",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_description",
+          "displayName": "Description",
+          "type": "Memo"
+        },
+        {
+          "schemaName": "fmc_sourcebuilding",
+          "displayName": "Source Building",
+          "type": "Text"
+        }
+      ]
+    },
+    {
+      "schemaName": "fmc_bmsequipment",
+      "displayName": "BMS Equipment",
+      "pluralName": "BMS Equipment",
+      "description": "Equipment catalog linked to a building; the existing plug-in validates the parent and code.",
+      "existing": true,
+      "quickCreate": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        {
+          "schemaName": "fmc_equipmentcode",
+          "displayName": "Code",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_equipmenttype",
+          "displayName": "Equipment Type",
+          "type": "Choice",
+          "options": [
+            "Water Meter",
+            "Temperature Sensor",
+            "Test Rig"
+          ]
+        },
+        {
+          "schemaName": "fmc_description",
+          "displayName": "Description",
+          "type": "Memo"
+        }
+      ]
+    },
+    {
+      "schemaName": "fmc_bmspoint",
+      "displayName": "[Bronze] BMS Point",
+      "pluralName": "[Bronze] BMS Points",
+      "description": "Current Bronze point state synchronized from SQL.",
+      "existing": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        {
+          "schemaName": "fmc_objectid",
+          "displayName": "Object ID",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_objecttype",
+          "displayName": "Object Type",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_building",
+          "displayName": "Building",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_currentvalue",
+          "displayName": "Current Value",
+          "type": "Decimal"
+        },
+        {
+          "schemaName": "fmc_unit",
+          "displayName": "Unit",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_lastreadingtime",
+          "displayName": "Reading Time",
+          "type": "DateTime"
+        },
+        {
+          "schemaName": "fmc_lastsqlid",
+          "displayName": "SQL Reading ID",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_sourcesystem",
+          "displayName": "Source System",
+          "type": "Text"
+        }
+      ]
+    },
+    {
+      "schemaName": "fmc_bmsreading",
+      "displayName": "[Bronze] BMS Reading",
+      "pluralName": "[Bronze] BMS Readings",
+      "description": "Retained Bronze reading history in an elastic table with event-time TTL.",
+      "existing": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        {
+          "schemaName": "fmc_objectid",
+          "displayName": "Object ID",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_objectname",
+          "displayName": "Object Name",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_building",
+          "displayName": "Building",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_readingvalue",
+          "displayName": "Reading Value",
+          "type": "Decimal"
+        },
+        {
+          "schemaName": "fmc_unit",
+          "displayName": "Unit",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_readingtime",
+          "displayName": "Reading Time",
+          "type": "DateTime"
+        },
+        {
+          "schemaName": "fmc_sqlreadingid",
+          "displayName": "SQL Reading ID",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_sourcesystem",
+          "displayName": "Source System",
+          "type": "Text"
+        }
+      ]
+    },
+    {
+      "schemaName": "cr3c8_silvernewbmspoint",
+      "displayName": "[Silver-Cloud] BMS Point",
+      "pluralName": "[Silver-Cloud] BMS Points",
+      "description": "Cloud dataflow output with normalized values, units and quality flags.",
+      "existing": true,
+      "primaryAttribute": {
+        "schemaName": "cr3c8_fmc_bmspointid",
+        "displayName": "BMS Point ID"
+      },
+      "columns": [
+        {
+          "schemaName": "cr3c8_fmc_name",
+          "displayName": "Name",
+          "type": "Text"
+        },
+        {
+          "schemaName": "cr3c8_fmc_objectid",
+          "displayName": "Object ID",
+          "type": "Text"
+        },
+        {
+          "schemaName": "cr3c8_fmc_building",
+          "displayName": "Building",
+          "type": "Text"
+        },
+        {
+          "schemaName": "cr3c8_fmc_valueconverted",
+          "displayName": "Value Converted",
+          "type": "Double"
+        },
+        {
+          "schemaName": "cr3c8_fmc_unitconverted",
+          "displayName": "Unit Converted",
+          "type": "Memo"
+        },
+        {
+          "schemaName": "cr3c8_fmc_warningflag",
+          "displayName": "Warning Flag",
+          "type": "Memo"
+        },
+        {
+          "schemaName": "cr3c8_fmc_lastreadingtime",
+          "displayName": "Reading Time",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "schemaName": "fmc_syncrequest",
+      "displayName": "Sync Request",
+      "pluralName": "Sync Requests",
+      "description": "Command queue and execution receipt for SQL-to-Dataverse synchronization.",
+      "existing": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        {
+          "schemaName": "fmc_status",
+          "displayName": "Sync Status",
+          "type": "Choice",
+          "options": [
+            "Queued",
+            "Running",
+            "Succeeded",
+            "Completed with issues",
+            "Failed"
+          ]
+        },
+        {
+          "schemaName": "fmc_pipeline",
+          "displayName": "Pipeline",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_command",
+          "displayName": "Command",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_requestedby",
+          "displayName": "Requested By",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_requestedcutoffid",
+          "displayName": "Requested Cutoff SQL ID",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_deliveredrows",
+          "displayName": "Delivered Rows",
+          "type": "BigInt"
+        },
+        {
+          "schemaName": "fmc_pendingafter",
+          "displayName": "Pending After",
+          "type": "BigInt"
+        },
+        {
+          "schemaName": "fmc_quarantinedrows",
+          "displayName": "Quarantined Rows",
+          "type": "BigInt"
+        },
+        {
+          "schemaName": "fmc_attempts",
+          "displayName": "Claim Attempts",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "fmc_startedat",
+          "displayName": "Started At",
+          "type": "DateTime"
+        },
+        {
+          "schemaName": "fmc_completedat",
+          "displayName": "Completed At",
+          "type": "DateTime"
+        },
+        {
+          "schemaName": "fmc_errormessage",
+          "displayName": "Error Message",
+          "type": "Memo"
+        }
+      ]
+    },
+    {
+      "schemaName": "fmc_spofile",
+      "displayName": "SPO File",
+      "pluralName": "SPO Files",
+      "description": "Idempotent SharePoint receipt with archived Dataverse file content.",
+      "existing": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        {
+          "schemaName": "fmc_filename",
+          "displayName": "File Name",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_file",
+          "displayName": "Archived File",
+          "type": "File"
+        },
+        {
+          "schemaName": "fmc_filesize",
+          "displayName": "File Size",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "fmc_sharepointurl",
+          "displayName": "SharePoint URL",
+          "type": "Text",
+          "format": "Url"
+        },
+        {
+          "schemaName": "fmc_status",
+          "displayName": "Archive Status",
+          "type": "Choice",
+          "options": [
+            "Received",
+            "Processing",
+            "Archived",
+            "Failed",
+            "Ignored"
+          ]
+        },
+        {
+          "schemaName": "fmc_importstatus",
+          "displayName": "Import Status",
+          "type": "Choice",
+          "options": [
+            "Not Requested",
+            "Processing",
+            "Imported",
+            "Failed"
+          ]
+        },
+        {
+          "schemaName": "fmc_rowcount",
+          "displayName": "Imported Row Count",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "fmc_receivedat",
+          "displayName": "Received At",
+          "type": "DateTime"
+        },
+        {
+          "schemaName": "fmc_processedat",
+          "displayName": "Processed At",
+          "type": "DateTime"
+        },
+        {
+          "schemaName": "fmc_errormessage",
+          "displayName": "Error Message",
+          "type": "Memo"
+        }
+      ]
+    },
+    {
+      "schemaName": "fmc_spoimportrow",
+      "displayName": "SPO Import Row",
+      "pluralName": "SPO Import Rows",
+      "description": "Parsed data rows associated with an imported SharePoint file version.",
+      "existing": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        {
+          "schemaName": "fmc_ordinal",
+          "displayName": "Ordinal",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "fmc_code",
+          "displayName": "Code",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_buildingname",
+          "displayName": "Building Name",
+          "type": "Text"
+        },
+        {
+          "schemaName": "fmc_floorcount",
+          "displayName": "Floor Count",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "fmc_sourceetag",
+          "displayName": "Source ETag",
+          "type": "Text"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "OneToMany",
+      "schemaName": "fmc_bmsbuilding_bmsequipment",
+      "referenced": "fmc_bmsbuilding",
+      "referencing": "fmc_bmsequipment",
+      "lookup": {
+        "schemaName": "fmc_buildingid",
+        "displayName": "Building",
+        "required": true
+      }
+    },
+    {
+      "type": "OneToMany",
+      "schemaName": "fmc_bmsequipment_bmspoint",
+      "referenced": "fmc_bmsequipment",
+      "referencing": "fmc_bmspoint",
+      "lookup": {
+        "schemaName": "fmc_equipmentid",
+        "displayName": "Equipment"
+      }
+    },
+    {
+      "type": "OneToMany",
+      "schemaName": "fmc_spofile_spoimportrow",
+      "referenced": "fmc_spofile",
+      "referencing": "fmc_spoimportrow",
+      "lookup": {
+        "schemaName": "fmc_fileid",
+        "displayName": "SPO File",
+        "required": true
+      }
+    }
+  ],
+  "webResources": [
+    {
+      "name": "fmc_/pages/BmsEventDemo.html",
+      "displayName": "Power Automate BMS Sync Demo",
+      "type": "html",
+      "contentPath": "../BmsEventDemo.html",
+      "description": "Calls fmc_RequestBmsSync and links to the Power Automate run history."
+    }
+  ],
+  "views": [
+    {
+      "entity": "fmc_bmsbuilding",
+      "name": "Tòa nhà BMS",
+      "columns": [
+        "fmc_name",
+        "fmc_buildingcode",
+        "fmc_sourcebuilding",
+        "modifiedon"
+      ],
+      "sort": [
+        {
+          "attr": "fmc_name",
+          "dir": "asc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_bmsequipment",
+      "name": "Thiết bị BMS",
+      "columns": [
+        "fmc_name",
+        "fmc_equipmentcode",
+        "fmc_equipmenttype",
+        "fmc_buildingid",
+        "modifiedon"
+      ],
+      "sort": [
+        {
+          "attr": "fmc_name",
+          "dir": "asc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_bmspoint",
+      "name": "Điểm BMS hiện tại",
+      "columns": [
+        "fmc_name",
+        "fmc_objectid",
+        "fmc_building",
+        "fmc_equipmentid",
+        "fmc_currentvalue",
+        "fmc_unit",
+        "fmc_lastreadingtime"
+      ],
+      "sort": [
+        {
+          "attr": "fmc_lastreadingtime",
+          "dir": "desc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_bmsreading",
+      "name": "Lịch sử Bronze gần đây",
+      "description": "Server-side paged view for the large elastic history.",
+      "columns": [
+        "fmc_objectname",
+        "fmc_objectid",
+        "fmc_building",
+        "fmc_readingvalue",
+        "fmc_unit",
+        "fmc_readingtime",
+        "fmc_sourcesystem"
+      ],
+      "sort": [
+        {
+          "attr": "fmc_readingtime",
+          "dir": "desc"
+        }
+      ],
+      "activeOnly": false
+    },
+    {
+      "entity": "cr3c8_silvernewbmspoint",
+      "name": "Dữ liệu Silver đã chuẩn hóa",
+      "columns": [
+        "cr3c8_fmc_name",
+        "cr3c8_fmc_objectid",
+        "cr3c8_fmc_building",
+        "cr3c8_fmc_valueconverted",
+        "cr3c8_fmc_unitconverted",
+        "cr3c8_fmc_warningflag",
+        "cr3c8_fmc_lastreadingtime"
+      ],
+      "sort": [
+        {
+          "attr": "modifiedon",
+          "dir": "desc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "cr3c8_silvernewbmspoint",
+      "name": "Cảnh báo chất lượng Silver",
+      "columns": [
+        "cr3c8_fmc_name",
+        "cr3c8_fmc_objectid",
+        "cr3c8_fmc_valueconverted",
+        "cr3c8_fmc_unitconverted",
+        "cr3c8_fmc_warningflag"
+      ],
+      "filters": [
+        {
+          "attr": "cr3c8_fmc_warningflag",
+          "op": "eq",
+          "value": "Flagged"
+        }
+      ],
+      "sort": [
+        {
+          "attr": "modifiedon",
+          "dir": "desc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_syncrequest",
+      "name": "Yêu cầu đồng bộ gần đây",
+      "columns": [
+        "fmc_name",
+        "fmc_status",
+        "fmc_requestedby",
+        "fmc_requestedcutoffid",
+        "fmc_deliveredrows",
+        "fmc_pendingafter",
+        "fmc_quarantinedrows",
+        "fmc_completedat"
+      ],
+      "sort": [
+        {
+          "attr": "createdon",
+          "dir": "desc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_syncrequest",
+      "name": "Yêu cầu đang xử lý",
+      "columns": [
+        "fmc_name",
+        "fmc_status",
+        "fmc_requestedby",
+        "fmc_attempts",
+        "fmc_startedat",
+        "modifiedon"
+      ],
+      "filters": [
+        {
+          "attr": "fmc_status",
+          "op": "in",
+          "values": [
+            "Queued",
+            "Running"
+          ]
+        }
+      ],
+      "sort": [
+        {
+          "attr": "createdon",
+          "dir": "asc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_spofile",
+      "name": "File SharePoint gần đây",
+      "columns": [
+        "fmc_filename",
+        "fmc_status",
+        "fmc_importstatus",
+        "fmc_filesize",
+        "fmc_rowcount",
+        "fmc_processedat"
+      ],
+      "sort": [
+        {
+          "attr": "createdon",
+          "dir": "desc"
+        }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_spoimportrow",
+      "name": "Dòng import SharePoint",
+      "columns": [
+        "fmc_name",
+        "fmc_ordinal",
+        "fmc_code",
+        "fmc_buildingname",
+        "fmc_floorcount",
+        "fmc_sourceetag"
+      ],
+      "sort": [
+        {
+          "attr": "fmc_ordinal",
+          "dir": "asc"
+        }
+      ],
+      "activeOnly": true
+    }
+  ],
+  "forms": [
+    {
+      "entity": "fmc_bmsbuilding",
+      "name": "Tòa nhà BMS - Demo",
+      "formType": "Main",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Thông tin tòa nhà",
+          "sections": [
+            {
+              "columns": 2,
+              "fields": [
+                "fmc_name",
+                "fmc_buildingcode",
+                "fmc_sourcebuilding",
+                "fmc_description"
+              ]
+            }
+          ]
+        }
+      ],
+      "subgrids": [
+        {
+          "childEntity": "fmc_bmsequipment",
+          "view": "Thiết bị BMS",
+          "label": "Thiết bị trong tòa nhà"
+        }
+      ]
+    },
+    {
+      "entity": "fmc_bmsbuilding",
+      "name": "Tạo nhanh tòa nhà BMS",
+      "formType": "QuickCreate",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Tạo tòa nhà",
+          "sections": [
+            {
+              "columns": 1,
+              "fields": [
+                "fmc_name",
+                "fmc_buildingcode",
+                "fmc_description"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entity": "fmc_bmsequipment",
+      "name": "Thiết bị BMS - Demo",
+      "formType": "Main",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Thông tin thiết bị",
+          "sections": [
+            {
+              "columns": 2,
+              "fields": [
+                "fmc_name",
+                "fmc_equipmentcode",
+                "fmc_equipmenttype",
+                "fmc_buildingid",
+                "fmc_description"
+              ]
+            }
+          ]
+        }
+      ],
+      "subgrids": [
+        {
+          "childEntity": "fmc_bmspoint",
+          "view": "Điểm BMS hiện tại",
+          "label": "Điểm thuộc thiết bị"
+        }
+      ]
+    },
+    {
+      "entity": "fmc_bmsequipment",
+      "name": "Tạo nhanh thiết bị BMS",
+      "formType": "QuickCreate",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Tạo thiết bị",
+          "sections": [
+            {
+              "columns": 1,
+              "fields": [
+                "fmc_name",
+                "fmc_equipmentcode",
+                "fmc_equipmenttype",
+                "fmc_buildingid",
+                "fmc_description"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entity": "fmc_bmspoint",
+      "name": "Điểm BMS - Demo",
+      "formType": "Main",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Dữ liệu Bronze",
+          "sections": [
+            {
+              "columns": 2,
+              "fields": [
+                {
+                  "name": "fmc_name",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_objectid",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_objecttype",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_equipmentid",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_building",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_currentvalue",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_unit",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_lastreadingtime",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_lastsqlid",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_sourcesystem",
+                  "readOnly": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entity": "fmc_syncrequest",
+      "name": "Yêu cầu đồng bộ - Demo",
+      "formType": "Main",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Trạng thái đồng bộ",
+          "sections": [
+            {
+              "columns": 2,
+              "fields": [
+                {
+                  "name": "fmc_name",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_status",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_pipeline",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_command",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_requestedby",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_requestedcutoffid",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_attempts",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_startedat",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_completedat",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_errormessage",
+                  "readOnly": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "entity": "fmc_spofile",
+      "name": "File SharePoint - Demo",
+      "formType": "Main",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Tiếp nhận file",
+          "sections": [
+            {
+              "columns": 2,
+              "fields": [
+                "fmc_name",
+                "fmc_filename",
+                "fmc_file",
+                "fmc_filesize",
+                "fmc_sharepointurl",
+                "fmc_status",
+                "fmc_importstatus",
+                "fmc_rowcount",
+                "fmc_receivedat",
+                "fmc_processedat",
+                "fmc_errormessage"
+              ]
+            }
+          ]
+        }
+      ],
+      "subgrids": [
+        {
+          "childEntity": "fmc_spoimportrow",
+          "view": "Dòng import SharePoint",
+          "label": "Dòng dữ liệu đã parse"
+        }
+      ]
+    },
+    {
+      "entity": "fmc_spoimportrow",
+      "name": "Dòng import SharePoint - Demo",
+      "formType": "Main",
+      "layout": "explicit",
+      "prune": false,
+      "tabs": [
+        {
+          "label": "Dòng import",
+          "sections": [
+            {
+              "columns": 2,
+              "fields": [
+                {
+                  "name": "fmc_name",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_fileid",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_ordinal",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_code",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_buildingname",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_floorcount",
+                  "readOnly": true
+                },
+                {
+                  "name": "fmc_sourceetag",
+                  "readOnly": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "key": "trung-tam-van-hanh",
+      "name": "Trung tâm vận hành BMS",
+      "purpose": "Vietnamese landing page for a live demo. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
+      "dataSources": [
+        "fmc_bmsbuilding",
+        "fmc_bmsequipment",
+        "fmc_bmspoint",
+        "fmc_bmsreading",
+        "cr3c8_silvernewbmspoint",
+        "fmc_syncrequest",
+        "fmc_spofile",
+        "fmc_spoimportrow"
+      ],
+      "source": {
+        "kind": "tsx",
+        "codeFile": "trung-tam-van-hanh.tsx"
+      }
+    }
+  ],
+  "design": {
+    "accentColor": "#0f6cbd",
+    "density": "comfortable",
+    "cornerRadius": "medium",
+    "darkMode": "system",
+    "layout": "cards"
+  },
+  "appShell": {
+    "areas": [
+      {
+        "label": "FMC BMS Demo",
+        "groups": [
+          {
+            "label": "Tổng quan",
+            "subAreas": [
+              {
+                "page": "trung-tam-van-hanh",
+                "title": "Trung tâm vận hành"
+              },
+              {
+                "url": "$webresource:fmc_/pages/BmsEventDemo.html",
+                "title": "Đồng bộ dữ liệu"
+              }
+            ]
+          },
+          {
+            "label": "Nhập liệu",
+            "subAreas": [
+              {
+                "entity": "fmc_bmsbuilding",
+                "title": "Tòa nhà"
+              },
+              {
+                "entity": "fmc_bmsequipment",
+                "title": "Thiết bị"
+              }
+            ]
+          },
+          {
+            "label": "Dữ liệu Bronze",
+            "subAreas": [
+              {
+                "entity": "fmc_bmspoint",
+                "title": "Điểm hiện tại"
+              },
+              {
+                "entity": "fmc_bmsreading",
+                "title": "Lịch sử readings"
+              }
+            ]
+          },
+          {
+            "label": "Dữ liệu Silver",
+            "subAreas": [
+              {
+                "entity": "cr3c8_silvernewbmspoint",
+                "title": "Điểm đã chuẩn hóa"
+              }
+            ]
+          },
+          {
+            "label": "SharePoint",
+            "subAreas": [
+              {
+                "entity": "fmc_spofile",
+                "title": "File đã tiếp nhận"
+              },
+              {
+                "entity": "fmc_spoimportrow",
+                "title": "Dòng đã parse"
+              }
+            ]
+          },
+          {
+            "label": "Vận hành",
+            "subAreas": [
+              {
+                "entity": "fmc_syncrequest",
+                "title": "Yêu cầu đồng bộ"
+              },
+              {
+                "url": "https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d13bfe37-ca87-412b-9531-d3ed381b5b21/details",
+                "title": "Lịch sử Power Automate"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "personas": [
+    {
+      "persona": "FMC BMS Demo Operator",
+      "appAccess": true,
+      "jobs": [
+        {
+          "name": "Theo dõi pipeline end-to-end",
+          "surfaces": [
+            "trung-tam-van-hanh",
+            "Điểm BMS hiện tại",
+            "Lịch sử Bronze gần đây",
+            "Dữ liệu Silver đã chuẩn hóa"
+          ],
+          "privileges": [
+            {
+              "entity": "fmc_bmsbuilding",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmsequipment",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmspoint",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmsreading",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "cr3c8_silvernewbmspoint",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_syncrequest",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_spofile",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_spoimportrow",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            }
+          ]
+        },
+        {
+          "name": "Nhập catalog BMS",
+          "surfaces": [
+            "Tạo nhanh tòa nhà BMS",
+            "Tạo nhanh thiết bị BMS",
+            "Tòa nhà BMS - Demo",
+            "Thiết bị BMS - Demo"
+          ],
+          "privileges": [
+            {
+              "entity": "fmc_bmsbuilding",
+              "access": [
+                "read",
+                "create",
+                "write",
+                "append",
+                "appendTo"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmsequipment",
+              "access": [
+                "read",
+                "create",
+                "write",
+                "append",
+                "appendTo"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmspoint",
+              "access": [
+                "read",
+                "appendTo"
+              ],
+              "scope": "organization"
+            }
+          ]
+        },
+        {
+          "name": "Yêu cầu và theo dõi đồng bộ",
+          "surfaces": [
+            "Đồng bộ dữ liệu",
+            "Yêu cầu đồng bộ gần đây",
+            "Yêu cầu đang xử lý"
+          ],
+          "privileges": [
+            {
+              "entity": "fmc_syncrequest",
+              "access": [
+                "read",
+                "create"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmspoint",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmsreading",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            }
+          ]
+        },
+        {
+          "name": "Kiểm tra tiếp nhận file SharePoint",
+          "surfaces": [
+            "File SharePoint gần đây",
+            "File SharePoint - Demo",
+            "Dòng import SharePoint"
+          ],
+          "privileges": [
+            {
+              "entity": "fmc_spofile",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_spoimportrow",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "FMC BMS Demo Viewer",
+      "appAccess": true,
+      "jobs": [
+        {
+          "name": "Xem demo ở chế độ chỉ đọc",
+          "surfaces": [
+            "trung-tam-van-hanh",
+            "Điểm BMS hiện tại",
+            "Dữ liệu Silver đã chuẩn hóa",
+            "Yêu cầu đồng bộ gần đây",
+            "File SharePoint gần đây"
+          ],
+          "privileges": [
+            {
+              "entity": "fmc_bmsbuilding",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmsequipment",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmspoint",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_bmsreading",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "cr3c8_silvernewbmspoint",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_syncrequest",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_spofile",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_spoimportrow",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sampleData": {}
+}

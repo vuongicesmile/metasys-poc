@@ -9,3 +9,4 @@ obj/
 dataverse/*.zip
 appsettings.Local.json
 .artifacts/
+dataverse/app-source/fmc-bms-demo/.maker-workspace/

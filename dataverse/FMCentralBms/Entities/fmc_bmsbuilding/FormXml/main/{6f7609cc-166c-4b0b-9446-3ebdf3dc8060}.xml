@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{6f7609cc-166c-4b0b-9446-3ebdf3dc8060}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab id="6814bc4e-316b-437d-85b9-564dbcddb06b" name="tab_0" expanded="true" visible="true">
+          <labels>
+            <label description="Thông tin tòa nhà" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section id="a33c6433-fdf5-49fd-9987-2821273e8044" name="section_0_0" showlabel="true" visible="true" columns="11">
+                  <labels>
+                    <label description="Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="76c3bc48-6d11-448c-837c-ed57f00d7a81" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="5fc706f2-f9ba-49dd-853d-3799dd750973" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_name" disabled="false" isrequired="true" />
+                      </cell>
+                      <cell id="2db258b0-daba-461a-9cfa-cbc28bfae4ec" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Code" languagecode="1033" />
+                        </labels>
+                        <control id="424439e8-f813-4e97-8155-0809487684b0" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_buildingcode" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="24718124-a631-4bbc-9812-e5ae28a6bcdb" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Source Building" languagecode="1033" />
+                        </labels>
+                        <control id="36381e60-74f8-49c3-8179-f231edf908df" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sourcebuilding" disabled="false" isrequired="false" />
+                      </cell>
+                      <cell id="d023d7da-c2b6-42c2-89f3-ee9505b7d49a" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Description" languagecode="1033" />
+                        </labels>
+                        <control id="778f1687-c410-4080-9d82-1dc0cd4fd56b" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_description" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+                <section id="e6134700-ad3e-4337-ab01-e5650d8afb6e" name="section_grid_fmc_bmsbuilding_bmsequipment" showlabel="true" visible="true" columns="1">
+                  <labels>
+                    <label description="Thiết bị trong tòa nhà" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="d794e8e1-2a4f-4a5f-89d9-4657174c473f" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Thiết bị trong tòa nhà" languagecode="1033" />
+                        </labels>
+                        <control id="662adc56-65e9-4422-8c88-de55b832b3f4" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}" disabled="false" isrequired="false">
+                          <parameters>
+                            <TargetEntityType>fmc_bmsequipment</TargetEntityType>
+                            <ViewId>a8eb2247-2c35-4da2-8638-88d673ce4ce1</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_bmsbuilding_bmsequipment</RelationshipName>
+                            <ChartGridMode>Grid</ChartGridMode>
+                            <RecordsPerPage>10</RecordsPerPage>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{017d6f69-f624-432e-9c53-1f2b2c5b703a}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{161e9efa-3f2d-4a6d-ad71-3308ce3f0e9c}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{d352b611-2351-4f26-8478-b192130e7d10}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{78dcce9d-1604-469f-9492-d90386effa85}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{6539aadd-8a73-48bd-a8d1-40461869148f}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{b2c14a18-0612-476d-83af-5dd4ff67d482}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{9746d471-17ab-4ac7-8962-fa4a3b3cbdc6}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{367c43f0-a1e0-4492-a814-c9de5072d676}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Tòa nhà BMS - Demo" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

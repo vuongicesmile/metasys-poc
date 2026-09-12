@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "pages": [
+    {
+      "key": "trung-tam-van-hanh",
+      "name": "Trung tâm vận hành BMS",
+      "pageId": "9d05b7f9-f4c4-4572-b6b8-0220b51812f3",
+      "purpose": "Vietnamese landing page for a live demo. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
+      "dataSources": [
+        "fmc_bmsbuilding",
+        "fmc_bmsequipment",
+        "fmc_bmspoint",
+        "fmc_bmsreading",
+        "cr3c8_silvernewbmspoint",
+        "fmc_syncrequest",
+        "fmc_spofile",
+        "fmc_spoimportrow"
+      ],
+      "source": {
+        "kind": "tsx",
+        "codeFile": "trung-tam-van-hanh.tsx"
+      }
+    }
+  ],
+  "design": {
+    "accentColor": "#0f6cbd",
+    "density": "comfortable",
+    "cornerRadius": "medium",
+    "darkMode": "system",
+    "layout": "cards"
+  }
+}

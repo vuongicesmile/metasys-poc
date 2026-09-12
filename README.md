@@ -11,6 +11,7 @@ Start at the [documentation index](docs/README.md):
 - [Interactive Custom API lab](docs/interactive/custom-api-lab/index.html)
 - [SQL-to-Dataverse operating runbook](docs/runbooks/sql-to-dataverse-runbook.vi.md)
 - [Dataverse deployment and implemented contract](docs/reference/dataverse-deployment.md)
+- [FMC BMS Demo model-driven app runbook (Vietnamese)](docs/runbooks/model-driven-app-demo.vi.md)
 - [Original Plan 3.0 — historical design](docs/plans/plan-3.0-sql-to-dataverse.md)
 
 ## SQL to Dataverse (Plan 3.0)

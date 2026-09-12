@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{e25478bd-ba69-4052-a910-45cf0ebeb238}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab id="6767dd82-8156-4fbb-93ca-f804a7d0bf76" name="tab_0" expanded="true" visible="true">
+          <labels>
+            <label description="Tiếp nhận file" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section id="205cff1b-2076-47c7-876f-ad4ec7d4c499" name="section_0_0" showlabel="true" visible="true" columns="11">
+                  <labels>
+                    <label description="Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="45b7497f-e950-4002-9718-5edd4618263e" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="3fca5854-36a5-4f99-8203-1b683b00d08c" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_name" disabled="false" isrequired="true" />
+                      </cell>
+                      <cell id="2bb840d6-5781-4029-80d3-7af6388d38bf" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="File Name" languagecode="1033" />
+                        </labels>
+                        <control id="9795c541-34b2-4b5e-a209-c5cd31f7d701" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_filename" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="7e555539-d9fb-472d-a823-7877e93ee38d" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Archived File" languagecode="1033" />
+                        </labels>
+                        <control id="b3c66b1a-d3e0-492b-9bc7-f681e7586a8c" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_file" disabled="false" isrequired="false" />
+                      </cell>
+                      <cell id="2d06b103-9c08-4184-86e4-4a3fc61f167c" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="File Size" languagecode="1033" />
+                        </labels>
+                        <control id="174eb6b1-51f3-4541-970b-a9dd4920e903" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_filesize" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="18d30835-61ce-4594-8f7e-014c6a997d9d" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="SharePoint URL" languagecode="1033" />
+                        </labels>
+                        <control id="9eea1a87-11ea-45b9-b986-9c9ac4f0190c" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sharepointurl" disabled="false" isrequired="false" />
+                      </cell>
+                      <cell id="eb002170-e9a5-4cea-b243-11b6552f8ac9" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Archive Status" languagecode="1033" />
+                        </labels>
+                        <control id="40f48823-e711-4de7-bc61-f6dfe7670d2c" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_status" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="a8819a21-8483-446c-b7a0-698d6a7aa114" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Import Status" languagecode="1033" />
+                        </labels>
+                        <control id="452283ba-3c9d-43a7-ba0b-bd1e9dabbc20" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_importstatus" disabled="false" isrequired="false" />
+                      </cell>
+                      <cell id="b43ed5b8-dcd5-417c-960c-4293099c6906" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Imported Row Count" languagecode="1033" />
+                        </labels>
+                        <control id="8b59d55a-a1d7-434c-98f1-b49550edeef3" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_rowcount" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="146bef32-c240-4100-a4ce-8f2f040dbc83" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Received At" languagecode="1033" />
+                        </labels>
+                        <control id="a14a15cf-9e6b-40ff-bb11-723524cda668" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="fmc_receivedat" disabled="false" isrequired="false" />
+                      </cell>
+                      <cell id="2c03eab3-02f0-4e84-a9a8-6dccb56b6dd1" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Processed At" languagecode="1033" />
+                        </labels>
+                        <control id="5815b51a-e9ec-43bc-a5bc-905d45a1ea95" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="fmc_processedat" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="421ea457-0581-4b3d-9e1c-27f2ae22f659" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Error Message" languagecode="1033" />
+                        </labels>
+                        <control id="c905b05a-f295-4da9-a221-31f135fd8700" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_errormessage" disabled="false" isrequired="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+                <section id="7f5e7685-2fec-42e0-9af4-72c445b50bf7" name="section_grid_fmc_spofile_spoimportrow" showlabel="true" visible="true" columns="1">
+                  <labels>
+                    <label description="Dòng dữ liệu đã parse" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="b6137e3b-013c-4974-a3a2-dd9bbbe89ffa" showlabel="true" visible="true" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Dòng dữ liệu đã parse" languagecode="1033" />
+                        </labels>
+                        <control id="a12ae708-ed4b-4654-8109-1b085c296f44" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}" disabled="false" isrequired="false">
+                          <parameters>
+                            <TargetEntityType>fmc_spoimportrow</TargetEntityType>
+                            <ViewId>ecf7a1ae-2471-4987-97b3-3f63d93e7e24</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_spofile_spoimportrow</RelationshipName>
+                            <ChartGridMode>Grid</ChartGridMode>
+                            <RecordsPerPage>10</RecordsPerPage>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{d09e5387-e09a-4821-aa2b-a3f85fe20ca0}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{68f406ad-2f56-4e32-adf7-c2da5499159d}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{8fd0acc2-670a-4b8d-8f47-d367c59deda9}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{5db8aaa6-05a4-4a1a-9a9e-7dcc910dd75c}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{c2bfb961-56dc-4fe2-a321-3bfce853d137}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{cd67c818-c0d8-4dcd-9ad2-df36be9de864}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{a7544ea9-0752-41ce-9210-4dc383b3c3c2}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{9c1db9d7-2fff-4e5f-ad7d-4514c0a142e8}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="File SharePoint - Demo" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

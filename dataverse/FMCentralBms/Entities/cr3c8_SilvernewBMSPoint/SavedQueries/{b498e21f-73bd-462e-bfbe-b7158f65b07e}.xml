@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>0</isdefault>
+    <savedqueryid>{b498e21f-73bd-462e-bfbe-b7158f65b07e}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="cr3c8_fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="cr3c8_silvernewbmspointid">
+          <cell name="cr3c8_fmc_name" width="100" />
+          <cell name="cr3c8_fmc_objectid" width="100" />
+          <cell name="cr3c8_fmc_valueconverted" width="100" />
+          <cell name="cr3c8_fmc_unitconverted" width="100" />
+          <cell name="cr3c8_fmc_warningflag" width="100" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="cr3c8_silvernewbmspoint">
+          <attribute name="cr3c8_fmc_name" />
+          <attribute name="cr3c8_fmc_objectid" />
+          <attribute name="cr3c8_fmc_valueconverted" />
+          <attribute name="cr3c8_fmc_unitconverted" />
+          <attribute name="cr3c8_fmc_warningflag" />
+          <order attribute="modifiedon" descending="true" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+            <condition attribute="cr3c8_fmc_warningflag" operator="eq" value="Flagged" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Cảnh báo chất lượng Silver" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

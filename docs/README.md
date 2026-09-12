@@ -5,6 +5,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| Runbook | [FMC BMS Demo hoàn chỉnh](runbooks/model-driven-app-demo.vi.md) | Demo đăng nhập, nhập liệu, SQL sync, Bronze/Silver, SharePoint, phân trang, phân quyền và đăng xuất |
 | Plan/receipt | [Custom API Request BMS Sync](plans/custom-api-request-bms-sync.vi.md) | Contract, kiến trúc, source và receipt của Custom API/business event đã deploy |
 | Runbook | [Test Custom API + Power Automate bằng UI](runbooks/custom-api-bms-sync-demo.vi.md) | Bấm Request BMS Sync trong app, đọc kết quả và kiểm tra Flow run history |
 | Interactive lab | [Custom API lab](interactive/custom-api-lab/index.html) | 13 bài chi tiết, source thật có giải thích từng dòng, simulator idempotency và contract designer chạy local |

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebResource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <WebResourceId>{e58d21ab-86ae-f111-aaad-00224819a344}</WebResourceId>
+  <Name>fmc_FMCBMSDemo_pagemanifest</Name>
+  <DisplayName>FMC BMS Demo Page Manifest</DisplayName>
+  <WebResourceType>3</WebResourceType>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <IsEnabledForMobileClient>0</IsEnabledForMobileClient>
+  <IsAvailableForMobileOffline>0</IsAvailableForMobileOffline>
+  <IsCustomizable>1</IsCustomizable>
+  <CanBeDeleted>1</CanBeDeleted>
+  <IsHidden>0</IsHidden>
+  <FileName>/WebResources/fmc_FMCBMSDemo_pagemanifestE58D21AB-86AE-F111-AAAD-00224819A344</FileName>
+</WebResource>
