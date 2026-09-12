@@ -9,7 +9,7 @@
       <tabs>
         <tab id="ce19408a-b041-4ca4-a1b0-9cbfae1476e8" name="tab_0" expanded="true" visible="true">
           <labels>
-            <label description="Dòng import" languagecode="1033" />
+            <label description="Import Row" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
@@ -125,7 +125,7 @@
     <IsCustomizable>1</IsCustomizable>
     <CanBeDeleted>1</CanBeDeleted>
     <LocalizedNames>
-      <LocalizedName description="Dòng import SharePoint - Demo" languagecode="1033" />
+      <LocalizedName description="SharePoint Import Row - Demo" languagecode="1033" />
     </LocalizedNames>
   </systemform>
 </forms>

@@ -9,7 +9,7 @@
       <tabs>
         <tab id="bacca442-d1da-4cd2-ad45-0552d24bcb3d" name="tab_0" expanded="true" visible="true">
           <labels>
-            <label description="Trạng thái đồng bộ" languagecode="1033" />
+            <label description="Sync Status" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
@@ -145,7 +145,7 @@
     <IsCustomizable>1</IsCustomizable>
     <CanBeDeleted>1</CanBeDeleted>
     <LocalizedNames>
-      <LocalizedName description="Yêu cầu đồng bộ - Demo" languagecode="1033" />
+      <LocalizedName description="Sync Request - Demo" languagecode="1033" />
     </LocalizedNames>
   </systemform>
 </forms>

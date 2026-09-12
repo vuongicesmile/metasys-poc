@@ -3,9 +3,9 @@
   "pages": [
     {
       "key": "trung-tam-van-hanh",
-      "name": "Trung tâm vận hành BMS",
+      "name": "BMS Operations Center",
       "pageId": "9d05b7f9-f4c4-4572-b6b8-0220b51812f3",
-      "purpose": "Vietnamese landing page for a live demo. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
+      "purpose": "English-first landing page with an English/Vietnamese selector. Persist the choice in localStorage key fmc.bms.language, fall back to English if unavailable, and localize static copy, statuses, date and number formats without changing business data. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
       "dataSources": [
         "fmc_bmsbuilding",
         "fmc_bmsequipment",

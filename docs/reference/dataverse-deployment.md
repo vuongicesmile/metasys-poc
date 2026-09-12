@@ -31,6 +31,16 @@ deployed generative page. The app ID remains
 `d19f4897-d227-4df3-8361-988f97c53e89`; the operating guide is
 [FMC BMS Demo model-driven app](../runbooks/model-driven-app-demo.vi.md).
 
+Later on 2026-09-12, the operations page and sync web resource were published
+with an English/Vietnamese selector and English as the default. The selector
+persists the preference, translates page copy/status/error messages and formats
+dates/numbers. Native demo navigation, ten view names and eight form names/labels
+were changed to English in place, preserving component IDs. The page selector
+does not change the user's Power Apps platform language. Published readback
+verified all 21 affected metadata/web-resource records; ValidateApp returned no
+issues. Local browser tests exercised both languages, persistence, blocked
+storage, translated errors and no extra data queries; six sync-page tests passed.
+
 On 2026-09-11, unbound action `fmc_RequestBmsSync`, main-operation plug-in
 `FMCentralBms.Plugins.RequestBmsSync`, business-event catalogs, active-key
 coalescing, flow `FMC - App Request BMS Sync Event`, and the **Power Automate

@@ -73,3 +73,54 @@ Result: independent live readback confirmed eight app tables, one deployed gener
 `pac solution unpack --zipfile .artifacts\model-apps\fmc-bms-demo-live.zip --folder .artifacts\model-apps\fmc-bms-demo-solution-20260912 --packagetype Unmanaged`
 
 Result: live unmanaged solution exported and unpacked successfully, then merged into `dataverse/FMCentralBms`. This preserves the exact app module, sitemap, forms, views, roles, web resources and existing integration components in source control.
+
+## Language edit — read-only planning and live baseline
+
+`node --version`
+Result: v24.20.0.
+
+`pac help`
+Result: PAC CLI Version 2.11.2, greater than 2.10.0.
+
+`pac auth list`
+Result: active profile ai-agent-platform, vuong.nguyenq@titancorpvn.com, expected environment.
+
+`pac org who`
+Result: organization ab191700-b99e-f111-aaa0-000d3a80bb96 and environment 5abcb0e5-99b2-e51f-aa0e-90d84405798b match the project target.
+
+`pac model genpage --help`
+Result: help syntax rejected; command usage returned. Used the supported help suffix below.
+
+`pac model genpage upload help`
+Result: existing-page update accepts --page-id; upload transpiles and publishes automatically.
+
+`pac model genpage download help`
+Result: --output-directory supports an isolated baseline snapshot.
+
+`pac model genpage list --app-id d19f4897-d227-4df3-8361-988f97c53e89 --environment https://org06cbc9ec.crm5.dynamics.com/`
+Result: one page, 9d05b7f9-f4c4-4572-b6b8-0220b51812f3.
+
+`pac model genpage download --environment https://org06cbc9ec.crm5.dynamics.com/ --app-id d19f4897-d227-4df3-8361-988f97c53e89 --page-id 9d05b7f9-f4c4-4572-b6b8-0220b51812f3 --output-directory D:\Coder\metasys-poc\.artifacts\model-apps\language-edit-before`
+Result: live TSX, JavaScript, config and original prompt downloaded. Config contains eight existing Dataverse tables and no connector/custom API bindings.
+
+`git diff --no-index --ignore-cr-at-eol -- D:\Coder\metasys-poc\dataverse\app-source\fmc-bms-demo\trung-tam-van-hanh.tsx D:\Coder\metasys-poc\.artifacts\model-apps\language-edit-before\9d05b7f9-f4c4-4572-b6b8-0220b51812f3\page.tsx`
+Result: only UTF-8 BOM and final blank line differ; no implementation drift.
+
+AskUserQuestion skipped: user explicitly requested English/Vietnamese selection with English default. Existing implementation/publish authorization remains applicable.
+EnterPlanMode unavailable in Default mode; bounded edit plan written to genpage-edit-plan.md for implementation. No TSX, metadata or live application edits were made by the planning step.
+
+## Language update — page deployment
+
+Command: `pac model genpage upload --environment https://org06cbc9ec.crm5.dynamics.com/ --app-id d19f4897-d227-4df3-8361-988f97c53e89 --page-id 9d05b7f9-f4c4-4572-b6b8-0220b51812f3 --code-file D:/Coder/metasys-poc/dataverse/app-source/fmc-bms-demo/trung-tam-van-hanh.tsx --name "BMS Operations Center" --data-sources "fmc_bmsbuilding,fmc_bmsequipment,fmc_bmspoint,fmc_bmsreading,cr3c8_silvernewbmspoint,fmc_syncrequest,fmc_spofile,fmc_spoimportrow" --prompt "Add English/Vietnamese language selection with English default, persisted preference, translated statuses, locale formatting and translated error states." --model gpt-6 --agent-message "Add an English-first bilingual operations dashboard while preserving data queries and navigation."`
+
+Local verification: dashboard browser tests passed (English default despite Vietnamese browser locale, locale date/number formats, status translations, persistence, cross-tab updates, translated errors, no refetch, blocked storage, mobile layout). Sync web-resource tests passed 6/6.
+
+Result: `pac model genpage upload` transpiled, updated page `9d05b7f9-f4c4-4572-b6b8-0220b51812f3` and published successfully. No new page was created.
+
+Native metadata update: prepared live snapshots, then PATCHed ten existing savedquery names, eight systemform names/labels, the existing sitemap and two web resources (sync page and page manifest). Component IDs were preserved. Two new English view names include a Demo suffix to avoid colliding with pre-existing views. Published using scoped `PublishXml` for the eight app tables, sitemap, web resources and app. All 21 records matched their expected values after publish; `ValidateApp` returned `ValidationSuccess=true` with no issues.
+
+Platform language: only LCID 1033 is provisioned. The authored page selectors use `fmc.bms.language` in localStorage and do not change Power Apps user settings. Browser verification used a local harness with synthetic data; it did not impersonate a live Viewer account or run SQL sync.
+
+Final read-only command: `node verify-model-app.js --env https://org06cbc9ec.crm5.dynamics.com/ --spec @D:/Coder/metasys-poc/dataverse/app-source/fmc-bms-demo/app-spec.json`. Result: PASS, 109/109 present, no missing components or errors.
+
+Source capture: `pac solution export --name FMCentralBms --path .artifacts/model-apps/fmc-bms-demo-bilingual.zip --managed false --environment https://org06cbc9ec.crm5.dynamics.com/ --overwrite`, then `pac solution unpack --zipfile .artifacts/model-apps/fmc-bms-demo-bilingual.zip --folder .artifacts/model-apps/fmc-bms-demo-bilingual-solution --packagetype Unmanaged`. Both succeeded; the exported solution was merged into `dataverse/FMCentralBms` after checking the target paths.

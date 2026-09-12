@@ -12,56 +12,56 @@
       </Titles>
       <Group Id="group_0_0" ResourceId="SitemapDesigner.NewGroup" DescriptionResourceId="SitemapDesigner.NewGroup" ToolTipResourseId="SitemapDesigner.Unknown" IntroducedVersion="7.0.0.0" IsProfile="false">
         <Titles>
-          <Title LCID="1033" Title="Tổng quan" />
+          <Title LCID="1033" Title="Overview" />
         </Titles>
         <SubArea Id="sub_0_0_0" GenPageId="9d05b7f9-f4c4-4572-b6b8-0220b51812f3" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false" VectorIcon="/_imgs/TableIconsFluentV9/document_one_page_sparkle.svg">
           <Titles>
-            <Title LCID="1033" Title="Trung tâm vận hành" />
+            <Title LCID="1033" Title="Operations Center" />
           </Titles>
         </SubArea>
         <SubArea Id="sub_0_0_1" Url="$webresource:fmc_/pages/BmsEventDemo.html" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Đồng bộ dữ liệu" />
+            <Title LCID="1033" Title="Sync Data" />
           </Titles>
         </SubArea>
       </Group>
       <Group Id="group_0_1" ResourceId="SitemapDesigner.NewGroup" DescriptionResourceId="SitemapDesigner.NewGroup" ToolTipResourseId="SitemapDesigner.Unknown" IntroducedVersion="7.0.0.0" IsProfile="false">
         <Titles>
-          <Title LCID="1033" Title="Nhập liệu" />
+          <Title LCID="1033" Title="Data Entry" />
         </Titles>
         <SubArea Id="sub_0_1_0" Entity="fmc_bmsbuilding" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Tòa nhà" />
+            <Title LCID="1033" Title="Buildings" />
           </Titles>
         </SubArea>
         <SubArea Id="sub_0_1_1" Entity="fmc_bmsequipment" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Thiết bị" />
+            <Title LCID="1033" Title="Equipment" />
           </Titles>
         </SubArea>
       </Group>
       <Group Id="group_0_2" ResourceId="SitemapDesigner.NewGroup" DescriptionResourceId="SitemapDesigner.NewGroup" ToolTipResourseId="SitemapDesigner.Unknown" IntroducedVersion="7.0.0.0" IsProfile="false">
         <Titles>
-          <Title LCID="1033" Title="Dữ liệu Bronze" />
+          <Title LCID="1033" Title="Bronze Data" />
         </Titles>
         <SubArea Id="sub_0_2_0" Entity="fmc_bmspoint" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Điểm hiện tại" />
+            <Title LCID="1033" Title="Current Points" />
           </Titles>
         </SubArea>
         <SubArea Id="sub_0_2_1" Entity="fmc_bmsreading" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Lịch sử readings" />
+            <Title LCID="1033" Title="Reading History" />
           </Titles>
         </SubArea>
       </Group>
       <Group Id="group_0_3" ResourceId="SitemapDesigner.NewGroup" DescriptionResourceId="SitemapDesigner.NewGroup" ToolTipResourseId="SitemapDesigner.Unknown" IntroducedVersion="7.0.0.0" IsProfile="false">
         <Titles>
-          <Title LCID="1033" Title="Dữ liệu Silver" />
+          <Title LCID="1033" Title="Silver Data" />
         </Titles>
         <SubArea Id="sub_0_3_0" Entity="cr3c8_silvernewbmspoint" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Điểm đã chuẩn hóa" />
+            <Title LCID="1033" Title="Normalized Points" />
           </Titles>
         </SubArea>
       </Group>
@@ -71,27 +71,27 @@
         </Titles>
         <SubArea Id="sub_0_4_0" Entity="fmc_spofile" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="File đã tiếp nhận" />
+            <Title LCID="1033" Title="Received Files" />
           </Titles>
         </SubArea>
         <SubArea Id="sub_0_4_1" Entity="fmc_spoimportrow" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Dòng đã parse" />
+            <Title LCID="1033" Title="Parsed Rows" />
           </Titles>
         </SubArea>
       </Group>
       <Group Id="group_0_5" ResourceId="SitemapDesigner.NewGroup" DescriptionResourceId="SitemapDesigner.NewGroup" ToolTipResourseId="SitemapDesigner.Unknown" IntroducedVersion="7.0.0.0" IsProfile="false">
         <Titles>
-          <Title LCID="1033" Title="Vận hành" />
+          <Title LCID="1033" Title="Operations" />
         </Titles>
         <SubArea Id="sub_0_5_0" Entity="fmc_syncrequest" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Yêu cầu đồng bộ" />
+            <Title LCID="1033" Title="Sync Requests" />
           </Titles>
         </SubArea>
         <SubArea Id="sub_0_5_1" Url="https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d13bfe37-ca87-412b-9531-d3ed381b5b21/details" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Lịch sử Power Automate" />
+            <Title LCID="1033" Title="Power Automate History" />
           </Titles>
         </SubArea>
       </Group>

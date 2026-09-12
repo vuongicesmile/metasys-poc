@@ -36,7 +36,7 @@
     </fetchxml>
     <IntroducedVersion>1.0</IntroducedVersion>
     <LocalizedNames>
-      <LocalizedName description="Thiết bị BMS" languagecode="1033" />
+      <LocalizedName description="BMS Equipment - Demo View" languagecode="1033" />
     </LocalizedNames>
   </savedquery>
 </savedqueries>

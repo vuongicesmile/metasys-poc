@@ -38,7 +38,7 @@
     </fetchxml>
     <IntroducedVersion>1.0</IntroducedVersion>
     <LocalizedNames>
-      <LocalizedName description="Dòng import SharePoint" languagecode="1033" />
+      <LocalizedName description="SharePoint Import Rows" languagecode="1033" />
     </LocalizedNames>
   </savedquery>
 </savedqueries>

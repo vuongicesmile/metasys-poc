@@ -9,7 +9,7 @@
       <tabs>
         <tab id="d9db7648-fe7c-4a6c-a058-45c2be69baae" name="tab_0" expanded="true" visible="true">
           <labels>
-            <label description="Thông tin thiết bị" languagecode="1033" />
+            <label description="Equipment Information" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
@@ -59,13 +59,13 @@
                 </section>
                 <section id="c19d964a-7849-45db-827f-aaf3e7698286" name="section_grid_fmc_bmsequipment_bmspoint" showlabel="true" visible="true" columns="1">
                   <labels>
-                    <label description="Điểm thuộc thiết bị" languagecode="1033" />
+                    <label description="Equipment Points" languagecode="1033" />
                   </labels>
                   <rows>
                     <row>
                       <cell id="f8f53235-7a9e-4eba-a481-34d3c83fd6db" showlabel="true" visible="true" colspan="1" rowspan="1">
                         <labels>
-                          <label description="Điểm thuộc thiết bị" languagecode="1033" />
+                          <label description="Equipment Points" languagecode="1033" />
                         </labels>
                         <control id="79b252b1-e372-460c-a4f5-0d45eb24f9f6" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}" disabled="false" isrequired="false">
                           <parameters>
@@ -135,7 +135,7 @@
     <IsCustomizable>1</IsCustomizable>
     <CanBeDeleted>1</CanBeDeleted>
     <LocalizedNames>
-      <LocalizedName description="Thiết bị BMS - Demo" languagecode="1033" />
+      <LocalizedName description="BMS Equipment - Demo" languagecode="1033" />
     </LocalizedNames>
   </systemform>
 </forms>

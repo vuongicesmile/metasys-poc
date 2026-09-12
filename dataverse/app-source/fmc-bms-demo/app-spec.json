@@ -8,7 +8,7 @@
   },
   "app": {
     "name": "FMC BMS Demo",
-    "description": "Demo tiếng Việt cho nhập catalog, Bronze-to-Silver, SQL sync và tiếp nhận file SharePoint.",
+    "description": "English-first BMS demo with an English/Vietnamese page selector, catalog entry, Bronze-to-Silver data, SQL sync and SharePoint file ingestion.",
     "uniqueName": "fmc_FMCBMSDemo",
     "newLook": true,
     "headerNavigationRefresh": true
@@ -473,7 +473,7 @@
   "views": [
     {
       "entity": "fmc_bmsbuilding",
-      "name": "Tòa nhà BMS",
+      "name": "BMS Buildings - Demo",
       "columns": [
         "fmc_name",
         "fmc_buildingcode",
@@ -490,7 +490,7 @@
     },
     {
       "entity": "fmc_bmsequipment",
-      "name": "Thiết bị BMS",
+      "name": "BMS Equipment - Demo View",
       "columns": [
         "fmc_name",
         "fmc_equipmentcode",
@@ -508,7 +508,7 @@
     },
     {
       "entity": "fmc_bmspoint",
-      "name": "Điểm BMS hiện tại",
+      "name": "Current BMS Points",
       "columns": [
         "fmc_name",
         "fmc_objectid",
@@ -528,7 +528,7 @@
     },
     {
       "entity": "fmc_bmsreading",
-      "name": "Lịch sử Bronze gần đây",
+      "name": "Recent Bronze Readings",
       "description": "Server-side paged view for the large elastic history.",
       "columns": [
         "fmc_objectname",
@@ -549,7 +549,7 @@
     },
     {
       "entity": "cr3c8_silvernewbmspoint",
-      "name": "Dữ liệu Silver đã chuẩn hóa",
+      "name": "Normalized Silver Data",
       "columns": [
         "cr3c8_fmc_name",
         "cr3c8_fmc_objectid",
@@ -569,7 +569,7 @@
     },
     {
       "entity": "cr3c8_silvernewbmspoint",
-      "name": "Cảnh báo chất lượng Silver",
+      "name": "Silver Quality Warnings",
       "columns": [
         "cr3c8_fmc_name",
         "cr3c8_fmc_objectid",
@@ -594,7 +594,7 @@
     },
     {
       "entity": "fmc_syncrequest",
-      "name": "Yêu cầu đồng bộ gần đây",
+      "name": "Recent Sync Requests",
       "columns": [
         "fmc_name",
         "fmc_status",
@@ -615,7 +615,7 @@
     },
     {
       "entity": "fmc_syncrequest",
-      "name": "Yêu cầu đang xử lý",
+      "name": "Pending Sync Requests",
       "columns": [
         "fmc_name",
         "fmc_status",
@@ -644,7 +644,7 @@
     },
     {
       "entity": "fmc_spofile",
-      "name": "File SharePoint gần đây",
+      "name": "Recent SharePoint Files",
       "columns": [
         "fmc_filename",
         "fmc_status",
@@ -663,7 +663,7 @@
     },
     {
       "entity": "fmc_spoimportrow",
-      "name": "Dòng import SharePoint",
+      "name": "SharePoint Import Rows",
       "columns": [
         "fmc_name",
         "fmc_ordinal",
@@ -684,13 +684,13 @@
   "forms": [
     {
       "entity": "fmc_bmsbuilding",
-      "name": "Tòa nhà BMS - Demo",
+      "name": "BMS Building - Demo",
       "formType": "Main",
       "layout": "explicit",
       "prune": false,
       "tabs": [
         {
-          "label": "Thông tin tòa nhà",
+          "label": "Building Information",
           "sections": [
             {
               "columns": 2,
@@ -707,20 +707,20 @@
       "subgrids": [
         {
           "childEntity": "fmc_bmsequipment",
-          "view": "Thiết bị BMS",
-          "label": "Thiết bị trong tòa nhà"
+          "view": "BMS Equipment - Demo View",
+          "label": "Building Equipment"
         }
       ]
     },
     {
       "entity": "fmc_bmsbuilding",
-      "name": "Tạo nhanh tòa nhà BMS",
+      "name": "Quick Create BMS Building",
       "formType": "QuickCreate",
       "layout": "explicit",
       "prune": false,
       "tabs": [
         {
-          "label": "Tạo tòa nhà",
+          "label": "Create Building",
           "sections": [
             {
               "columns": 1,
@@ -736,13 +736,13 @@
     },
     {
       "entity": "fmc_bmsequipment",
-      "name": "Thiết bị BMS - Demo",
+      "name": "BMS Equipment - Demo",
       "formType": "Main",
       "layout": "explicit",
       "prune": false,
       "tabs": [
         {
-          "label": "Thông tin thiết bị",
+          "label": "Equipment Information",
           "sections": [
             {
               "columns": 2,
@@ -760,20 +760,20 @@
       "subgrids": [
         {
           "childEntity": "fmc_bmspoint",
-          "view": "Điểm BMS hiện tại",
-          "label": "Điểm thuộc thiết bị"
+          "view": "Current BMS Points",
+          "label": "Equipment Points"
         }
       ]
     },
     {
       "entity": "fmc_bmsequipment",
-      "name": "Tạo nhanh thiết bị BMS",
+      "name": "Quick Create BMS Equipment",
       "formType": "QuickCreate",
       "layout": "explicit",
       "prune": false,
       "tabs": [
         {
-          "label": "Tạo thiết bị",
+          "label": "Create Equipment",
           "sections": [
             {
               "columns": 1,
@@ -791,13 +791,13 @@
     },
     {
       "entity": "fmc_bmspoint",
-      "name": "Điểm BMS - Demo",
+      "name": "BMS Point - Demo",
       "formType": "Main",
       "layout": "explicit",
       "prune": false,
       "tabs": [
         {
-          "label": "Dữ liệu Bronze",
+          "label": "Bronze Data",
           "sections": [
             {
               "columns": 2,
@@ -850,13 +850,13 @@
     },
     {
       "entity": "fmc_syncrequest",
-      "name": "Yêu cầu đồng bộ - Demo",
+      "name": "Sync Request - Demo",
       "formType": "Main",
       "layout": "explicit",
       "prune": false,
       "tabs": [
         {
-          "label": "Trạng thái đồng bộ",
+          "label": "Sync Status",
           "sections": [
             {
               "columns": 2,
@@ -915,7 +915,7 @@
       "prune": false,
       "tabs": [
         {
-          "label": "Tiếp nhận file",
+          "label": "File Receipt",
           "sections": [
             {
               "columns": 2,
@@ -939,20 +939,20 @@
       "subgrids": [
         {
           "childEntity": "fmc_spoimportrow",
-          "view": "Dòng import SharePoint",
-          "label": "Dòng dữ liệu đã parse"
+          "view": "SharePoint Import Rows",
+          "label": "Parsed Data Rows"
         }
       ]
     },
     {
       "entity": "fmc_spoimportrow",
-      "name": "Dòng import SharePoint - Demo",
+      "name": "SharePoint Import Row - Demo",
       "formType": "Main",
       "layout": "explicit",
       "prune": false,
       "tabs": [
         {
-          "label": "Dòng import",
+          "label": "Import Row",
           "sections": [
             {
               "columns": 2,
@@ -995,8 +995,8 @@
   "pages": [
     {
       "key": "trung-tam-van-hanh",
-      "name": "Trung tâm vận hành BMS",
-      "purpose": "Vietnamese landing page for a live demo. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
+      "name": "BMS Operations Center",
+      "purpose": "English-first landing page with an English/Vietnamese selector. Persist the choice in localStorage key fmc.bms.language, fall back to English if unavailable, and localize static copy, statuses, date and number formats without changing business data. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
       "dataSources": [
         "fmc_bmsbuilding",
         "fmc_bmsequipment",
@@ -1026,50 +1026,50 @@
         "label": "FMC BMS Demo",
         "groups": [
           {
-            "label": "Tổng quan",
+            "label": "Overview",
             "subAreas": [
               {
                 "page": "trung-tam-van-hanh",
-                "title": "Trung tâm vận hành"
+                "title": "Operations Center"
               },
               {
                 "url": "$webresource:fmc_/pages/BmsEventDemo.html",
-                "title": "Đồng bộ dữ liệu"
+                "title": "Sync Data"
               }
             ]
           },
           {
-            "label": "Nhập liệu",
+            "label": "Data Entry",
             "subAreas": [
               {
                 "entity": "fmc_bmsbuilding",
-                "title": "Tòa nhà"
+                "title": "Buildings"
               },
               {
                 "entity": "fmc_bmsequipment",
-                "title": "Thiết bị"
+                "title": "Equipment"
               }
             ]
           },
           {
-            "label": "Dữ liệu Bronze",
+            "label": "Bronze Data",
             "subAreas": [
               {
                 "entity": "fmc_bmspoint",
-                "title": "Điểm hiện tại"
+                "title": "Current Points"
               },
               {
                 "entity": "fmc_bmsreading",
-                "title": "Lịch sử readings"
+                "title": "Reading History"
               }
             ]
           },
           {
-            "label": "Dữ liệu Silver",
+            "label": "Silver Data",
             "subAreas": [
               {
                 "entity": "cr3c8_silvernewbmspoint",
-                "title": "Điểm đã chuẩn hóa"
+                "title": "Normalized Points"
               }
             ]
           },
@@ -1078,24 +1078,24 @@
             "subAreas": [
               {
                 "entity": "fmc_spofile",
-                "title": "File đã tiếp nhận"
+                "title": "Received Files"
               },
               {
                 "entity": "fmc_spoimportrow",
-                "title": "Dòng đã parse"
+                "title": "Parsed Rows"
               }
             ]
           },
           {
-            "label": "Vận hành",
+            "label": "Operations",
             "subAreas": [
               {
                 "entity": "fmc_syncrequest",
-                "title": "Yêu cầu đồng bộ"
+                "title": "Sync Requests"
               },
               {
                 "url": "https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d13bfe37-ca87-412b-9531-d3ed381b5b21/details",
-                "title": "Lịch sử Power Automate"
+                "title": "Power Automate History"
               }
             ]
           }
@@ -1109,12 +1109,12 @@
       "appAccess": true,
       "jobs": [
         {
-          "name": "Theo dõi pipeline end-to-end",
+          "name": "Monitor the end-to-end pipeline",
           "surfaces": [
             "trung-tam-van-hanh",
-            "Điểm BMS hiện tại",
-            "Lịch sử Bronze gần đây",
-            "Dữ liệu Silver đã chuẩn hóa"
+            "Current BMS Points",
+            "Recent Bronze Readings",
+            "Normalized Silver Data"
           ],
           "privileges": [
             {
@@ -1176,12 +1176,12 @@
           ]
         },
         {
-          "name": "Nhập catalog BMS",
+          "name": "Maintain the BMS catalog",
           "surfaces": [
-            "Tạo nhanh tòa nhà BMS",
-            "Tạo nhanh thiết bị BMS",
-            "Tòa nhà BMS - Demo",
-            "Thiết bị BMS - Demo"
+            "Quick Create BMS Building",
+            "Quick Create BMS Equipment",
+            "BMS Building - Demo",
+            "BMS Equipment - Demo"
           ],
           "privileges": [
             {
@@ -1217,11 +1217,11 @@
           ]
         },
         {
-          "name": "Yêu cầu và theo dõi đồng bộ",
+          "name": "Request and monitor synchronization",
           "surfaces": [
-            "Đồng bộ dữ liệu",
-            "Yêu cầu đồng bộ gần đây",
-            "Yêu cầu đang xử lý"
+            "Sync Data",
+            "Recent Sync Requests",
+            "Pending Sync Requests"
           ],
           "privileges": [
             {
@@ -1249,11 +1249,11 @@
           ]
         },
         {
-          "name": "Kiểm tra tiếp nhận file SharePoint",
+          "name": "Inspect SharePoint file ingestion",
           "surfaces": [
-            "File SharePoint gần đây",
+            "Recent SharePoint Files",
             "File SharePoint - Demo",
-            "Dòng import SharePoint"
+            "SharePoint Import Rows"
           ],
           "privileges": [
             {
@@ -1279,13 +1279,13 @@
       "appAccess": true,
       "jobs": [
         {
-          "name": "Xem demo ở chế độ chỉ đọc",
+          "name": "View the demo with read-only access",
           "surfaces": [
             "trung-tam-van-hanh",
-            "Điểm BMS hiện tại",
-            "Dữ liệu Silver đã chuẩn hóa",
-            "Yêu cầu đồng bộ gần đây",
-            "File SharePoint gần đây"
+            "Current BMS Points",
+            "Normalized Silver Data",
+            "Recent Sync Requests",
+            "Recent SharePoint Files"
           ],
           "privileges": [
             {

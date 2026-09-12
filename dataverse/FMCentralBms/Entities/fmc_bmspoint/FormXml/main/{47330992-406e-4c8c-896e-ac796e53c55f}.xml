@@ -9,7 +9,7 @@
       <tabs>
         <tab id="3201b5ce-1338-4701-ba55-51f3019e95ab" name="tab_0" expanded="true" visible="true">
           <labels>
-            <label description="Dữ liệu Bronze" languagecode="1033" />
+            <label description="Bronze Data" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
@@ -145,7 +145,7 @@
     <IsCustomizable>1</IsCustomizable>
     <CanBeDeleted>1</CanBeDeleted>
     <LocalizedNames>
-      <LocalizedName description="Điểm BMS - Demo" languagecode="1033" />
+      <LocalizedName description="BMS Point - Demo" languagecode="1033" />
     </LocalizedNames>
   </systemform>
 </forms>

@@ -1,5 +1,33 @@
 # FMC BMS Demo — hướng dẫn demo end-to-end
 
+## Chọn ngôn ngữ — cập nhật 2026-09-12
+
+Trang **BMS Operations Center** và **Sync Data** có bộ chọn **Language → English / Tiếng Việt**. Mặc định là **English**, kể cả khi trình duyệt dùng tiếng Việt. Nếu đã chọn một ngôn ngữ, app nhớ lựa chọn trong trình duyệt bằng khóa `fmc.bms.language`; nếu trình duyệt chặn storage, vẫn chuyển được trong phiên hiện tại.
+
+Bộ chọn dịch nội dung hai trang, nhãn truy cập, trạng thái, thông báo lỗi, ngày và số. Dữ liệu nghiệp vụ như tên tòa nhà, tên file và thông báo gốc từ server được giữ nguyên. Đổi ngôn ngữ không đọc lại dữ liệu hoặc gửi thêm request sync.
+
+Menu, tên view và nhãn form của demo đã đổi sang English. Bộ chọn trong trang không thay đổi ngôn ngữ tài khoản hay dịch thanh công cụ chuẩn của Power Apps. Môi trường hiện chỉ bật ngôn ngữ nền tảng English (LCID 1033).
+
+| Tên trong hướng dẫn tiếng Việt bên dưới | Tên hiện tại trong app |
+| --- | --- |
+| Tổng quan → Trung tâm vận hành BMS | Overview → Operations Center |
+| Tổng quan → Đồng bộ dữ liệu | Overview → Sync Data |
+| Nhập liệu → Tòa nhà / Thiết bị | Data Entry → Buildings / Equipment |
+| Dữ liệu Bronze → Điểm hiện tại / Lịch sử readings | Bronze Data → Current Points / Reading History |
+| Dữ liệu Silver → Điểm đã chuẩn hóa | Silver Data → Normalized Points |
+| SharePoint → File đã tiếp nhận / Dòng đã parse | SharePoint → Received Files / Parsed Rows |
+| Vận hành → Yêu cầu đồng bộ | Operations → Sync Requests |
+
+Kiểm thử local chạy bằng dữ liệu giả, không gọi Dataverse:
+
+```powershell
+npm install --prefix .artifacts/language-tests --no-audit --no-fund typescript@5 react@17 react-dom@17 @fluentui/react-components@9 @fluentui/react-icons@2 @playwright/test@1 @types/react@17 @types/react-dom@17 esbuild@0.25
+node scripts/tests/bms-language-ui.cjs
+node --test scripts/tests/Test-BmsEventDemoLanguage.mjs
+```
+
+UI test dùng Microsoft Edge cài trên máy. Các ca kiểm tra gồm mặc định English, dịch sang tiếng Việt, lưu lựa chọn, đổi ngôn ngữ giữa các tab, định dạng ngày/số, trạng thái Choice, lỗi tải/điều hướng, storage bị chặn và bố cục mobile.
+
 ## Trạng thái triển khai
 
 App đã được build và publish ngày 2026-09-12 vào môi trường Developer:

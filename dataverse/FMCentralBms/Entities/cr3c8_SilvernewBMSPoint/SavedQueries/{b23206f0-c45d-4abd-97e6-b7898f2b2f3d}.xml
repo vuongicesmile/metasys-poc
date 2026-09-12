@@ -40,7 +40,7 @@
     </fetchxml>
     <IntroducedVersion>1.0</IntroducedVersion>
     <LocalizedNames>
-      <LocalizedName description="Dữ liệu Silver đã chuẩn hóa" languagecode="1033" />
+      <LocalizedName description="Normalized Silver Data" languagecode="1033" />
     </LocalizedNames>
   </savedquery>
 </savedqueries>

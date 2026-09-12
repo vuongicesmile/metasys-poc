@@ -37,7 +37,7 @@
     </fetchxml>
     <IntroducedVersion>1.0</IntroducedVersion>
     <LocalizedNames>
-      <LocalizedName description="Cảnh báo chất lượng Silver" languagecode="1033" />
+      <LocalizedName description="Silver Quality Warnings" languagecode="1033" />
     </LocalizedNames>
   </savedquery>
 </savedqueries>

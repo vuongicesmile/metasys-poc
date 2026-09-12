@@ -1,6 +1,6 @@
 # FMC BMS Demo — design
 
-Demo tiếng Việt cho nhập catalog, Bronze-to-Silver, SQL sync và tiếp nhận file SharePoint.
+English-first BMS demo with an English/Vietnamese page selector, catalog entry, Bronze-to-Silver data, SQL sync and SharePoint file ingestion.
 
 Generated from `app-spec.json` by `scripts/write-app-spec-doc.js`. **Regenerate rather than
 hand-edit** — `app-spec.json` is the source of truth, so a manual edit here is lost on the next
@@ -19,11 +19,11 @@ run and silently disagrees with what actually builds.
 
 | Persona | Job to be done | Surfaces that satisfy it |
 |---|---|---|
-| FMC BMS Demo Operator | Theo dõi pipeline end-to-end | trung-tam-van-hanh, Điểm BMS hiện tại, Lịch sử Bronze gần đây, Dữ liệu Silver đã chuẩn hóa |
-| FMC BMS Demo Operator | Nhập catalog BMS | Tạo nhanh tòa nhà BMS, Tạo nhanh thiết bị BMS, Tòa nhà BMS - Demo, Thiết bị BMS - Demo |
-| FMC BMS Demo Operator | Yêu cầu và theo dõi đồng bộ | Đồng bộ dữ liệu, Yêu cầu đồng bộ gần đây, Yêu cầu đang xử lý |
-| FMC BMS Demo Operator | Kiểm tra tiếp nhận file SharePoint | File SharePoint gần đây, File SharePoint - Demo, Dòng import SharePoint |
-| FMC BMS Demo Viewer | Xem demo ở chế độ chỉ đọc | trung-tam-van-hanh, Điểm BMS hiện tại, Dữ liệu Silver đã chuẩn hóa, Yêu cầu đồng bộ gần đây, File SharePoint gần đây |
+| FMC BMS Demo Operator | Monitor the end-to-end pipeline | trung-tam-van-hanh, Current BMS Points, Recent Bronze Readings, Normalized Silver Data |
+| FMC BMS Demo Operator | Maintain the BMS catalog | Quick Create BMS Building, Quick Create BMS Equipment, BMS Building - Demo, BMS Equipment - Demo |
+| FMC BMS Demo Operator | Request and monitor synchronization | Sync Data, Recent Sync Requests, Pending Sync Requests |
+| FMC BMS Demo Operator | Inspect SharePoint file ingestion | Recent SharePoint Files, File SharePoint - Demo, SharePoint Import Rows |
+| FMC BMS Demo Viewer | View the demo with read-only access | trung-tam-van-hanh, Current BMS Points, Normalized Silver Data, Recent Sync Requests, Recent SharePoint Files |
 
 ## Data model
 
@@ -161,56 +161,56 @@ Parsed data rows associated with an imported SharePoint file version.
 
 | Page | Key | Purpose | Reads | Navigates to | State |
 |---|---|---|---|---|---|
-| Trung tâm vận hành BMS | `trung-tam-van-hanh` | Vietnamese landing page for a live demo. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states. | fmc_bmsbuilding, fmc_bmsequipment, fmc_bmspoint, fmc_bmsreading, cr3c8_silvernewbmspoint, fmc_syncrequest, fmc_spofile, fmc_spoimportrow | — | built (`trung-tam-van-hanh.tsx`) |
+| BMS Operations Center | `trung-tam-van-hanh` | English-first landing page with an English/Vietnamese selector. Persist the choice in localStorage key fmc.bms.language, fall back to English if unavailable, and localize static copy, statuses, date and number formats without changing business data. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states. | fmc_bmsbuilding, fmc_bmsequipment, fmc_bmspoint, fmc_bmsreading, cr3c8_silvernewbmspoint, fmc_syncrequest, fmc_spofile, fmc_spoimportrow | — | built (`trung-tam-van-hanh.tsx`) |
 
 ### Forms
 
 | Form | Table | Type | Layout | Sub-grids |
 |---|---|---|---|---|
-| Tòa nhà BMS - Demo | fmc_bmsbuilding | Main | explicit (1 tab) | fmc_bmsequipment |
-| Tạo nhanh tòa nhà BMS | fmc_bmsbuilding | QuickCreate | explicit (1 tab) | — |
-| Thiết bị BMS - Demo | fmc_bmsequipment | Main | explicit (1 tab) | fmc_bmspoint |
-| Tạo nhanh thiết bị BMS | fmc_bmsequipment | QuickCreate | explicit (1 tab) | — |
-| Điểm BMS - Demo | fmc_bmspoint | Main | explicit (1 tab) | — |
-| Yêu cầu đồng bộ - Demo | fmc_syncrequest | Main | explicit (1 tab) | — |
+| BMS Building - Demo | fmc_bmsbuilding | Main | explicit (1 tab) | fmc_bmsequipment |
+| Quick Create BMS Building | fmc_bmsbuilding | QuickCreate | explicit (1 tab) | — |
+| BMS Equipment - Demo | fmc_bmsequipment | Main | explicit (1 tab) | fmc_bmspoint |
+| Quick Create BMS Equipment | fmc_bmsequipment | QuickCreate | explicit (1 tab) | — |
+| BMS Point - Demo | fmc_bmspoint | Main | explicit (1 tab) | — |
+| Sync Request - Demo | fmc_syncrequest | Main | explicit (1 tab) | — |
 | File SharePoint - Demo | fmc_spofile | Main | explicit (1 tab) | fmc_spoimportrow |
-| Dòng import SharePoint - Demo | fmc_spoimportrow | Main | explicit (1 tab) | — |
+| SharePoint Import Row - Demo | fmc_spoimportrow | Main | explicit (1 tab) | — |
 
 ### Views
 
 | View | Table | Columns | Filters | Sort |
 |---|---|---|---|---|
-| Tòa nhà BMS | fmc_bmsbuilding | fmc_name, fmc_buildingcode, fmc_sourcebuilding, modifiedon | — | fmc_name asc |
-| Thiết bị BMS | fmc_bmsequipment | fmc_name, fmc_equipmentcode, fmc_equipmenttype, fmc_buildingid, modifiedon | — | fmc_name asc |
-| Điểm BMS hiện tại | fmc_bmspoint | fmc_name, fmc_objectid, fmc_building, fmc_equipmentid, fmc_currentvalue, fmc_unit, fmc_lastreadingtime | — | fmc_lastreadingtime desc |
-| Lịch sử Bronze gần đây | fmc_bmsreading | fmc_objectname, fmc_objectid, fmc_building, fmc_readingvalue, fmc_unit, fmc_readingtime, fmc_sourcesystem | all records | fmc_readingtime desc |
-| Dữ liệu Silver đã chuẩn hóa | cr3c8_silvernewbmspoint | cr3c8_fmc_name, cr3c8_fmc_objectid, cr3c8_fmc_building, cr3c8_fmc_valueconverted, cr3c8_fmc_unitconverted, cr3c8_fmc_warningflag, cr3c8_fmc_lastreadingtime | — | modifiedon desc |
-| Cảnh báo chất lượng Silver | cr3c8_silvernewbmspoint | cr3c8_fmc_name, cr3c8_fmc_objectid, cr3c8_fmc_valueconverted, cr3c8_fmc_unitconverted, cr3c8_fmc_warningflag | cr3c8_fmc_warningflag eq Flagged | modifiedon desc |
-| Yêu cầu đồng bộ gần đây | fmc_syncrequest | fmc_name, fmc_status, fmc_requestedby, fmc_requestedcutoffid, fmc_deliveredrows, fmc_pendingafter, fmc_quarantinedrows, fmc_completedat | — | createdon desc |
-| Yêu cầu đang xử lý | fmc_syncrequest | fmc_name, fmc_status, fmc_requestedby, fmc_attempts, fmc_startedat, modifiedon | fmc_status in Queued/Running | createdon asc |
-| File SharePoint gần đây | fmc_spofile | fmc_filename, fmc_status, fmc_importstatus, fmc_filesize, fmc_rowcount, fmc_processedat | — | createdon desc |
-| Dòng import SharePoint | fmc_spoimportrow | fmc_name, fmc_ordinal, fmc_code, fmc_buildingname, fmc_floorcount, fmc_sourceetag | — | fmc_ordinal asc |
+| BMS Buildings - Demo | fmc_bmsbuilding | fmc_name, fmc_buildingcode, fmc_sourcebuilding, modifiedon | — | fmc_name asc |
+| BMS Equipment - Demo View | fmc_bmsequipment | fmc_name, fmc_equipmentcode, fmc_equipmenttype, fmc_buildingid, modifiedon | — | fmc_name asc |
+| Current BMS Points | fmc_bmspoint | fmc_name, fmc_objectid, fmc_building, fmc_equipmentid, fmc_currentvalue, fmc_unit, fmc_lastreadingtime | — | fmc_lastreadingtime desc |
+| Recent Bronze Readings | fmc_bmsreading | fmc_objectname, fmc_objectid, fmc_building, fmc_readingvalue, fmc_unit, fmc_readingtime, fmc_sourcesystem | all records | fmc_readingtime desc |
+| Normalized Silver Data | cr3c8_silvernewbmspoint | cr3c8_fmc_name, cr3c8_fmc_objectid, cr3c8_fmc_building, cr3c8_fmc_valueconverted, cr3c8_fmc_unitconverted, cr3c8_fmc_warningflag, cr3c8_fmc_lastreadingtime | — | modifiedon desc |
+| Silver Quality Warnings | cr3c8_silvernewbmspoint | cr3c8_fmc_name, cr3c8_fmc_objectid, cr3c8_fmc_valueconverted, cr3c8_fmc_unitconverted, cr3c8_fmc_warningflag | cr3c8_fmc_warningflag eq Flagged | modifiedon desc |
+| Recent Sync Requests | fmc_syncrequest | fmc_name, fmc_status, fmc_requestedby, fmc_requestedcutoffid, fmc_deliveredrows, fmc_pendingafter, fmc_quarantinedrows, fmc_completedat | — | createdon desc |
+| Pending Sync Requests | fmc_syncrequest | fmc_name, fmc_status, fmc_requestedby, fmc_attempts, fmc_startedat, modifiedon | fmc_status in Queued/Running | createdon asc |
+| Recent SharePoint Files | fmc_spofile | fmc_filename, fmc_status, fmc_importstatus, fmc_filesize, fmc_rowcount, fmc_processedat | — | createdon desc |
+| SharePoint Import Rows | fmc_spoimportrow | fmc_name, fmc_ordinal, fmc_code, fmc_buildingname, fmc_floorcount, fmc_sourceetag | — | fmc_ordinal asc |
 
 ## Navigation
 
 - **FMC BMS Demo**
-  - Tổng quan
-    - Trung tâm vận hành → page `trung-tam-van-hanh`
-    - Đồng bộ dữ liệu → URL $webresource:fmc_/pages/BmsEventDemo.html
-  - Nhập liệu
-    - Tòa nhà → table `fmc_bmsbuilding` — icon: the table's own
-    - Thiết bị → table `fmc_bmsequipment` — icon: the table's own
-  - Dữ liệu Bronze
-    - Điểm hiện tại → table `fmc_bmspoint` — icon: the table's own
-    - Lịch sử readings → table `fmc_bmsreading` — icon: the table's own
-  - Dữ liệu Silver
-    - Điểm đã chuẩn hóa → table `cr3c8_silvernewbmspoint` — icon: the table's own
+  - Overview
+    - Operations Center → page `trung-tam-van-hanh`
+    - Sync Data → URL $webresource:fmc_/pages/BmsEventDemo.html
+  - Data Entry
+    - Buildings → table `fmc_bmsbuilding` — icon: the table's own
+    - Equipment → table `fmc_bmsequipment` — icon: the table's own
+  - Bronze Data
+    - Current Points → table `fmc_bmspoint` — icon: the table's own
+    - Reading History → table `fmc_bmsreading` — icon: the table's own
+  - Silver Data
+    - Normalized Points → table `cr3c8_silvernewbmspoint` — icon: the table's own
   - SharePoint
-    - File đã tiếp nhận → table `fmc_spofile` — icon: the table's own
-    - Dòng đã parse → table `fmc_spoimportrow` — icon: the table's own
-  - Vận hành
-    - Yêu cầu đồng bộ → table `fmc_syncrequest` — icon: the table's own
-    - Lịch sử Power Automate → URL https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d13bfe37-ca87-412b-9531-d3ed381b5b21/details
+    - Received Files → table `fmc_spofile` — icon: the table's own
+    - Parsed Rows → table `fmc_spoimportrow` — icon: the table's own
+  - Operations
+    - Sync Requests → table `fmc_syncrequest` — icon: the table's own
+    - Power Automate History → URL https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d13bfe37-ca87-412b-9531-d3ed381b5b21/details
 
 ## Security
 

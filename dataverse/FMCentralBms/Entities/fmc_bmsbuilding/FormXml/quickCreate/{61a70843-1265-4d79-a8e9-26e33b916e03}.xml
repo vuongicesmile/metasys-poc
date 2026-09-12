@@ -9,7 +9,7 @@
       <tabs>
         <tab id="a863aa64-d704-4f8a-b4f1-e3ee58ebe258" name="tab_0" expanded="true" visible="true">
           <labels>
-            <label description="Tạo tòa nhà" languagecode="1033" />
+            <label description="Create Building" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
@@ -57,7 +57,7 @@
     <IsCustomizable>1</IsCustomizable>
     <CanBeDeleted>1</CanBeDeleted>
     <LocalizedNames>
-      <LocalizedName description="Tạo nhanh tòa nhà BMS" languagecode="1033" />
+      <LocalizedName description="Quick Create BMS Building" languagecode="1033" />
     </LocalizedNames>
   </systemform>
 </forms>

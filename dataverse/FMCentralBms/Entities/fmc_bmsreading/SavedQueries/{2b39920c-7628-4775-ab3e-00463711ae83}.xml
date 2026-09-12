@@ -37,7 +37,7 @@
     </fetchxml>
     <IntroducedVersion>1.0</IntroducedVersion>
     <LocalizedNames>
-      <LocalizedName description="Lịch sử Bronze gần đây" languagecode="1033" />
+      <LocalizedName description="Recent Bronze Readings" languagecode="1033" />
     </LocalizedNames>
     <Descriptions>
       <Description description="Server-side paged view for the large elastic history." languagecode="1033" />

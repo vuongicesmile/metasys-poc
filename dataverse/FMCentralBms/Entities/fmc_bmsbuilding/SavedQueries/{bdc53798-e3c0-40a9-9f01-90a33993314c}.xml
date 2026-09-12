@@ -34,7 +34,7 @@
     </fetchxml>
     <IntroducedVersion>1.0</IntroducedVersion>
     <LocalizedNames>
-      <LocalizedName description="Tòa nhà BMS" languagecode="1033" />
+      <LocalizedName description="BMS Buildings - Demo" languagecode="1033" />
     </LocalizedNames>
   </savedquery>
 </savedqueries>
