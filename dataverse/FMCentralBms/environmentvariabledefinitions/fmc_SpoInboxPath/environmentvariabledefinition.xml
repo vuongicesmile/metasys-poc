@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="fmc_SpoInboxPath">
+  <description default="SharePoint Online file-ingestion configuration. Bind a current value per environment before enabling flows.">
+    <label description="SharePoint Online file-ingestion configuration. Bind a current value per environment before enabling flows." languagecode="1033" />
+  </description>
+  <displayname default="FMC SPO Inbox Path">
+    <label description="FMC SPO Inbox Path" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

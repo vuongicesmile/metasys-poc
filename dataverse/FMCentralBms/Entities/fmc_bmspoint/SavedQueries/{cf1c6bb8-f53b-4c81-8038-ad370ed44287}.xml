@@ -10,13 +10,13 @@
     <layoutxml>
       <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
         <row name="result" id="fmc_bmspointid">
-          <cell name="fmc_objectid" width="180" />
-          <cell name="fmc_name" width="180" />
-          <cell name="fmc_equipmentid" width="180" />
-          <cell name="fmc_building" width="180" />
-          <cell name="fmc_currentvalue" width="180" />
-          <cell name="fmc_unit" width="180" />
-          <cell name="fmc_lastreadingtime" width="180" />
+          <cell name="fmc_objectid" width="220" />
+          <cell name="fmc_name" width="220" />
+          <cell name="fmc_objecttype" width="140" />
+          <cell name="fmc_currentvalue" width="140" />
+          <cell name="fmc_unit" width="140" />
+          <cell name="fmc_lastreadingtime" width="140" />
+          <cell name="fmc_building" width="140" />
         </row>
       </grid>
     </layoutxml>
@@ -27,15 +27,12 @@
           <attribute name="fmc_bmspointid" />
           <attribute name="fmc_objectid" />
           <attribute name="fmc_name" />
-          <attribute name="fmc_equipmentid" />
-          <attribute name="fmc_building" />
+          <attribute name="fmc_objecttype" />
           <attribute name="fmc_currentvalue" />
           <attribute name="fmc_unit" />
           <attribute name="fmc_lastreadingtime" />
+          <attribute name="fmc_building" />
           <order attribute="fmc_name" descending="false" />
-          <filter type="and">
-            <condition attribute="statecode" operator="eq" value="0" />
-          </filter>
         </entity>
       </fetch>
     </fetchxml>

@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{4811af6f-7ddf-43a3-b771-65844099f090}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{007d0f17-8f89-4859-bd3f-90780f29b951}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{def4be08-454a-403d-9d04-019ddf5f1201}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{36c4c062-3935-48d8-8bc8-a854930b517c}">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="fmc_name" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_spoingestion" id="{aea578cd-5aee-811a-a740-9104fa90ea0a}" showlabel="true" expanded="true">
+          <labels>
+            <label description="SPO File Ingestion" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_spoingestion_details" id="{eb509cd8-1c9f-81c3-bfc9-998ed78a4925}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="SPO File Ingestion" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{408b4ffa-db88-897c-bf6c-3214e2b9fc80}">
+                        <labels>
+                          <label description="SPO File" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_fileid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="fmc_fileid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{86a04bc5-669f-80f8-93ae-a61930fd20b7}">
+                        <labels>
+                          <label description="Source ETag" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_sourceetag" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sourceetag" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{d5afdaa4-992a-80a9-9332-8fba5e20bed5}">
+                        <labels>
+                          <label description="Ordinal" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_ordinal" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_ordinal" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{f86ab0ef-9b74-8e29-a9e5-503afd6a7577}">
+                        <labels>
+                          <label description="Code" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_code" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_code" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{21a9ab85-4b23-89a3-86a1-edc2f8b85607}">
+                        <labels>
+                          <label description="Building Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_buildingname" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_buildingname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{f9d8051b-8bb8-8563-a6d3-5aa4e99e11cf}">
+                        <labels>
+                          <label description="Floor Count" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_floorcount" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_floorcount" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

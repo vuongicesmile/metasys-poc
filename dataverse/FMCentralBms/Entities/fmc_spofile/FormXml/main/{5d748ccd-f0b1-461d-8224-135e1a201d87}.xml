@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{5d748ccd-f0b1-461d-8224-135e1a201d87}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{33a661f3-a71b-40d4-b0ef-1bc813cf3213}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{db251775-8a9c-424f-8ad4-e6ccdcb40a2f}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{7c940973-674d-480c-b8f5-82e11e602343}">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="fmc_name" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_spoingestion" id="{e99f3fc3-8ab7-8478-afef-7278288a42ba}" showlabel="true" expanded="true">
+          <labels>
+            <label description="SPO File Ingestion" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_spoingestion_details" id="{fec697bb-6a4c-8a61-a8f0-14aa840466cd}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="SPO File Ingestion" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{3e7f273f-6646-8399-ab7a-f469ebe8291e}">
+                        <labels>
+                          <label description="File Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_filename" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_filename" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{7bf59047-532e-8d38-8b58-7ebb4f497782}">
+                        <labels>
+                          <label description="Archived File" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_file" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_file" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{0f864062-233b-83d9-8a85-7326f8416fe2}">
+                        <labels>
+                          <label description="Archive Status" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_status" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_status" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{17bd78b4-16bb-85f3-8d5c-4e4c76b887ff}">
+                        <labels>
+                          <label description="Import Status" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_importstatus" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="fmc_importstatus" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{d52fcad4-eb20-8a7f-82e2-56ae65ee4b0e}">
+                        <labels>
+                          <label description="File Size" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_filesize" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_filesize" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{dae17875-f76d-8650-82ee-d9ecc377ff29}">
+                        <labels>
+                          <label description="Source Key" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_sourcekey" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sourcekey" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{caad0918-1b97-858b-9055-a0716570e9ec}">
+                        <labels>
+                          <label description="Archived ETag" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_etag" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_etag" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{a4f8d29e-1247-8b06-8471-afd51ab8c06f}">
+                        <labels>
+                          <label description="Candidate ETag" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_candidateetag" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_candidateetag" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{4b141ed1-1934-8f78-adf6-70b46197832c}">
+                        <labels>
+                          <label description="Received At" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_receivedat" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="fmc_receivedat" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{9f1e2d50-7b61-88e2-b4b5-1d5f2118bc7d}">
+                        <labels>
+                          <label description="Processed At" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_processedat" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="fmc_processedat" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{cfca20d0-6cc7-8d94-af04-fde8c7c50af3}">
+                        <labels>
+                          <label description="Imported Rows" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_rowcount" classid="{C6D124CA-7EDA-4A60-AEA9-7FB8D318B68F}" datafieldname="fmc_rowcount" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{778d62de-4fa8-8790-a3aa-bbfdf95725eb}">
+                        <labels>
+                          <label description="Flow Run ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_runid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_runid" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{cbdb0636-e18b-88de-889f-e41645aa923d}">
+                        <labels>
+                          <label description="SharePoint URL" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_sharepointurl" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sharepointurl" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{96d20065-3bbc-8eb8-bf15-25d3c495f8f3}">
+                        <labels>
+                          <label description="Error Message" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_errormessage" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" datafieldname="fmc_errormessage" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{c4c8b9e9-748d-8a50-83a5-f06b865df618}">
+                        <labels>
+                          <label description="Imported JSON Rows" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_spoimportrows" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+                          <parameters>
+                            <TargetEntityType>fmc_spoimportrow</TargetEntityType>
+                            <ViewId>{517ce905-05ae-f111-aaad-00224819a344}</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_spofile_spoimportrow</RelationshipName>
+                            <RecordsPerPage>10</RecordsPerPage>
+                            <EnableQuickFind>false</EnableQuickFind>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

@@ -1,0 +1,689 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedsharepointonline"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "SpoSiteUrl": {
+          "type": "String",
+          "defaultValue": "https://titancorpvncom.sharepoint.com/sites/Powerplatform",
+          "metadata": {
+            "schemaName": "fmc_SpoSiteUrl"
+          }
+        },
+        "SpoLibraryId": {
+          "type": "String",
+          "defaultValue": "7d9282a4-c45d-4ef8-8719-18f78e71d0d0",
+          "metadata": {
+            "schemaName": "fmc_SpoLibraryId"
+          }
+        },
+        "SpoInboxPath": {
+          "type": "String",
+          "defaultValue": "/Shared Documents",
+          "metadata": {
+            "schemaName": "fmc_SpoInboxPath"
+          }
+        },
+        "SpoSourceNamespace": {
+          "type": "String",
+          "defaultValue": "bms_spo_dev01",
+          "metadata": {
+            "schemaName": "fmc_SpoSourceNamespace"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          },
+          "runtimeConfiguration": {
+            "concurrency": {
+              "runs": 1
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_row": {
+          "type": "InitializeVariable",
+          "runAfter": {},
+          "inputs": {
+            "variables": [
+              {
+                "name": "RowId",
+                "type": "string",
+                "value": ""
+              }
+            ]
+          }
+        },
+        "Try_copy": {
+          "type": "Scope",
+          "runAfter": {
+            "Initialize_row": [
+              "Succeeded"
+            ]
+          },
+          "actions": {
+            "Find_source": {
+              "type": "OpenApiConnection",
+              "runAfter": {},
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileItems"
+                },
+                "parameters": {
+                  "dataset": "@parameters('SpoSiteUrl')",
+                  "table": "@parameters('SpoLibraryId')",
+                  "folderPath": "@parameters('SpoInboxPath')",
+                  "viewScopeOption": "Default",
+                  "$filter": "FileLeafRef eq 'employee_bronze_profiling_demo_full.csv'",
+                  "$top": 2
+                }
+              }
+            },
+            "Require_one_source": {
+              "type": "If",
+              "runAfter": {
+                "Find_source": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@length(body('Find_source')?['value'])",
+                  1
+                ]
+              },
+              "actions": {},
+              "else": {
+                "actions": {
+                  "Source_missing_or_ambiguous": {
+                    "type": "Terminate",
+                    "runAfter": {},
+                    "inputs": {
+                      "runStatus": "Failed",
+                      "runError": {
+                        "code": "SPO-SOURCE",
+                        "message": "Expected exactly one demo file."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Source_properties": {
+              "type": "Compose",
+              "inputs": "@first(body('Find_source')?['value'])",
+              "runAfter": {
+                "Require_one_source": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Source_key": {
+              "type": "Compose",
+              "inputs": "@concat(parameters('SpoSourceNamespace'), '_', toLower(parameters('SpoLibraryId')), '_', string(outputs('Source_properties')?['ID']))",
+              "runAfter": {
+                "Source_properties": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Find_receipt": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Source_key": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "ListRecords"
+                },
+                "parameters": {
+                  "entityName": "fmc_spofiles",
+                  "$select": "fmc_spofileid,fmc_status,fmc_etag",
+                  "$top": 2,
+                  "$filter": "@concat('fmc_sourcekey eq ', decodeUriComponent('%27'), outputs('Source_key'), decodeUriComponent('%27'))"
+                }
+              }
+            },
+            "Resolve_receipt": {
+              "type": "If",
+              "runAfter": {
+                "Find_receipt": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@length(body('Find_receipt')?['value'])",
+                  0
+                ]
+              },
+              "actions": {
+                "Create_attempt": {
+                  "type": "Scope",
+                  "runAfter": {},
+                  "actions": {
+                    "Create_receipt": {
+                      "type": "OpenApiConnection",
+                      "runAfter": {},
+                      "inputs": {
+                        "host": {
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                          "connectionName": "shared_commondataserviceforapps",
+                          "operationId": "CreateRecord"
+                        },
+                        "parameters": {
+                          "entityName": "fmc_spofiles",
+                          "item/fmc_name": "@outputs('Source_properties')?['{FilenameWithExtension}']",
+                          "item/fmc_filename": "@outputs('Source_properties')?['{FilenameWithExtension}']",
+                          "item/fmc_sourcekey": "@outputs('Source_key')",
+                          "item/fmc_status": 789110000,
+                          "item/fmc_receivedat": "@utcNow()",
+                          "item/fmc_rowcount": 0,
+                          "item/fmc_importstatus": 789111000
+                        }
+                      }
+                    },
+                    "Set_created_id": {
+                      "type": "SetVariable",
+                      "runAfter": {
+                        "Create_receipt": [
+                          "Succeeded"
+                        ]
+                      },
+                      "inputs": {
+                        "name": "RowId",
+                        "value": "@body('Create_receipt')?['fmc_spofileid']"
+                      }
+                    }
+                  }
+                },
+                "Recover_create": {
+                  "type": "Scope",
+                  "runAfter": {
+                    "Create_attempt": [
+                      "Failed",
+                      "TimedOut"
+                    ]
+                  },
+                  "actions": {
+                    "Find_after_create_fault": {
+                      "type": "OpenApiConnection",
+                      "runAfter": {},
+                      "inputs": {
+                        "host": {
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                          "connectionName": "shared_commondataserviceforapps",
+                          "operationId": "ListRecords"
+                        },
+                        "parameters": {
+                          "entityName": "fmc_spofiles",
+                          "$select": "fmc_spofileid",
+                          "$top": 2,
+                          "$filter": "@concat('fmc_sourcekey eq ', decodeUriComponent('%27'), outputs('Source_key'), decodeUriComponent('%27'))"
+                        }
+                      }
+                    },
+                    "Recover_only_one": {
+                      "type": "If",
+                      "runAfter": {
+                        "Find_after_create_fault": [
+                          "Succeeded"
+                        ]
+                      },
+                      "expression": {
+                        "equals": [
+                          "@length(body('Find_after_create_fault')?['value'])",
+                          1
+                        ]
+                      },
+                      "actions": {
+                        "Recover_id": {
+                          "type": "SetVariable",
+                          "runAfter": {},
+                          "inputs": {
+                            "name": "RowId",
+                            "value": "@first(body('Find_after_create_fault')?['value'])?['fmc_spofileid']"
+                          }
+                        }
+                      },
+                      "else": {
+                        "actions": {
+                          "Create_unresolved": {
+                            "type": "Terminate",
+                            "runAfter": {},
+                            "inputs": {
+                              "runStatus": "Failed",
+                              "runError": {
+                                "code": "SPO-CREATE",
+                                "message": "Create failed; no unique receipt recovered."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "else": {
+                "actions": {
+                  "Require_unique_receipt": {
+                    "type": "If",
+                    "runAfter": {},
+                    "expression": {
+                      "equals": [
+                        "@length(body('Find_receipt')?['value'])",
+                        1
+                      ]
+                    },
+                    "actions": {
+                      "Set_existing_id": {
+                        "type": "SetVariable",
+                        "runAfter": {},
+                        "inputs": {
+                          "name": "RowId",
+                          "value": "@first(body('Find_receipt')?['value'])?['fmc_spofileid']"
+                        }
+                      }
+                    },
+                    "else": {
+                      "actions": {
+                        "Duplicate_receipt": {
+                          "type": "Terminate",
+                          "runAfter": {},
+                          "inputs": {
+                            "runStatus": "Failed",
+                            "runError": {
+                              "code": "SPO-001",
+                              "message": "Duplicate source key."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Metadata_before": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Resolve_receipt": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileMetadata"
+                },
+                "parameters": {
+                  "dataset": "@parameters('SpoSiteUrl')",
+                  "id": "@outputs('Source_properties')?['{Identifier}']"
+                }
+              }
+            },
+            "Require_valid_metadata": {
+              "type": "If",
+              "runAfter": {
+                "Metadata_before": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "and": [
+                  {
+                    "not": {
+                      "equals": [
+                        "@body('Metadata_before')?['ETag']",
+                        ""
+                      ]
+                    }
+                  },
+                  {
+                    "not": {
+                      "equals": [
+                        "@body('Metadata_before')?['ETag']",
+                        null
+                      ]
+                    }
+                  },
+                  {
+                    "lessOrEquals": [
+                      "@int(body('Metadata_before')?['Size'])",
+                      5242880
+                    ]
+                  }
+                ]
+              },
+              "actions": {},
+              "else": {
+                "actions": {
+                  "Reject_metadata": {
+                    "type": "OpenApiConnection",
+                    "runAfter": {},
+                    "inputs": {
+                      "host": {
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                        "connectionName": "shared_commondataserviceforapps",
+                        "operationId": "UpdateOnlyRecord"
+                      },
+                      "parameters": {
+                        "entityName": "fmc_spofiles",
+                        "recordId": "@variables('RowId')",
+                        "item/fmc_status": 789110003,
+                        "item/fmc_errormessage": "Missing ETag or file exceeds 5 MiB."
+                      }
+                    }
+                  },
+                  "Stop_invalid_metadata": {
+                    "type": "Terminate",
+                    "runAfter": {
+                      "Reject_metadata": [
+                        "Succeeded"
+                      ]
+                    },
+                    "inputs": {
+                      "runStatus": "Failed",
+                      "runError": {
+                        "code": "SPO-002",
+                        "message": "Missing ETag or file exceeds 5 MiB."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Mark_processing": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Require_valid_metadata": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "UpdateOnlyRecord"
+                },
+                "parameters": {
+                  "entityName": "fmc_spofiles",
+                  "recordId": "@variables('RowId')",
+                  "item/fmc_status": 789110001,
+                  "item/fmc_candidateetag": "@body('Metadata_before')?['ETag']",
+                  "item/fmc_name": "@outputs('Source_properties')?['{FilenameWithExtension}']",
+                  "item/fmc_filename": "@outputs('Source_properties')?['{FilenameWithExtension}']",
+                  "item/fmc_sharepointidentifier": "@outputs('Source_properties')?['{Identifier}']",
+                  "item/fmc_sharepointpath": "@outputs('Source_properties')?['{FullPath}']",
+                  "item/fmc_sharepointurl": "@outputs('Source_properties')?['{Link}']",
+                  "item/fmc_filesize": "@int(body('Metadata_before')?['Size'])",
+                  "item/fmc_runid": "@workflow()?['run']?['name']"
+                }
+              }
+            },
+            "Get_content": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Mark_processing": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileContent"
+                },
+                "parameters": {
+                  "dataset": "@parameters('SpoSiteUrl')",
+                  "id": "@outputs('Source_properties')?['{Identifier}']",
+                  "inferContentType": false
+                }
+              }
+            },
+            "Metadata_after": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Get_content": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileMetadata"
+                },
+                "parameters": {
+                  "dataset": "@parameters('SpoSiteUrl')",
+                  "id": "@outputs('Source_properties')?['{Identifier}']"
+                }
+              }
+            },
+            "Require_stable_version": {
+              "type": "If",
+              "runAfter": {
+                "Metadata_after": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@body('Metadata_before')?['ETag']",
+                  "@body('Metadata_after')?['ETag']"
+                ]
+              },
+              "actions": {
+                "Upload_file": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {},
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "UpdateEntityFileImageFieldContent"
+                    },
+                    "parameters": {
+                      "entityName": "fmc_spofiles",
+                      "recordId": "@variables('RowId')",
+                      "fileImageFieldName": "fmc_file",
+                      "item": "@body('Get_content')",
+                      "x-ms-file-name": "@outputs('Source_properties')?['{FilenameWithExtension}']"
+                    }
+                  }
+                },
+                "Mark_archived": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {
+                    "Upload_file": [
+                      "Succeeded"
+                    ]
+                  },
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "UpdateOnlyRecord"
+                    },
+                    "parameters": {
+                      "entityName": "fmc_spofiles",
+                      "recordId": "@variables('RowId')",
+                      "item/fmc_status": 789110002,
+                      "item/fmc_etag": "@body('Metadata_before')?['ETag']",
+                      "item/fmc_processedat": "@utcNow()",
+                      "item/fmc_errormessage": null
+                    }
+                  }
+                }
+              },
+              "else": {
+                "actions": {
+                  "Mark_changed": {
+                    "type": "OpenApiConnection",
+                    "runAfter": {},
+                    "inputs": {
+                      "host": {
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                        "connectionName": "shared_commondataserviceforapps",
+                        "operationId": "UpdateOnlyRecord"
+                      },
+                      "parameters": {
+                        "entityName": "fmc_spofiles",
+                        "recordId": "@variables('RowId')",
+                        "item/fmc_status": 789110003,
+                        "item/fmc_errormessage": "SPO-003 Source changed during read."
+                      }
+                    }
+                  },
+                  "Stop_changed": {
+                    "type": "Terminate",
+                    "runAfter": {
+                      "Mark_changed": [
+                        "Succeeded"
+                      ]
+                    },
+                    "inputs": {
+                      "runStatus": "Failed",
+                      "runError": {
+                        "code": "SPO-003",
+                        "message": "Source changed during read."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Catch_copy": {
+          "type": "Scope",
+          "runAfter": {
+            "Try_copy": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "actions": {
+            "Has_receipt": {
+              "type": "If",
+              "runAfter": {},
+              "expression": {
+                "not": {
+                  "equals": [
+                    "@variables('RowId')",
+                    ""
+                  ]
+                }
+              },
+              "actions": {
+                "Mark_failed": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {},
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "UpdateOnlyRecord"
+                    },
+                    "parameters": {
+                      "entityName": "fmc_spofiles",
+                      "recordId": "@variables('RowId')",
+                      "item/fmc_status": 789110003,
+                      "item/fmc_runid": "@workflow()?['run']?['name']",
+                      "item/fmc_errormessage": "SPO-COPY: connector action failed; inspect flow run history."
+                    }
+                  }
+                }
+              },
+              "else": {
+                "actions": {}
+              }
+            },
+            "Fail_run": {
+              "type": "Terminate",
+              "runAfter": {
+                "Has_receipt": [
+                  "Succeeded",
+                  "Failed",
+                  "TimedOut",
+                  "Skipped"
+                ]
+              },
+              "inputs": {
+                "runStatus": "Failed",
+                "runError": {
+                  "code": "SPO-COPY",
+                  "message": "Copy failed; inspect action error in run history."
+                }
+              }
+            }
+          }
+        },
+        "Copy_receipt": {
+          "type": "Compose",
+          "inputs": {
+            "rowId": "@variables('RowId')",
+            "status": "Archived",
+            "sourceKey": "@outputs('Source_key')",
+            "etag": "@body('Metadata_before')?['ETag']",
+            "size": "@body('Metadata_before')?['Size']"
+          },
+          "runAfter": {
+            "Try_copy": [
+              "Succeeded"
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

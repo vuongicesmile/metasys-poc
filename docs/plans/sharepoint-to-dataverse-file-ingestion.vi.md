@@ -1,6 +1,8 @@
 # Plan triển khai SharePoint Online → Dataverse
 
-Trạng thái: đề xuất đã review, chưa triển khai. Cập nhật: 2026-09-11.
+Trạng thái: schema/UI đã triển khai; manual flow copy CSV SPO → Dataverse đã chạy thật
+hai lần, cùng record và SHA-256 trùng nguồn. Event archive, parser và reconciliation
+đầy đủ còn chưa triển khai. Cập nhật: 2026-09-12.
 
 ## 1. Phạm vi và quyết định MVP
 
@@ -36,9 +38,9 @@ Flow chạy cloud, không cần download xuống local hoặc bật worker SQL �
 
 | Cấu hình | Nguồn lấy / giá trị |
 | --- | --- |
-| SPO Site URL | URL site được phép đọc, chưa được cung cấp |
-| SPO Library ID | GUID library lấy từ Library settings / connection picker; lưu không có braces |
-| Inbox folder | Chọn bằng folder picker sau khi chọn library |
+| SPO Site URL | `https://titancorpvncom.sharepoint.com/sites/Powerplatform` — đã xác thực |
+| SPO Library ID | `7d9282a4-c45d-4ef8-8719-18f78e71d0d0` — Tài liệu / Shared Documents |
+| Inbox folder | Demo dùng root `/Shared Documents`; chưa tạo inbox con |
 | Source namespace | Alias ổn định như `bms_spo_dev01`; chỉ a-z, 0-9, underscore; duy nhất trong environment |
 | Dataverse URL | https://org06cbc9ec.crm5.dynamics.com/ — target Developer dự kiến |
 | Organization ID | ab191700-b99e-f111-aaa0-000d3a80bb96 — phải verify trước deployment |
@@ -347,7 +349,10 @@ giữ row ID; move sang library khác tạo row mới. Xóa nguồn không tự 
 | docs/runbooks/spo-file-ingestion.vi.md | Runbook sau deployment thực tế |
 | Deployment receipt | Target, component IDs, run IDs, kết quả so file/rows |
 
-Các artifact trên là deliverables tương lai, chưa được tạo chỉ vì plan liệt kê.
+Schema source/export, app module, environment-variable definitions, fixtures và runbook đã
+được tạo. Manual copy flow có source, live run ID và SHA-256 receipt trong
+`docs/runbooks/spo-file-ingestion.vi.md`. Event/reconciliation flows và parser còn chưa
+triển khai; không coi manual demo là nghiệm thu toàn bộ plan.
 Implementation: schema → key Active → connections/variables → flows Off → UI → fixtures
 → enable archive → test → export/unpack. Với C# thay đổi chạy build MetasysPoc.sln.
 
@@ -391,10 +396,11 @@ tests đạt. Hai mốc được nghiệm thu riêng.
 
 ## 12. Giới hạn còn cần dữ liệu thật để xác nhận
 
-Đã chốt cách implement MVP trong plan. Còn thiếu Site URL, Library GUID, inbox folder
-và connection identity thực để bind và chạy test. Cần kiểm tra dynamic output ETag,
-Identifier, file-content shape trên tenant ở lần chạy đầu. Chưa có live verification,
-capacity/load test hoặc production SLA.
+Đã provision và verify schema/UI trên Developer environment; app validation thành công với
+0 issue. SharePoint và Dataverse connection đều Connected. Site/library/root folder đã
+bind vào manual demo; GetFileItems trả list ID=1, Get_content trả binary envelope, ETag
+trước/sau ổn định và bản Dataverse có cùng SHA-256. Replay dùng lại record hiện có. Còn
+chưa test các failure path của toàn bộ plan, capacity/load hoặc production SLA.
 
 Không cần Custom API/plugin mới để archive. Nếu mở rộng processing dài, API chỉ nhận
 File Row ID và enqueue job; không truyền binary lớn qua synchronous plug-in.

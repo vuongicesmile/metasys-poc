@@ -1,0 +1,510 @@
+{
+    "schemaVersion":  1,
+    "items":  [
+                  {
+                      "code":  "BLD001",
+                      "name":  "Building 001",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD002",
+                      "name":  "Building 002",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD003",
+                      "name":  "Building 003",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD004",
+                      "name":  "Building 004",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD005",
+                      "name":  "Building 005",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD006",
+                      "name":  "Building 006",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD007",
+                      "name":  "Building 007",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD008",
+                      "name":  "Building 008",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD009",
+                      "name":  "Building 009",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD010",
+                      "name":  "Building 010",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD011",
+                      "name":  "Building 011",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD012",
+                      "name":  "Building 012",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD013",
+                      "name":  "Building 013",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD014",
+                      "name":  "Building 014",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD015",
+                      "name":  "Building 015",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD016",
+                      "name":  "Building 016",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD017",
+                      "name":  "Building 017",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD018",
+                      "name":  "Building 018",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD019",
+                      "name":  "Building 019",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD020",
+                      "name":  "Building 020",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD021",
+                      "name":  "Building 021",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD022",
+                      "name":  "Building 022",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD023",
+                      "name":  "Building 023",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD024",
+                      "name":  "Building 024",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD025",
+                      "name":  "Building 025",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD026",
+                      "name":  "Building 026",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD027",
+                      "name":  "Building 027",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD028",
+                      "name":  "Building 028",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD029",
+                      "name":  "Building 029",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD030",
+                      "name":  "Building 030",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD031",
+                      "name":  "Building 031",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD032",
+                      "name":  "Building 032",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD033",
+                      "name":  "Building 033",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD034",
+                      "name":  "Building 034",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD035",
+                      "name":  "Building 035",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD036",
+                      "name":  "Building 036",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD037",
+                      "name":  "Building 037",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD038",
+                      "name":  "Building 038",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD039",
+                      "name":  "Building 039",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD040",
+                      "name":  "Building 040",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD041",
+                      "name":  "Building 041",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD042",
+                      "name":  "Building 042",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD043",
+                      "name":  "Building 043",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD044",
+                      "name":  "Building 044",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD045",
+                      "name":  "Building 045",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD046",
+                      "name":  "Building 046",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD047",
+                      "name":  "Building 047",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD048",
+                      "name":  "Building 048",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD049",
+                      "name":  "Building 049",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD050",
+                      "name":  "Building 050",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD051",
+                      "name":  "Building 051",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD052",
+                      "name":  "Building 052",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD053",
+                      "name":  "Building 053",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD054",
+                      "name":  "Building 054",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD055",
+                      "name":  "Building 055",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD056",
+                      "name":  "Building 056",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD057",
+                      "name":  "Building 057",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD058",
+                      "name":  "Building 058",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD059",
+                      "name":  "Building 059",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD060",
+                      "name":  "Building 060",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD061",
+                      "name":  "Building 061",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD062",
+                      "name":  "Building 062",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD063",
+                      "name":  "Building 063",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD064",
+                      "name":  "Building 064",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD065",
+                      "name":  "Building 065",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD066",
+                      "name":  "Building 066",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD067",
+                      "name":  "Building 067",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD068",
+                      "name":  "Building 068",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD069",
+                      "name":  "Building 069",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD070",
+                      "name":  "Building 070",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD071",
+                      "name":  "Building 071",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD072",
+                      "name":  "Building 072",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD073",
+                      "name":  "Building 073",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD074",
+                      "name":  "Building 074",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD075",
+                      "name":  "Building 075",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD076",
+                      "name":  "Building 076",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD077",
+                      "name":  "Building 077",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD078",
+                      "name":  "Building 078",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD079",
+                      "name":  "Building 079",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD080",
+                      "name":  "Building 080",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD081",
+                      "name":  "Building 081",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD082",
+                      "name":  "Building 082",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD083",
+                      "name":  "Building 083",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD084",
+                      "name":  "Building 084",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD085",
+                      "name":  "Building 085",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD086",
+                      "name":  "Building 086",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD087",
+                      "name":  "Building 087",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD088",
+                      "name":  "Building 088",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD089",
+                      "name":  "Building 089",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD090",
+                      "name":  "Building 090",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD091",
+                      "name":  "Building 091",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD092",
+                      "name":  "Building 092",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD093",
+                      "name":  "Building 093",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD094",
+                      "name":  "Building 094",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD095",
+                      "name":  "Building 095",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD096",
+                      "name":  "Building 096",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD097",
+                      "name":  "Building 097",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD098",
+                      "name":  "Building 098",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD099",
+                      "name":  "Building 099",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD100",
+                      "name":  "Building 100",
+                      "floorCount":  1
+                  },
+                  {
+                      "code":  "BLD101",
+                      "name":  "Building 101",
+                      "floorCount":  1
+                  }
+              ]
+}

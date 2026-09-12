@@ -3,7 +3,11 @@ using DataverseSyncWorker.Services;
 
 var (relationCommand, remainingArgs) = BmsRelationCommand.Parse(args);
 args = remainingArgs;
-var commands = new[] { "--provision", "--register-plugin", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once" };
+var commands = new[]
+{
+    "--provision", "--register-plugin", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once",
+    "--spo-ingestion-status", "--provision-spo-ingestion", "--verify-spo-ingestion"
+};
 var hostArgs = args.Where(a => !commands.Contains(a) &&
     !a.StartsWith("--plugin-path=", StringComparison.OrdinalIgnoreCase)).ToArray();
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -75,6 +79,21 @@ if (relationCommand is not null)
 }
 
 if (args.Contains("--self-test")) { await Verification.SelfTest(app.Services); return; }
+if (args.Contains("--spo-ingestion-status"))
+{
+    await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).PrintSpoIngestionStatus();
+    return;
+}
+if (args.Contains("--provision-spo-ingestion"))
+{
+    await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).ProvisionSpoIngestion();
+    return;
+}
+if (args.Contains("--verify-spo-ingestion"))
+{
+    await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).VerifySpoIngestion();
+    return;
+}
 if (args.Contains("--provision")) { await new DataverseProvisioner(app.Services.GetRequiredService<DataverseConnection>(), options).Run(); return; }
 if (args.Contains("--register-plugin"))
 {

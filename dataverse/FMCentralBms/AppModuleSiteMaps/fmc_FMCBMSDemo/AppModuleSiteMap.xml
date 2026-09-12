@@ -29,6 +29,11 @@
             <Title LCID="1033" Title="Power Automate Demo" />
           </Titles>
         </SubArea>
+        <SubArea Id="fmc_spofiles" Entity="fmc_spofile">
+          <Titles>
+            <Title LCID="1033" Title="SPO Files" />
+          </Titles>
+        </SubArea>
       </Group>
     </Area>
   </SiteMap>

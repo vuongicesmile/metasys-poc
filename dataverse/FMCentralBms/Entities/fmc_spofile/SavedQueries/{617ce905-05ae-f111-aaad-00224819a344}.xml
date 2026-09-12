@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>0</isdefault>
+    <savedqueryid>{617ce905-05ae-f111-aaad-00224819a344}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_spofileid">
+          <cell name="fmc_name" width="260" />
+          <cell name="fmc_filename" width="150" />
+          <cell name="fmc_status" width="150" />
+          <cell name="fmc_importstatus" width="150" />
+          <cell name="fmc_filesize" width="150" />
+          <cell name="fmc_processedat" width="150" />
+          <cell name="fmc_errormessage" width="150" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_spofile">
+          <attribute name="fmc_spofileid" />
+          <attribute name="fmc_name" />
+          <attribute name="fmc_filename" />
+          <attribute name="fmc_status" />
+          <attribute name="fmc_importstatus" />
+          <attribute name="fmc_filesize" />
+          <attribute name="fmc_processedat" />
+          <attribute name="fmc_errormessage" />
+          <filter type="and">
+            <condition attribute="fmc_importstatus" operator="eq" value="789111003" />
+          </filter>
+          <order attribute="createdon" descending="true" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Import Failed SPO Files" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

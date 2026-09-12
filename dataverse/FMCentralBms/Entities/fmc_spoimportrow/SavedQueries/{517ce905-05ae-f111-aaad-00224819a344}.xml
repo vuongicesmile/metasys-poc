@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>0</isdefault>
+    <savedqueryid>{517ce905-05ae-f111-aaad-00224819a344}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_spoimportrowid">
+          <cell name="fmc_name" width="260" />
+          <cell name="fmc_fileid" width="150" />
+          <cell name="fmc_sourceetag" width="150" />
+          <cell name="fmc_ordinal" width="150" />
+          <cell name="fmc_code" width="150" />
+          <cell name="fmc_buildingname" width="150" />
+          <cell name="fmc_floorcount" width="150" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_spoimportrow">
+          <attribute name="fmc_spoimportrowid" />
+          <attribute name="fmc_name" />
+          <attribute name="fmc_fileid" />
+          <attribute name="fmc_sourceetag" />
+          <attribute name="fmc_ordinal" />
+          <attribute name="fmc_code" />
+          <attribute name="fmc_buildingname" />
+          <attribute name="fmc_floorcount" />
+          <order attribute="createdon" descending="true" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="All SPO Import Rows" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

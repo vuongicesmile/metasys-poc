@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "code": "BLD001",
+      "name": "Building A",
+      "floorCount": 5
+    },
+    {
+      "code": "BLD002",
+      "name": "Building B",
+      "floorCount": 3
+    }
+  ]
+}
