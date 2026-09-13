@@ -10,4 +10,6 @@ dataverse/*.zip
 appsettings.Local.json
 .artifacts/
 node_modules/
+__pycache__/
+*.pyc
 dataverse/app-source/fmc-bms-demo/.maker-workspace/

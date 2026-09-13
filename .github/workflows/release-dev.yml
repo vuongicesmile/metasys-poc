@@ -1,0 +1,58 @@
+name: Release Dataverse Developer
+on:
+  push:
+    tags: ['dev-v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing immutable dev-vMAJOR.MINOR.PATCH tag to retry
+        required: true
+        type: string
+
+permissions:
+  contents: read
+concurrency:
+  group: fmc-dataverse-developer
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # This runner has local PAC/Azure sessions. Never route PR events to it.
+    if: github.repository == 'vuongicesmile/metasys-poc' && (github.event_name == 'push' || github.ref == 'refs/heads/main')
+    runs-on: [self-hosted, Windows, X64, fmc-dataverse-dev]
+    environment:
+      name: dataverse-dev
+      url: https://org06cbc9ec.crm5.dynamics.com/main.aspx?appid=d19f4897-d227-4df3-8361-988f97c53e89
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: powershell
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Validate tag input
+        run: |
+          if ($env:RELEASE_TAG -notmatch '^dev-v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$') { throw 'Invalid release tag' }
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Test release planner
+        run: |
+          python -m unittest discover -s scripts/tests -p test_release.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Plan, build, deploy, verify and export
+        run: |
+          python scripts/release/release.py deploy --tag $env:RELEASE_TAG
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload deployment receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .artifacts/release/**/receipt.json
+          if-no-files-found: warn
+          retention-days: 30
+      # Full solution backups and worker artifacts stay on the deployment machine.
+      # GitHub is public; do not upload local credentials or runtime configuration.

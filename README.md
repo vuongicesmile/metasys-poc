@@ -4,6 +4,7 @@
 
 Start at the [documentation index](docs/README.md):
 
+- [Tag-triggered local-to-Dataverse release (Vietnamese)](docs/runbooks/tag-release-dataverse.vi.md)
 - [Service architecture and extension guide (Vietnamese)](docs/reference/service-architecture.vi.md)
 - [Power Automate integration plan and pilot receipt](docs/plans/power-automate-sql-to-dataverse.vi.md)
 - [Power Automate trigger operating runbook](docs/runbooks/power-automate-sql-sync.vi.md)

@@ -1,0 +1,21 @@
+{
+  "repository": "vuongicesmile/metasys-poc",
+  "branch": "main",
+  "tagPrefix": "dev-v",
+  "baselineCommit": "aaa0caee7d09a299f22a7d8df077eec6ac115b44",
+  "environmentUrl": "https://org06cbc9ec.crm5.dynamics.com/",
+  "organizationId": "ab191700-b99e-f111-aaa0-000d3a80bb96",
+  "environmentId": "5abcb0e5-99b2-e51f-aa0e-90d84405798b",
+  "solution": "FMCentralBms",
+  "publisher": "FMCentralBmsPublisher",
+  "appId": "d19f4897-d227-4df3-8361-988f97c53e89",
+  "pageId": "9d05b7f9-f4c4-4572-b6b8-0220b51812f3",
+  "pageName": "BMS Operations Center",
+  "pageDirectory": "dataverse/app-source/fmc-bms-demo",
+  "pageFile": "trung-tam-van-hanh.tsx",
+  "dataSources": "fmc_bmsbuilding,fmc_bmsequipment,fmc_bmspoint,fmc_bmsreading,cr3c8_silvernewbmspoint,fmc_syncrequest,fmc_spofile,fmc_spoimportrow",
+  "webResources": {
+    "dataverse/app-source/BmsEventDemo.html": "fmc_/pages/BmsEventDemo.html",
+    "dataverse/app-source/EquipmentPluginTest.js": "fmc_/scripts/EquipmentPluginTest.js"
+  }
+}
