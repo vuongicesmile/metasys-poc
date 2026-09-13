@@ -1,4 +1,4 @@
-// Run after installing the UI test dependencies described in the demo runbook.
+// Run npm ci in dataverse/app-source/fmc-bms-demo first.
 // This test uses synthetic data and never calls Dataverse or starts the sync worker.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -7,7 +7,9 @@ const assert = require('node:assert/strict');
 const { createRequire } = require('node:module');
 const repo = path.resolve(__dirname, '../..');
 const testDir = path.join(repo, '.artifacts/language-tests');
-const dependency = createRequire(path.join(testDir, 'package.json'));
+const appDir = path.join(repo, 'dataverse/app-source/fmc-bms-demo');
+fs.mkdirSync(testDir, { recursive: true });
+const dependency = createRequire(path.join(appDir, 'package.json'));
 const esbuild = dependency('esbuild');
 const { chromium } = dependency('@playwright/test');
 
@@ -17,7 +19,7 @@ async function main() {
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
-import Dashboard from '../../dataverse/app-source/fmc-bms-demo/trung-tam-van-hanh';
+import Dashboard from '${process.argv.includes('--source') ? './src/Dashboard' : './trung-tam-van-hanh'}';
 window.queries = 0;
 const dataApi = { queryTable: async (table) => {
     window.queries++;
@@ -30,9 +32,9 @@ const dataApi = { queryTable: async (table) => {
     return { rows: rows[table] || [{id:'fixture'}], hasMoreRows: table === 'fmc_bmsreading' };
 }};
 ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataApi} pageInput={{}} /></FluentProvider>,document.getElementById('root'));
-`, resolveDir: testDir, loader: 'tsx' },
+`, resolveDir: appDir, loader: 'tsx' },
         bundle: true, write: false, format: 'iife', jsx: 'automatic',
-        nodePaths: [path.join(testDir, 'node_modules')], logLevel: 'silent'
+        nodePaths: [path.join(appDir, 'node_modules')], logLevel: 'silent'
     });
     const server = http.createServer((req, res) => {
         if (req.url === '/app.js') {
@@ -49,7 +51,7 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         const context = await browser.newContext({ locale: 'vi-VN' });
         const page = await context.newPage();
         const errors = [];
-        page.on('pageerror', error => errors.push(error.message));
+        page.on('pageerror', error => { errors.push(error.message); console.error('Browser error:', error.message); });
         const url = `http://127.0.0.1:${server.address().port}`;
         await page.goto(url);
         await page.getByRole('heading', { name: 'BMS Operations Center' }).waitFor();

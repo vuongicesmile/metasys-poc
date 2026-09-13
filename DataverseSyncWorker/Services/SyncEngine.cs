@@ -1,3 +1,4 @@
+using DataverseSyncWorker.Abstractions;
 using DataverseSyncWorker.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
@@ -5,7 +6,7 @@ using Microsoft.Xrm.Sdk;
 namespace DataverseSyncWorker.Services;
 
 public sealed class SyncEngine(SqlStore store, ReadingMapper mapper, IDataverseWriter writer,
-    SyncOptions options, ILogger<SyncEngine> logger)
+    SyncOptions options, ILogger<SyncEngine> logger) : ISyncEngine
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
     public async Task<BatchResult> Run(CancellationToken ct, long? cutoffId = null)

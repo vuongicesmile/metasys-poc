@@ -1,19 +1,11 @@
+using DataverseSyncWorker.Abstractions;
 using DataverseSyncWorker.Models;
 using System.ServiceModel;
 using Microsoft.Xrm.Sdk;
 
 namespace DataverseSyncWorker.Services;
 
-public sealed record RuntimeSnapshot(string State, DateTime? LastRunAt = null, BatchResult? LastBatch = null,
-    string? Error = null, Guid? RequestId = null);
-public sealed class RuntimeState
-{
-    private RuntimeSnapshot _snapshot = new("Starting");
-    public RuntimeSnapshot Snapshot => Volatile.Read(ref _snapshot);
-    public void Set(RuntimeSnapshot value) => Volatile.Write(ref _snapshot, value);
-}
-
-public sealed class SyncWorker(SyncEngine engine, CommandProcessor commands, SyncOptions options, RuntimeState status,
+public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, SyncOptions options, RuntimeState status,
     ILogger<SyncWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)

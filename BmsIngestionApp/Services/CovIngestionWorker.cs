@@ -1,5 +1,4 @@
-using System.Net.Http.Json;
-using System.Text.Json;
+using BmsIngestionApp.Abstractions;
 using BmsIngestionApp.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,8 @@ public sealed class CovIngestionWorker(
     AppSettings settings,
     IngestionRuntimeOptions runtimeOptions,
     IngestionStatusTracker status,
+    IMetasysClient metasys,
+    IBmsReadingRepository repository,
     ILogger<CovIngestionWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -18,37 +19,14 @@ public sealed class CovIngestionWorker(
 
         try
         {
-            using var httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(settings.Metasys.BaseUrl, UriKind.Absolute),
-                Timeout = Timeout.InfiniteTimeSpan
-            };
-
-            logger.LogInformation("Connecting to Fake Metasys at {BaseUrl}", httpClient.BaseAddress);
-
-            var buildings = await httpClient.GetFromJsonAsync<BmsBuilding[]>("api/metasys/buildings", AppSettings.JsonOptions, stoppingToken)
-                ?? throw new InvalidOperationException("Fake Metasys returned an empty building catalog response.");
-            var equipment = await httpClient.GetFromJsonAsync<BmsEquipment[]>("api/metasys/equipment", AppSettings.JsonOptions, stoppingToken)
-                ?? throw new InvalidOperationException("Fake Metasys returned an empty equipment catalog response.");
-            var points = await httpClient.GetFromJsonAsync<CovPoint[]>("api/metasys/objects", AppSettings.JsonOptions, stoppingToken)
-                ?? throw new InvalidOperationException("Fake Metasys returned an empty point catalog response.");
+            logger.LogInformation("Connecting to Fake Metasys at {BaseUrl}", settings.Metasys.BaseUrl);
+            var catalog = await metasys.ReadCatalogAsync(stoppingToken);
             if (runtimeOptions.SqlEnabled)
             {
-                var catalogRepository = new BmsReadingRepository(settings.Sql.ConnectionString);
-                await catalogRepository.PersistCatalogAsync(buildings, equipment, stoppingToken);
-                status.CatalogPersisted(buildings.Length, equipment.Length);
+                await repository.PersistCatalogAsync(catalog.Buildings, catalog.Equipment, stoppingToken);
+                status.CatalogPersisted(catalog.Buildings.Length, catalog.Equipment.Length);
             }
-            var requestedObjects = points.Select(p => p.ObjectId).ToArray();
-
-            using var subscriptionResponse = await httpClient.PostAsJsonAsync(
-                "api/metasys/subscriptions",
-                new SubscriptionRequest { ObjectIds = [.. requestedObjects] },
-                stoppingToken);
-            subscriptionResponse.EnsureSuccessStatusCode();
-
-            var subscription = await subscriptionResponse.Content.ReadFromJsonAsync<SubscriptionResponse>(
-                cancellationToken: stoppingToken)
-                ?? throw new InvalidOperationException("Fake Metasys returned an empty subscription response.");
+            var subscription = await metasys.SubscribeAsync(catalog.Points.Select(p => p.ObjectId), stoppingToken);
 
             status.Connected(subscription.SubscriptionId);
             logger.LogInformation(
@@ -56,32 +34,8 @@ public sealed class CovIngestionWorker(
                 subscription.SubscriptionId,
                 runtimeOptions.SqlEnabled);
 
-            var repository = runtimeOptions.SqlEnabled
-                ? new BmsReadingRepository(settings.Sql.ConnectionString)
-                : null;
-
-            using var streamResponse = await httpClient.GetAsync(
-                $"api/metasys/subscriptions/{Uri.EscapeDataString(subscription.SubscriptionId)}/stream",
-                HttpCompletionOption.ResponseHeadersRead,
-                stoppingToken);
-            streamResponse.EnsureSuccessStatusCode();
-
-            await using var stream = await streamResponse.Content.ReadAsStreamAsync(stoppingToken);
-            using var reader = new StreamReader(stream);
-
-            while (await reader.ReadLineAsync(stoppingToken) is { } line)
+            await foreach (var covEvent in metasys.ReadEventsAsync(subscription.SubscriptionId, stoppingToken))
             {
-                if (!line.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var covEvent = JsonSerializer.Deserialize<CovEvent>(line[5..].TrimStart(), AppSettings.JsonOptions);
-                if (covEvent is null)
-                {
-                    continue;
-                }
-
                 status.EventReceived(covEvent);
                 logger.LogInformation(
                     "COV {ObjectId}: {PreviousValue} -> {CurrentValue} {Unit}",
@@ -90,7 +44,7 @@ public sealed class CovIngestionWorker(
                     covEvent.CurrentValue,
                     covEvent.Unit);
 
-                if (repository is not null)
+                if (runtimeOptions.SqlEnabled)
                 {
                     await repository.InsertAsync(covEvent, stoppingToken);
                     status.RowInserted();
@@ -108,5 +62,3 @@ public sealed class CovIngestionWorker(
         }
     }
 }
-
-file sealed record CovPoint(string ObjectId);

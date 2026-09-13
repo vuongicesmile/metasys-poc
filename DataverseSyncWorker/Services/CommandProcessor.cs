@@ -1,10 +1,11 @@
+using DataverseSyncWorker.Abstractions;
 using System.Diagnostics;
 using DataverseSyncWorker.Models;
 
 namespace DataverseSyncWorker.Services;
 
-public sealed class CommandProcessor(ISyncRequestStore requests, SqlStore sql, SyncEngine engine,
-    SyncOptions options, ILogger<CommandProcessor> logger)
+public sealed class CommandProcessor(ISyncRequestStore requests, ISyncLedger sql, ISyncEngine engine,
+    SyncOptions options, ILogger<CommandProcessor> logger) : ICommandProcessor
 {
     private readonly string _workerOwner = $"{Environment.MachineName}:{Environment.ProcessId}:{Guid.NewGuid():N}";
 

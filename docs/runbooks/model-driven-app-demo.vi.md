@@ -21,7 +21,8 @@ Menu, tên view và nhãn form của demo đã đổi sang English. Bộ chọn 
 Kiểm thử local chạy bằng dữ liệu giả, không gọi Dataverse:
 
 ```powershell
-npm install --prefix .artifacts/language-tests --no-audit --no-fund typescript@5 react@17 react-dom@17 @fluentui/react-components@9 @fluentui/react-icons@2 @playwright/test@1 @types/react@17 @types/react-dom@17 esbuild@0.25
+npm --prefix dataverse/app-source/fmc-bms-demo ci
+npm --prefix dataverse/app-source/fmc-bms-demo run build
 node scripts/tests/bms-language-ui.cjs
 node --test scripts/tests/Test-BmsEventDemoLanguage.mjs
 ```
@@ -194,4 +195,4 @@ Build live ngày 2026-09-12 có kết quả:
 - Đọc ngược môi trường xác nhận 8 bảng trong app, 1 generative page và không mất sitemap subarea.
 - Solution unmanaged đã export lại vào `dataverse/FMCentralBms`.
 
-Source thiết kế nằm ở `dataverse/app-source/fmc-bms-demo/app-spec.json`; source trang ở `trung-tam-van-hanh.tsx`. `app-spec.json` là nguồn để tái build app, còn solution export giữ bản sao chính xác của component đã deploy.
+Source thiết kế nằm ở `dataverse/app-source/fmc-bms-demo/app-spec.json`; source trang được chỉnh sửa trong thư mục `src/` cùng cấp. Chạy `npm ci`, `npm run build`, `npm test` tại thư mục app để sinh và kiểm tra `trung-tam-van-hanh.tsx` trước khi deploy. Không sửa trực tiếp file TSX sinh ra. `app-spec.json` là nguồn để tái build app, còn solution export giữ bản sao chính xác của component đã deploy. Xem [kiến trúc service](../reference/service-architecture.vi.md) để biết luồng code và cách mở rộng.

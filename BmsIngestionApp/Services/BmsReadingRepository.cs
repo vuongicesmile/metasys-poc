@@ -1,10 +1,11 @@
 using System.Data;
+using BmsIngestionApp.Abstractions;
 using BmsIngestionApp.Models;
 using Microsoft.Data.SqlClient;
 
 namespace BmsIngestionApp.Services;
 
-public sealed class BmsReadingRepository(string connectionString)
+public sealed class BmsReadingRepository(string connectionString) : IBmsReadingRepository
 {
     private const string InsertSql = """
         INSERT INTO raw.bms_reading

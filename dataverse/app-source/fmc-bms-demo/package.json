@@ -1,0 +1,21 @@
+{
+  "name": "fmc-bms-demo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.cjs",
+    "check": "node build.cjs --check",
+    "test": "npm run check && node ../../../scripts/tests/bms-language-ui.cjs && node ../../../scripts/tests/bms-language-ui.cjs --source"
+  },
+  "devDependencies": {
+    "@fluentui/react-components": "9.74.7",
+    "@fluentui/react-icons": "2.0.341",
+    "@playwright/test": "1.63.0",
+    "@types/react": "17.0.93",
+    "@types/react-dom": "17.0.26",
+    "esbuild": "0.25.12",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "typescript": "5.9.3"
+  }
+}

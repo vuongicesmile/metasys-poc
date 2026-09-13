@@ -1,3 +1,4 @@
+using DataverseSyncWorker.Abstractions;
 using System.Data;
 using System.Text.Json;
 using DataverseSyncWorker.Models;
@@ -5,7 +6,7 @@ using Microsoft.Data.SqlClient;
 
 namespace DataverseSyncWorker.Services;
 
-public sealed class SqlStore(IConfiguration configuration, SyncOptions options)
+public sealed class SqlStore(IConfiguration configuration, SyncOptions options) : ISyncLedger
 {
     private string ConnectionString => configuration.GetConnectionString("Sql")
         ?? throw new InvalidOperationException("Missing ConnectionStrings:Sql.");

@@ -4,6 +4,7 @@
 
 Start at the [documentation index](docs/README.md):
 
+- [Service architecture and extension guide (Vietnamese)](docs/reference/service-architecture.vi.md)
 - [Power Automate integration plan and pilot receipt](docs/plans/power-automate-sql-to-dataverse.vi.md)
 - [Power Automate trigger operating runbook](docs/runbooks/power-automate-sql-sync.vi.md)
 - [Custom API + Power Automate UI demo](docs/runbooks/custom-api-bms-sync-demo.vi.md)
