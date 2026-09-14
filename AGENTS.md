@@ -30,6 +30,12 @@ relevant changes, verification and any remaining limitation.
   and holds full history.
 - DataverseSyncWorker on port 5300 sends current state and retained history to
   Dataverse independently of ingestion.
+- SpoIngestion.Functions is the cloud-ready SharePoint file consumer backed by
+  Azure Blob Storage/Queue; its checked-in code and Bicep are not evidence of a
+  live Azure deployment.
+- SPO mappings write typed records into the existing fmc_bmsbuilding,
+  fmc_bmsequipment, fmc_bmspoint and fmc_bmsreading tables; do not introduce a
+  generic Bronze JSON table for this path.
 - Power Automate `FMC - Request SQL to Dataverse Sync` queues `fmc_syncrequest`;
   CommandDriven worker instances atomically claim, lease and complete requests.
 - The existing solution is FMCentralBms, publisher FMCentralBmsPublisher, prefix fmc.

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DataverseSyncWorker\DataverseSyncWorker.csproj" />
     <ProjectReference Include="..\..\BmsIngestionApp\BmsIngestionApp.csproj" />
+    <ProjectReference Include="..\..\SpoIngestion.Core\SpoIngestion.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,2 @@
+Title,sourceReadingId,objectId,objectName,objectType,building,equipmentCode,readingTime,readingValue,unit,sourceSystem
+SPO Demo Manual Reading,SPODEMO-L000001,SPODEMO-P001,SPO Demo Room Temperature,analogInput,SPODEMO-SITE-001,SPODEMO-E001,2026-09-14T00:15:00Z,23.5000,degC,SPO Demo List

@@ -1,0 +1,108 @@
+{
+  "sourceNamespace": "bms_spo_dev01",
+  "sourceId": "FMC",
+  "historyTtlSeconds": 2592000,
+  "batchSize": 100,
+  "maxFileBytes": 52428800,
+  "rawContainer": "spo-raw",
+  "controlContainer": "spo-control",
+  "queueName": "spo-ingestion",
+  "equipmentTypeChoices": {
+    "WaterMeter": 789100000,
+    "TemperatureSensor": 789100001,
+    "Temperature Sensor": 789100001,
+    "TestRig": 789100002,
+    "Test Rig": 789100002
+  },
+  "sources": [
+    {
+      "key": "spo-building",
+      "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/Building/",
+      "mapping": "building-v1",
+      "targetTable": "fmc_bmsbuilding",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "localSample": "building.csv",
+      "ownedKeyPrefix": "BLD",
+      "maxRows": 10000
+    },
+    {
+      "key": "spo-equipment",
+      "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/Equipment/",
+      "mapping": "equipment-v1",
+      "targetTable": "fmc_bmsequipment",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "localSample": "equipment.csv",
+      "ownedKeyPrefix": "EQ",
+      "maxRows": 100000
+    },
+    {
+      "key": "spo-electric-meter",
+      "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/ElectricMeter/",
+      "mapping": "electric-meter-v1",
+      "targetTable": "",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "enabled": false,
+      "localSample": "electric_meter.csv",
+      "maxRows": 100000
+    },
+    {
+      "key": "spo-water-meter",
+      "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/WaterMeter/",
+      "mapping": "water-meter-v1",
+      "targetTable": "fmc_bmsequipment",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "localSample": "water_meter.csv",
+      "ownedKeyPrefix": "WM",
+      "maxRows": 100000
+    },
+    {
+      "key": "spo-electricity-reading",
+      "pathPrefix": "/Shared Documents/FMC-Inbox/02-Telemetry/Electricity/",
+      "mapping": "electricity-reading-v1",
+      "targetTable": "fmc_bmspoint,fmc_bmsreading",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "localSample": "electricity_reading_hourly.csv",
+      "ownedKeyPrefix": "EM",
+      "timestampUtcOffset": "+07:00",
+      "maxRows": 250000
+    },
+    {
+      "key": "spo-water-reading",
+      "pathPrefix": "/Shared Documents/FMC-Inbox/02-Telemetry/Water/",
+      "mapping": "water-reading-v1",
+      "targetTable": "fmc_bmspoint,fmc_bmsreading",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "localSample": "water_reading_hourly.csv",
+      "ownedKeyPrefix": "WM",
+      "timestampUtcOffset": "+07:00",
+      "maxRows": 250000
+    },
+    {
+      "key": "spo-equipment-fault",
+      "pathPrefix": "/Shared Documents/FMC-Operations/EquipmentFault/",
+      "mapping": "equipment-fault-v1",
+      "targetTable": "",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "enabled": false,
+      "localSample": "equipment_fault.csv"
+    },
+    {
+      "key": "spo-maintenance",
+      "pathPrefix": "/Shared Documents/FMC-Operations/Maintenance/",
+      "mapping": "maintenance-v1",
+      "targetTable": "",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "enabled": false,
+      "localSample": "maintenance.csv"
+    },
+    {
+      "key": "spo-building-kpi",
+      "pathPrefix": "/Shared Documents/FMC-Derived/BuildingEnergyKpi/",
+      "mapping": "building-kpi-v1",
+      "targetTable": "",
+      "extensions": [ "csv", "json", "xlsx" ],
+      "enabled": false,
+      "localSample": "building_energy_kpi.csv"
+    }
+  ]
+}

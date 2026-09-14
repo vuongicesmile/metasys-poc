@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "sourceReadingId": "SPODEMO-R000003",
+      "objectId": "SPODEMO-P001",
+      "objectName": "SPO Demo Room Temperature",
+      "objectType": "analogInput",
+      "building": "SPODEMO-SITE-001",
+      "equipmentCode": "SPODEMO-E001",
+      "readingTime": "2026-09-14T00:10:00Z",
+      "readingValue": 23.3750,
+      "unit": "degC",
+      "sourceSystem": "SPO Demo"
+    }
+  ]
+}

@@ -14,7 +14,23 @@ Start at the [documentation index](docs/README.md):
 - [SQL-to-Dataverse operating runbook](docs/runbooks/sql-to-dataverse-runbook.vi.md)
 - [Dataverse deployment and implemented contract](docs/reference/dataverse-deployment.md)
 - [FMC BMS Demo model-driven app runbook (Vietnamese)](docs/runbooks/model-driven-app-demo.vi.md)
+- [SPO Cloud Ingestion build/deploy/test runbook (Vietnamese)](docs/runbooks/spo-cloud-ingestion-service.vi.md)
+- [SPO Local Ingestion runbook (Vietnamese)](docs/runbooks/spo-local-ingestion.vi.md)
 - [Original Plan 3.0 — historical design](docs/plans/plan-3.0-sql-to-dataverse.md)
+
+## SharePoint cloud ingestion
+
+`SpoIngestion.Core`, `SpoIngestion.Cli` and `SpoIngestion.Functions` implement the
+cloud-ready SharePoint file path: CSV/JSON/XLSX raw snapshots in Azure Blob Storage,
+durable queue/lease processing and typed writes into the existing BMS Bronze tables.
+No new Dataverse table or column is provisioned. Azure deployment is currently
+prepared but not executed because the checked account has no Azure subscription.
+See the [SPO runbook](docs/runbooks/spo-cloud-ingestion-service.vi.md) for dry-run,
+deployment, Power Automate capture-flow and UI test steps.
+
+When Azure hosting is unavailable, `SpoIngestion.Cli ingest-local` reuses the same
+parser, mapper and Dataverse writer to process local copies of SharePoint files.
+See the [local ingestion runbook](docs/runbooks/spo-local-ingestion.vi.md).
 
 ## SQL to Dataverse (Plan 3.0)
 

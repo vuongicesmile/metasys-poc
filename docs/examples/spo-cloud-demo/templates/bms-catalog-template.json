@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "sourceId": "FMC",
+  "buildings": [
+    {
+      "code": "SPODEMO-B001",
+      "name": "SPO Demo Building",
+      "sourceBuilding": "SPODEMO-SITE-001",
+      "description": "Synthetic catalog record for SPO ingestion testing."
+    }
+  ],
+  "equipment": [
+    {
+      "code": "SPODEMO-E001",
+      "name": "SPO Demo Temperature Sensor",
+      "type": "TemperatureSensor",
+      "buildingCode": "SPODEMO-B001",
+      "description": "Synthetic equipment record."
+    }
+  ],
+  "pointMappings": [
+    {
+      "objectId": "SPODEMO-P001",
+      "equipmentCode": "SPODEMO-E001"
+    }
+  ]
+}

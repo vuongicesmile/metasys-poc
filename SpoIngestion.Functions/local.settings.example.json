@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "SpoStorage": "UseDevelopmentStorage=true",
+    "SpoQueueName": "spo-ingestion",
+    "DataverseConnectionString": "AuthType=ClientSecret;Url=https://YOUR-ORG.crm.dynamics.com;ClientId=YOUR-APP-ID;ClientSecret=SET-OUTSIDE-SOURCE"
+  }
+}
