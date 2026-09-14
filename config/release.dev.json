@@ -10,7 +10,7 @@
   "publisher": "FMCentralBmsPublisher",
   "appId": "d19f4897-d227-4df3-8361-988f97c53e89",
   "pageId": "9d05b7f9-f4c4-4572-b6b8-0220b51812f3",
-  "pageName": "BMS Operations Center",
+  "pageName": "BMS Operations Center1",
   "pageDirectory": "dataverse/app-source/fmc-bms-demo",
   "pageFile": "trung-tam-van-hanh.tsx",
   "dataSources": "fmc_bmsbuilding,fmc_bmsequipment,fmc_bmspoint,fmc_bmsreading,cr3c8_silvernewbmspoint,fmc_syncrequest,fmc_spofile,fmc_spoimportrow",

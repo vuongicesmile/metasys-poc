@@ -65,7 +65,7 @@ export const englishMessages: Record<string, string> = {
     "Thử xóa bộ lọc hoặc tạo yêu cầu đồng bộ mới.": "Clear the filter or create a new sync request.",
     "Tiếp nhận": "Archive status",
     "Toàn cảnh dữ liệu": "Data overview",
-    "Trung tâm vận hành BMS": "BMS Operations Center",
+    "Trung tâm vận hành BMS": "BMS Operations Center1",
     "Trạng thái": "Status",
     "Tòa nhà": "Buildings",
     "Tệp": "File",

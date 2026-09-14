@@ -54,7 +54,7 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         page.on('pageerror', error => { errors.push(error.message); console.error('Browser error:', error.message); });
         const url = `http://127.0.0.1:${server.address().port}`;
         await page.goto(url);
-        await page.getByRole('heading', { name: 'BMS Operations Center' }).waitFor();
+        await page.getByRole('heading', { name: 'BMS Operations Center1' }).waitFor();
         await page.getByText('Queued', { exact: true }).waitFor();
         assert.equal(await page.getByRole('combobox', { name: 'Language' }).inputValue(), 'en');
         assert.equal(await page.locator('main').getAttribute('lang'), 'en');
@@ -76,7 +76,7 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         const other = await context.newPage();
         await other.goto(url);
         await other.getByRole('combobox', { name: 'Ngôn ngữ' }).selectOption('en');
-        await page.getByRole('heading', { name: 'BMS Operations Center' }).waitFor();
+        await page.getByRole('heading', { name: 'BMS Operations Center1' }).waitFor();
         await other.close();
         await page.goto(url + '?fail');
         await page.getByText('Unable to load data', { exact: true }).waitFor();
@@ -96,7 +96,7 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         const blockedPage = await blocked.newPage();
         blockedPage.on('pageerror', error => errors.push(error.message));
         await blockedPage.goto(url);
-        await blockedPage.getByRole('heading', { name: 'BMS Operations Center' }).waitFor();
+        await blockedPage.getByRole('heading', { name: 'BMS Operations Center1' }).waitFor();
         await blockedPage.getByRole('combobox', { name: 'Language' }).selectOption('vi');
         await blockedPage.getByRole('heading', { name: 'Trung tâm vận hành BMS' }).waitFor();
         await blocked.close();

@@ -2,7 +2,7 @@
 
 ## Chọn ngôn ngữ — cập nhật 2026-09-12
 
-Trang **BMS Operations Center** và **Sync Data** có bộ chọn **Language → English / Tiếng Việt**. Mặc định là **English**, kể cả khi trình duyệt dùng tiếng Việt. Nếu đã chọn một ngôn ngữ, app nhớ lựa chọn trong trình duyệt bằng khóa `fmc.bms.language`; nếu trình duyệt chặn storage, vẫn chuyển được trong phiên hiện tại.
+Trang **BMS Operations Center1** và **Sync Data** có bộ chọn **Language → English / Tiếng Việt**. Mặc định là **English**, kể cả khi trình duyệt dùng tiếng Việt. Nếu đã chọn một ngôn ngữ, app nhớ lựa chọn trong trình duyệt bằng khóa `fmc.bms.language`; nếu trình duyệt chặn storage, vẫn chuyển được trong phiên hiện tại.
 
 Bộ chọn dịch nội dung hai trang, nhãn truy cập, trạng thái, thông báo lỗi, ngày và số. Dữ liệu nghiệp vụ như tên tòa nhà, tên file và thông báo gốc từ server được giữ nguyên. Đổi ngôn ngữ không đọc lại dữ liệu hoặc gửi thêm request sync.
 
