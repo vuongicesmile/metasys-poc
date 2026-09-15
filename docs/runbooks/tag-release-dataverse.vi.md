@@ -1,6 +1,6 @@
-# Release bằng Git tag: local → GitHub → Dataverse
+# Release bằng Git tag: GitHub-hosted → Dataverse
 
-Quy trình này triển khai solution Developer `FMCentralBms` tại `org06cbc9ec.crm5.dynamics.com`. Tạo và push tag `dev-vX.Y.Z` sẽ kích hoạt workflow **Release Dataverse Developer**. GitHub gửi job đến runner local dùng phiên PAC/Azure đã đăng nhập. Không cần đưa token Power Platform lên GitHub.
+Quy trình này triển khai solution Developer `FMCentralBms` tại `org06cbc9ec.crm5.dynamics.com`. Tạo và push tag `dev-vX.Y.Z` sẽ kích hoạt workflow **Release Dataverse Developer** trên runner `windows-latest` do GitHub quản lý. PAC dùng OIDC để đăng nhập bằng application user riêng; không phụ thuộc máy local, phiên đăng nhập tương tác hoặc client secret dài hạn.
 
 ## 1. Luồng đầy đủ
 
@@ -9,7 +9,7 @@ flowchart LR
     A[Sửa code local] --> B[Commit main]
     B --> C[Push main + tag dev-vX.Y.Z]
     C --> D[GitHub Actions]
-    D --> E[Runner Windows local]
+    D --> E[GitHub-hosted Windows runner]
     E --> F[Kiểm tra tag và diff từ release thành công]
     F --> G[Build và test]
     G --> H[WhoAmI và kiểm tra solution]
@@ -24,8 +24,8 @@ Có hai workflow độc lập:
 | Event | Máy chạy | Kết quả |
 | --- | --- | --- |
 | Push `main` hoặc Pull Request | GitHub-hosted Windows | Test backend, release planner, dashboard và web resources; không deploy |
-| Push `dev-v*` | Runner local `FMC-Dataverse-Local` | Kiểm tra release, build/test lại đúng tag, deploy và verify |
-| Run workflow thủ công trên `main`, nhập tag đã tồn tại | Cùng runner local | Retry đúng commit sau khi sửa nguyên nhân bên ngoài như hết phiên đăng nhập |
+| Push `dev-v*` | GitHub-hosted Windows | Kiểm tra release, build/test lại đúng tag, đăng nhập OIDC, deploy và verify |
+| Run workflow thủ công trên `main`, nhập tag đã tồn tại | GitHub-hosted Windows | Retry đúng commit sau khi sửa nguyên nhân bên ngoài; không cần bật máy developer |
 
 Tag trỏ đến commit bất biến. Pipeline yêu cầu commit thuộc lịch sử `origin/main`, khớp tag trên GitHub và checkout sạch. Không dùng tag di động kiểu `latest` để deploy.
 
@@ -66,38 +66,32 @@ Theo dõi tại [GitHub Actions của repo](https://github.com/vuongicesmile/met
 
 Pipeline không khởi động worker, không enqueue `fmc_syncrequest` và không tự chạy luồng copy SharePoint. Deploy code và đồng bộ dữ liệu nghiệp vụ là hai thao tác khác nhau. Máy hiện chưa có Windows service `FMCentralDataverseSync`; việc cài/cập nhật runtime dùng [runbook SQL](sql-to-dataverse-runbook.vi.md) và script cài service hiện có.
 
-## 4. Runner local và xác thực
+## 4. GitHub OIDC và xác thực
 
-Cài một lần bằng:
+Thiết lập một lần:
 
-```powershell
-powershell -NoProfile -File scripts/release/Install-LocalRunner.ps1
-```
+1. Tạo Microsoft Entra application `FMC Dataverse Dev Release` và service principal.
+2. Tạo application user trong environment Developer, gán deployment role phù hợp để import/publish toàn bộ solution.
+3. Thêm federated credential với issuer `https://token.actions.githubusercontent.com`, audience `api://AzureADTokenExchange` và subject `repo:vuongicesmile/metasys-poc:environment:dataverse-dev`.
+4. Cấu hình variables `POWER_PLATFORM_CLIENT_ID` và `POWER_PLATFORM_TENANT_ID` trong GitHub environment `dataverse-dev`.
+5. Lưu khóa ký plugin dạng Base64 trong environment secret `FMC_PLUGIN_SIGNING_KEY_B64`. Release không đổi plugin vẫn chạy khi secret này chưa có; release có đổi plugin sẽ dừng trước cloud write nếu thiếu khóa.
 
-Script tải runner Windows từ release chính thức `actions/runner`, kiểm tra SHA256 của asset, đăng ký runner bằng quyền repo hiện có qua Git Credential Manager và tạo Scheduled Task `FMC-Dataverse-ReleaseRunner`. Task chạy ẩn khi tài khoản Windows hiện tại đăng nhập, dùng cùng PAC/Azure session. Không đăng ký dưới `SYSTEM` vì tài khoản đó không có phiên đăng nhập của bạn.
+Workflow cần `id-token: write` để GitHub phát token ngắn hạn. `pac auth create --githubFederated` đổi token đó lấy quyền của application user; `pac org who` và organization guard trong `release.py` chặn deployment nếu identity trỏ sai environment.
 
-Runner nằm tại `D:\Coder\fmc-runner`. File `.env` của runner chỉ chứa đường dẫn `FMC_AZURE_PYTHON` và `FMC_RELEASE_STATE`. Credential đăng ký runner do GitHub runner quản lý ngoài repository.
+Environment `dataverse-dev` chỉ nên cho phép protected release tags/nhánh được duyệt và có reviewer nếu repository có nhiều người được phép sửa workflow. Application user này chỉ dùng cho ALM ở Developer, không dùng làm runtime identity của worker.
 
-Máy phải bật, có mạng và tài khoản Windows phải đăng nhập. Nếu máy tắt, job chờ runner online. Nếu token hết hạn, đăng nhập lại PAC/Azure bằng tài khoản developer, rồi **Re-run jobs** hoặc chạy workflow thủ công với tag cũ. Không tạo tag mới chỉ để retry lỗi mạng.
+`scripts/release/Install-LocalRunner.ps1` chỉ còn là công cụ fallback chẩn đoán, không nằm trong đường deploy mặc định.
 
-```powershell
-Get-ScheduledTaskInfo -TaskName FMC-Dataverse-ReleaseRunner
-Start-ScheduledTask -TaskName FMC-Dataverse-ReleaseRunner
-Stop-ScheduledTask -TaskName FMC-Dataverse-ReleaseRunner
-```
-
-Repo public nhưng PR chỉ chạy trên GitHub-hosted runner. Không thêm PR event vào workflow release hoặc cho code chưa tin cậy chạy trên label `fmc-dataverse-dev`: runner có quyền Dataverse của developer đang đăng nhập. Người được phép push tag release phải là người được phép deploy môi trường này.
-
-Nếu sửa plugin, cấu hình `FMC_PLUGIN_SIGNING_KEY` trong môi trường runner trỏ đến `.snk` gốc, rồi restart runner. Checkout hiện thiếu khóa này; không dùng `SignAssembly=false` cho release.
+Repo public nhưng PR không được gọi workflow release và không nhận OIDC token của environment. Người được phép push tag hoặc approve environment phải là người được phép deploy môi trường này.
 
 ## 5. Receipt, lỗi và rollback
 
-Baseline ban đầu là commit `aaa0caee7d09a299f22a7d8df077eec6ac115b44`, tương ứng nguồn của lần publish song ngữ đã ghi nhận. Sau lần release đầu tiên, diff lấy từ `release-state/last-success.json`, không lấy tag gần nhất nếu tag đó từng thất bại.
+Baseline cloud hiện tại là commit `3fcfc91230841ac7f9b6bdc51ef6f36b285c4c4b`, tương ứng release `dev-v1.0.2` đã xác minh. Mỗi job mới tải receipt của workflow thành công gần nhất từ GitHub Actions artifact làm `last-success.json`; không lấy tag gần nhất nếu tag đó từng thất bại.
 
-Trên runner:
+Trong thư mục tạm của từng GitHub-hosted runner:
 
 ```text
-D:\Coder\fmc-runner\release-state\
+%RUNNER_TEMP%\fmc-release-state\
   last-success.json
   last-attempt.json
   artifacts\dev-vX.Y.Z\timestamp-pid\
@@ -109,7 +103,7 @@ D:\Coder\fmc-runner\release-state\
     workers\
 ```
 
-Backup và package nằm ngoài checkout để không bị GitHub checkout xóa ở job sau. Chỉ receipt được upload lên GitHub Actions; full solution và worker configuration giữ local. `receipt.json` ghi commit, baseline, files thay đổi, version, stage và trạng thái.
+Backup, package và worker artifacts là tạm thời và bị xóa cùng hosted runner. Chỉ receipt không chứa secret được upload lên GitHub Actions trong 30 ngày để job sau khôi phục baseline. `receipt.json` ghi commit, baseline, files thay đổi, version, stage và trạng thái.
 
 Build/test hoặc preflight thất bại: không deploy. Lỗi trong import/upload/verify: receipt ghi Failed, giữ backup, không tăng `last-success`. Dataverse không có transaction chung cho toàn release; một component có thể đã cập nhật trước lỗi. Kiểm tra log và retry đúng tag sau khi khắc phục. Không coi job đỏ là toàn bộ cloud đã rollback.
 
@@ -132,6 +126,7 @@ python -m unittest discover -s scripts/tests -p test_release.py -v
 Bộ test bao gồm tag/version, phân loại component, dependency khi import solution, từ chối migration chưa xử lý, failure không ghi state thành công và retry không deploy trùng.
 
 - [GitHub: sự kiện kích hoạt workflow](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
-- [GitHub: đăng ký self-hosted runner](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/add-runners)
+- [Microsoft: GitHub OIDC/FIC cho Power Platform](https://learn.microsoft.com/en-us/power-platform/alm/tutorials/github-actions-oidc-fic)
+- [Microsoft: PAC auth và `--githubFederated`](https://learn.microsoft.com/en-us/power-platform/developer/cli/reference/auth)
 - [Microsoft: PAC model, transpile/upload/download generative page](https://learn.microsoft.com/en-us/power-platform/developer/cli/reference/model)
 - [Microsoft: PAC solution pack/import/export](https://learn.microsoft.com/en-us/power-platform/developer/cli/reference/solution)

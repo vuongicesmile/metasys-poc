@@ -24,6 +24,27 @@ def command(*args, cwd=ROOT, capture=False):
     return result.stdout.strip() if capture else None
 
 
+def pac_access_token(output):
+    candidates = [line.strip() for line in output.splitlines()
+                  if len(line.strip()) > 500 and line.strip().count(".") == 2]
+    if len(candidates) != 1:
+        raise ValueError("PAC did not return exactly one Dataverse access token")
+    return candidates[0]
+
+
+def access_token():
+    python = os.environ.get("FMC_AZURE_PYTHON")
+    if python:
+        if not Path(python).is_file():
+            raise ValueError("FMC_AZURE_PYTHON does not identify an existing executable")
+        token = command(python, ROOT / "scripts/get-dataverse-token.py", capture=True)
+    else:
+        token = pac_access_token(command("pac", "auth", "token", capture=True))
+    if token.count(".") != 2:
+        raise ValueError("Dataverse access token acquisition failed")
+    return token
+
+
 def version(tag):
     match = re.fullmatch(r"dev-v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)", tag)
     if not match:
@@ -127,12 +148,7 @@ def validate(plan, out):
 
 class Dataverse:
     def __init__(self):
-        python = os.environ.get("FMC_AZURE_PYTHON")
-        if not python or not Path(python).is_file():
-            raise ValueError("Set FMC_AZURE_PYTHON to the existing Azure CLI Python executable")
-        self.token = command(python, ROOT / "scripts/get-dataverse-token.py", capture=True)
-        if self.token.count(".") != 2:
-            raise ValueError("Developer token acquisition failed")
+        self.token = access_token()
         who = self.request("WhoAmI")
         if who["OrganizationId"].lower() != CONFIG["organizationId"]:
             raise ValueError("Unexpected live organization")
@@ -202,11 +218,20 @@ def deploy(plan, out, receipt):
         if len(rows) != 1:
             raise ValueError(f"Expected one existing web resource: {name}")
         content = (ROOT / source).read_text(encoding="utf-8-sig")
-        if "__FLOW_ID__" in content:
-            flows = dv.request("workflows?$select=workflowid&$filter=name eq 'FMC - App Request BMS Sync Event' and category eq 5 and type eq 1")["value"]
+        for placeholder, flow_name in CONFIG.get("flowPlaceholders", {}).items():
+            if placeholder not in content:
+                continue
+            escaped_name = flow_name.replace("'", "''")
+            flows = dv.request(
+                f"workflows?$select=workflowid&$filter=name eq '{escaped_name}' and category eq 5 and type eq 1"
+            )["value"]
             if len(flows) != 1:
-                raise ValueError("Expected one BMS demo flow")
-            content = content.replace("__FLOW_ID__", flows[0]["workflowid"]).replace("__ENVIRONMENT_ID__", CONFIG["environmentId"])
+                raise ValueError(f"Expected one flow for {placeholder}: {flow_name}")
+            content = content.replace(placeholder, flows[0]["workflowid"])
+        content = content.replace("__ENVIRONMENT_ID__", CONFIG["environmentId"])
+        unresolved = [marker for marker in ("__FLOW_ID__", "__SPO_FLOW_ID__", "__FULL_FLOW_ID__", "__ENVIRONMENT_ID__") if marker in content]
+        if unresolved:
+            raise ValueError(f"Unresolved web-resource placeholders in {source}: {', '.join(unresolved)}")
         resource_id = rows[0]["webresourceid"]
         dv.request(f"{dv.webresource_set}({resource_id})", "PATCH", {"content": base64.b64encode(content.encode()).decode()})
         dv.request("PublishXml", "POST", {"ParameterXml": f"<importexportxml><webresources><webresource>{resource_id}</webresource></webresources></importexportxml>"})

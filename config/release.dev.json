@@ -2,7 +2,7 @@
   "repository": "vuongicesmile/metasys-poc",
   "branch": "main",
   "tagPrefix": "dev-v",
-  "baselineCommit": "aaa0caee7d09a299f22a7d8df077eec6ac115b44",
+  "baselineCommit": "3fcfc91230841ac7f9b6bdc51ef6f36b285c4c4b",
   "environmentUrl": "https://org06cbc9ec.crm5.dynamics.com/",
   "organizationId": "ab191700-b99e-f111-aaa0-000d3a80bb96",
   "environmentId": "5abcb0e5-99b2-e51f-aa0e-90d84405798b",
@@ -17,5 +17,10 @@
   "webResources": {
     "dataverse/app-source/BmsEventDemo.html": "fmc_/pages/BmsEventDemo.html",
     "dataverse/app-source/EquipmentPluginTest.js": "fmc_/scripts/EquipmentPluginTest.js"
+  },
+  "flowPlaceholders": {
+    "__FLOW_ID__": "FMC - App Request BMS Sync Event",
+    "__SPO_FLOW_ID__": "FMC - Request SPO Sync",
+    "__FULL_FLOW_ID__": "FMC - Request Full Sync"
   }
 }

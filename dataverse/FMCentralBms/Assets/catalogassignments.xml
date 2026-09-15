@@ -3,4 +3,12 @@
     <iscustomizable>1</iscustomizable>
     <name>Request BMS Sync</name>
   </catalogassignment>
+  <catalogassignment catalogid.uniquename="fmc_BmsAppEvents" object.uniquename="fmc_RequestFullSync" objectidtype="customapi">
+    <iscustomizable>1</iscustomizable>
+    <name>Request Full Sync</name>
+  </catalogassignment>
+  <catalogassignment catalogid.uniquename="fmc_BmsAppEvents" object.uniquename="fmc_RequestSpoSync" objectidtype="customapi">
+    <iscustomizable>1</iscustomizable>
+    <name>Request SharePoint Sync</name>
+  </catalogassignment>
 </catalogassignments>

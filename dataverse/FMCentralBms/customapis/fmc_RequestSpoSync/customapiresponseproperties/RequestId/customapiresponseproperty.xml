@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="RequestId">
+  <displayname default="Request ID">
+    <label description="Request ID" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>RequestId</name>
+  <type>12</type>
+</customapiresponseproperty>

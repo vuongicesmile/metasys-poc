@@ -1,0 +1,106 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_full_sync_requested": {
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "BusinessEventsTrigger",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "catalog": "eef0e546-6cbf-49a7-acc3-0d6b1c3f940f",
+              "category": "31f00635-c05c-4de8-9619-f63fef619d9b",
+              "subscriptionRequest/entityname": "none",
+              "subscriptionRequest/sdkmessagename": "fmc_RequestFullSync"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Request_SQL_sync": {
+          "type": "OpenApiConnection",
+          "runAfter": {},
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "PerformUnboundAction"
+            },
+            "parameters": {
+              "actionName": "fmc_RequestBmsSync",
+              "item/ClientRequestId": "@string(triggerBody()?['OutputParameters']?['RequestId'])"
+            }
+          }
+        },
+        "Request_SharePoint_sync": {
+          "type": "OpenApiConnection",
+          "runAfter": {},
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "PerformUnboundAction"
+            },
+            "parameters": {
+              "actionName": "fmc_RequestSpoSync",
+              "item/ClientRequestId": "@string(triggerBody()?['OutputParameters']?['RequestId'])"
+            }
+          }
+        },
+        "Dispatch_summary": {
+          "type": "Compose",
+          "runAfter": {
+            "Request_SQL_sync": [
+              "Succeeded",
+              "Failed",
+              "Skipped",
+              "TimedOut"
+            ],
+            "Request_SharePoint_sync": [
+              "Succeeded",
+              "Failed",
+              "Skipped",
+              "TimedOut"
+            ]
+          },
+          "inputs": {
+            "requestId": "@triggerBody()?['OutputParameters']?['RequestId']",
+            "dispatchedAt": "@utcNow()",
+            "sqlAction": "fmc_RequestBmsSync",
+            "sharePointAction": "fmc_RequestSpoSync",
+            "note": "Each child pipeline reports and retries independently."
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

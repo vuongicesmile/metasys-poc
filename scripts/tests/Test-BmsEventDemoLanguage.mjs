@@ -19,7 +19,7 @@ function mount({ stored = null, blocked = false, context = true, fetchImpl } = {
     if (id) nodes.set(id, node);
     return node;
   }
-  for (const id of ['send', 'status', 'language', 'event-card']) element(id);
+  for (const id of ['send', 'status', 'spo-send', 'spo-status', 'full-send', 'full-status', 'language', 'event-card', 'spo-card', 'full-card']) element(id);
   const translated = [...html.matchAll(/<[^>]*data-i18n="([^"]+)"[^>]*>/g)].map(match => {
     const id = match[0].match(/\bid="([^"]+)"/)?.[1];
     const node = id && nodes.get(id) || element(id, match[1]);
@@ -45,6 +45,8 @@ function mount({ stored = null, blocked = false, context = true, fetchImpl } = {
     choose(value) { nodes.get('language').value = value; nodes.get('language').dispatch('change'); },
     crossTab(value, key = 'fmc.bms.language') { windowListeners.get('storage')({ key, newValue: value, storageArea: storage }); },
     send: () => nodes.get('send').dispatch('click'),
+    sendSpo: () => nodes.get('spo-send').dispatch('click'),
+    sendFull: () => nodes.get('full-send').dispatch('click'),
     status: () => nodes.get('status').textContent
   };
 }
@@ -130,5 +132,29 @@ test('missing host and timeout errors remain translatable after failure', async 
 
 test('deployment placeholders and link isolation remain intact', () => {
   assert.match(html, /environments\/__ENVIRONMENT_ID__\/flows\/__FLOW_ID__\/details/);
+  assert.match(html, /environments\/__ENVIRONMENT_ID__\/flows\/__SPO_FLOW_ID__\/details/);
+  assert.match(html, /environments\/__ENVIRONMENT_ID__\/flows\/__FULL_FLOW_ID__\/details/);
   assert.match(html, /target="_blank" rel="noopener noreferrer"/);
+});
+
+test('SharePoint button calls its own Custom API and leaves SQL sync unchanged', async () => {
+  const app = mount({ fetchImpl: async () => ({ ok: true, json: async () => ({ RequestId: 'spo-request', Accepted: true }) }) });
+  await app.sendSpo();
+  assert.equal(app.calls.length, 1);
+  const [url, options] = app.calls[0];
+  assert.equal(url, 'https://example.crm.dynamics.com/api/data/v9.2/fmc_RequestSpoSync');
+  assert.deepEqual(JSON.parse(options.body), { ClientRequestId: 'click-123' });
+  assert.match(app.nodes.get('spo-status').textContent, /SharePoint scan accepted/);
+  assert.equal(app.nodes.get('spo-send').disabled, false);
+});
+
+test('Full Sync button calls only the orchestration Custom API', async () => {
+  const app = mount({ fetchImpl: async () => ({ ok: true, json: async () => ({ RequestId: 'full-request', Accepted: true }) }) });
+  await app.sendFull();
+  assert.equal(app.calls.length, 1);
+  const [url, options] = app.calls[0];
+  assert.equal(url, 'https://example.crm.dynamics.com/api/data/v9.2/fmc_RequestFullSync');
+  assert.deepEqual(JSON.parse(options.body), { ClientRequestId: 'click-123' });
+  assert.match(app.nodes.get('full-status').textContent, /Full sync request accepted/);
+  assert.equal(app.nodes.get('full-send').disabled, false);
 });

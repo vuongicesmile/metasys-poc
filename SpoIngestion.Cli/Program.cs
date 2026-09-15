@@ -8,6 +8,8 @@ if (args.Length == 0 || args[0] is "-h" or "--help")
     Console.WriteLine("Usage:");
     Console.WriteLine("  SpoIngestion.Cli preview-all [--root <folder>] [--config <file>] [--utc-now <ISO timestamp>]");
     Console.WriteLine("  SpoIngestion.Cli ingest-local [--root <folder>] [--config <file>] [--appsettings <file>] [--source <source-key>] [--utc-now <ISO timestamp>]");
+    Console.WriteLine("  SpoIngestion.Cli ingest-dataverse-once [--config <file>] [--appsettings <file>] [--max <1..100>] [--utc-now <ISO timestamp>]");
+    Console.WriteLine("  SpoIngestion.Cli watch-dataverse [--config <file>] [--appsettings <file>] [--max <1..100>] [--poll-seconds <seconds>]");
     return;
 }
 string Arg(string name, string fallback)
@@ -20,6 +22,45 @@ var configPath = Path.GetFullPath(Arg("--config", Path.Combine(Environment.Curre
 var utcNow = DateTime.Parse(Arg("--utc-now", DateTime.UtcNow.ToString("O")), null,
     System.Globalization.DateTimeStyles.AssumeUniversal | System.Globalization.DateTimeStyles.AdjustToUniversal);
 var options = SpoConfiguration.Load(configPath);
+
+if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
+{
+    var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "DataverseSyncWorker", "appsettings.json")));
+    var maxFiles = int.Parse(Arg("--max", "20"), System.Globalization.CultureInfo.InvariantCulture);
+    var pollSeconds = int.Parse(Arg("--poll-seconds", "10"), System.Globalization.CultureInfo.InvariantCulture);
+    if (pollSeconds is < 2 or > 3600) throw new ArgumentOutOfRangeException("--poll-seconds", "poll-seconds must be 2..3600.");
+    var dataverse = LoadDataverseOptions(appsettingsPath);
+    using var connection = new DataverseConnection(dataverse);
+    var client = connection.Get();
+    var writer = new DataverseBronzeWriter(client, options);
+    var local = new SpoLocalProcessor(new TabularParser(), new SpoBronzeMapper(options), writer, options);
+    var inbox = new SpoDataverseInboxProcessor(client, local, options);
+    using var stop = new CancellationTokenSource();
+    Console.CancelKeyPress += (_, eventArgs) => { eventArgs.Cancel = true; stop.Cancel(); };
+
+    do
+    {
+        var cycleUtc = args[0] == "watch-dataverse" ? DateTime.UtcNow : utcNow;
+        var cycle = await inbox.ProcessOnce(maxFiles, cycleUtc, stop.Token);
+        Console.WriteLine(JsonSerializer.Serialize(new
+        {
+            utcNow = cycleUtc,
+            count = cycle.Count,
+            imported = cycle.Count(x => x.Status == "Imported"),
+            waiting = cycle.Count(x => x.Status == "WaitingDependency"),
+            failed = cycle.Count(x => x.Status == "Failed"),
+            files = cycle
+        }, SpoConfiguration.Json));
+        if (args[0] == "ingest-dataverse-once")
+        {
+            if (cycle.Any(x => x.Status == "Failed")) Environment.ExitCode = 1;
+            return;
+        }
+        try { await Task.Delay(TimeSpan.FromSeconds(pollSeconds), stop.Token); }
+        catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
+    } while (!stop.IsCancellationRequested);
+    return;
+}
 
 if (args[0] == "ingest-local")
 {

@@ -10,16 +10,19 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: read
+  id-token: write
 concurrency:
   group: fmc-dataverse-developer
   cancel-in-progress: false
 
 jobs:
   deploy:
-    # This runner has local PAC/Azure sessions. Never route PR events to it.
+    # GitHub OIDC authenticates a dedicated Dataverse application user. No local
+    # machine, interactive PAC profile or long-lived client secret is required.
     if: github.repository == 'vuongicesmile/metasys-poc' && (github.event_name == 'push' || github.ref == 'refs/heads/main')
-    runs-on: [self-hosted, Windows, X64, fmc-dataverse-dev]
+    runs-on: windows-latest
     environment:
       name: dataverse-dev
       url: https://org06cbc9ec.crm5.dynamics.com/main.aspx?appid=d19f4897-d227-4df3-8361-988f97c53e89
@@ -38,6 +41,55 @@ jobs:
           ref: ${{ env.RELEASE_TAG }}
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.x'
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@0e44beb5424af932af47250a2568eba4c259e3d8 # v1
+        with:
+          add-tools-to-path: true
+      - name: Authenticate to Dataverse with GitHub OIDC
+        run: |
+          if (-not '${{ vars.POWER_PLATFORM_CLIENT_ID }}' -or -not '${{ vars.POWER_PLATFORM_TENANT_ID }}') {
+            throw 'Set POWER_PLATFORM_CLIENT_ID and POWER_PLATFORM_TENANT_ID in the dataverse-dev GitHub environment.'
+          }
+          pac auth create --name fmc-dev-release --applicationId '${{ vars.POWER_PLATFORM_CLIENT_ID }}' --tenant '${{ vars.POWER_PLATFORM_TENANT_ID }}' --githubFederated --environment 'https://org06cbc9ec.crm5.dynamics.com/'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pac org who --environment 'https://org06cbc9ec.crm5.dynamics.com/'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Restore last successful release receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $state = Join-Path $env:RUNNER_TEMP 'fmc-release-state'
+          New-Item -ItemType Directory -Path $state -Force | Out-Null
+          $runs = gh run list --repo '${{ github.repository }}' --workflow release-dev.yml --status success --limit 1 --json databaseId | ConvertFrom-Json
+          if ($runs.Count -gt 0) {
+            $recovery = Join-Path $state 'recovery'
+            gh run download $runs[0].databaseId --repo '${{ github.repository }}' --pattern 'release-receipt-*' --dir $recovery
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $receipts = @(Get-ChildItem -LiteralPath $recovery -Recurse -Filter receipt.json)
+            if ($receipts.Count -ne 1) { throw 'Expected exactly one receipt from the last successful release.' }
+            Copy-Item -LiteralPath $receipts[0].FullName -Destination (Join-Path $state 'last-success.json')
+          }
+          "FMC_RELEASE_STATE=$state" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Restore plugin signing key
+        env:
+          FMC_PLUGIN_SIGNING_KEY_B64: ${{ secrets.FMC_PLUGIN_SIGNING_KEY_B64 }}
+        run: |
+          if (-not $env:FMC_PLUGIN_SIGNING_KEY_B64) {
+            Write-Host 'Plugin signing key is not configured; releases without plugin changes can continue.'
+            exit 0
+          }
+          $key = Join-Path $env:RUNNER_TEMP 'FMCentralBms.Plugins.snk'
+          [IO.File]::WriteAllBytes($key, [Convert]::FromBase64String($env:FMC_PLUGIN_SIGNING_KEY_B64))
+          "FMC_PLUGIN_SIGNING_KEY=$key" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Test release planner
         run: |
           python -m unittest discover -s scripts/tests -p test_release.py -v
@@ -54,5 +106,5 @@ jobs:
           path: .artifacts/release/**/receipt.json
           if-no-files-found: warn
           retention-days: 30
-      # Full solution backups and worker artifacts stay on the deployment machine.
-      # GitHub is public; do not upload local credentials or runtime configuration.
+      # Full solution backups and worker artifacts remain ephemeral on the hosted
+      # runner. Only the non-secret receipt is retained for the next release.

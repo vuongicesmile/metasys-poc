@@ -16,6 +16,8 @@ public sealed partial class DataverseProvisioner
     public const string SpoFileSourceKey = "fmc_spofile_sourcekey";
     public const string SpoImportRowKey = "fmc_spoimportrow_versionordinal";
     public const string SpoFileImportRelationship = "fmc_spofile_spoimportrow";
+    public const int SpoMaxFileBytes = 52_428_800;
+    public const int SpoMaxFileSizeInKb = SpoMaxFileBytes / 1024;
 
     private const string DemoAppUniqueName = "fmc_FMCBMSDemo";
     private const string DemoSiteMapName = "fmc_FMCBMSDemo";
@@ -88,7 +90,11 @@ public sealed partial class DataverseProvisioner
 
         RequireStandardOrganizationTable(file);
         RequireStandardOrganizationTable(rows);
-        RequireAttribute<FileAttributeMetadata>(file, "fmc_file", a => a.MaxSizeInKB == 5120, "MaxSizeInKB=5120");
+        RequireAttribute<FileAttributeMetadata>(file, "fmc_file", a => a.MaxSizeInKB == SpoMaxFileSizeInKb,
+            $"MaxSizeInKB={SpoMaxFileSizeInKb}");
+        RequireAttribute<IntegerAttributeMetadata>(file, "fmc_filesize",
+            a => a.MinValue == 0 && a.MaxValue == SpoMaxFileBytes,
+            $"Whole Number 0..{SpoMaxFileBytes}");
         RequireAttribute<StringAttributeMetadata>(file, "fmc_sourcekey",
             a => a.MaxLength == 150 && a.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired,
             "Text(150), ApplicationRequired");
@@ -131,7 +137,7 @@ public sealed partial class DataverseProvisioner
         var site = await FindSingle(client, "sitemap", "sitemapname", DemoSiteMapName,
             new ColumnSet("sitemapid", "sitemapxml"));
         if (!XElement.Parse(site.GetAttributeValue<string>("sitemapxml")).Descendants("SubArea")
-                .Any(x => (string?)x.Attribute("Id") == "fmc_spofiles" && (string?)x.Attribute("Entity") == SpoFileTable))
+                .Any(x => (string?)x.Attribute("Entity") == SpoFileTable))
             throw new InvalidOperationException("FMC BMS Demo sitemap does not contain the SPO Files page.");
         await RequireSolutionComponent(client, app.Id, 80);
         await RequireSolutionComponent(client, site.Id, 62);
@@ -209,6 +215,39 @@ public sealed partial class DataverseProvisioner
             }
             else if (present.GetType() != attribute.GetType())
                 throw new InvalidOperationException($"{table}.{attribute.SchemaName} has an incompatible type.");
+            else if (present is FileAttributeMetadata currentFile &&
+                     attribute is FileAttributeMetadata expectedFile &&
+                     currentFile.MaxSizeInKB != expectedFile.MaxSizeInKB)
+            {
+                await client.ExecuteAsync(new UpdateAttributeRequest
+                {
+                    EntityName = table,
+                    Attribute = new FileAttributeMetadata
+                    {
+                        LogicalName = currentFile.LogicalName,
+                        MaxSizeInKB = expectedFile.MaxSizeInKB
+                    },
+                    MergeLabels = true
+                });
+                Console.WriteLine($"Updated column: {table}.{attribute.SchemaName} MaxSizeInKB={expectedFile.MaxSizeInKB}.");
+            }
+            else if (present is IntegerAttributeMetadata currentInteger &&
+                     attribute is IntegerAttributeMetadata expectedInteger &&
+                     (currentInteger.MinValue != expectedInteger.MinValue || currentInteger.MaxValue != expectedInteger.MaxValue))
+            {
+                await client.ExecuteAsync(new UpdateAttributeRequest
+                {
+                    EntityName = table,
+                    Attribute = new IntegerAttributeMetadata
+                    {
+                        LogicalName = currentInteger.LogicalName,
+                        MinValue = expectedInteger.MinValue,
+                        MaxValue = expectedInteger.MaxValue
+                    },
+                    MergeLabels = true
+                });
+                Console.WriteLine($"Updated column: {table}.{attribute.SchemaName} range={expectedInteger.MinValue}..{expectedInteger.MaxValue}.");
+            }
         }
     }
 
@@ -512,18 +551,22 @@ public sealed partial class DataverseProvisioner
         var site = await FindSingle(client, "sitemap", "sitemapname", DemoSiteMapName,
             new ColumnSet("sitemapid", "sitemapxml"));
         var xml = XElement.Parse(site.GetAttributeValue<string>("sitemapxml"));
-        var group = xml.Descendants("Group").FirstOrDefault(g => (string?)g.Attribute("Id") == "fmc_catalog")
-            ?? throw new InvalidOperationException("FMC BMS Demo catalog group is missing; refusing to replace the sitemap.");
-        var subArea = group.Elements("SubArea").SingleOrDefault(x => (string?)x.Attribute("Id") == "fmc_spofiles");
+        var existingAreas = xml.Descendants("SubArea")
+            .Where(x => (string?)x.Attribute("Entity") == SpoFileTable).ToArray();
+        if (existingAreas.Length > 1)
+            throw new InvalidOperationException("FMC BMS Demo contains duplicate SPO Files sitemap entries.");
+        var subArea = existingAreas.SingleOrDefault();
         if (subArea is null)
         {
+            var group = xml.Descendants("Group").FirstOrDefault(g => (string?)g.Attribute("Id") == "fmc_catalog")
+                ?? xml.Descendants("Group").FirstOrDefault(g => g.Descendants("Title")
+                    .Any(t => string.Equals((string?)t.Attribute("Title"), "SharePoint", StringComparison.OrdinalIgnoreCase)))
+                ?? throw new InvalidOperationException("FMC BMS Demo SharePoint group is missing; refusing to choose another sitemap group.");
             subArea = new XElement("SubArea", new XAttribute("Id", "fmc_spofiles"), new XAttribute("Entity", SpoFileTable),
                 new XElement("Titles", new XElement("Title", new XAttribute("LCID", "1033"), new XAttribute("Title", "SPO Files"))));
             group.Add(subArea);
             await client.UpdateAsync(new Entity("sitemap", site.Id) { ["sitemapxml"] = xml.ToString(SaveOptions.DisableFormatting) });
         }
-        else if ((string?)subArea.Attribute("Entity") != SpoFileTable)
-            throw new InvalidOperationException("Existing fmc_spofiles sitemap entry targets another component.");
 
         await AddSpoSolutionComponent(client, site.Id, 62, false);
         await AddSpoSolutionComponent(client, app.Id, 80, false);
@@ -595,12 +638,12 @@ public sealed partial class DataverseProvisioner
         yield return SpoText("fmc_sharepointidentifier", "SharePoint Identifier", 4000);
         yield return SpoText("fmc_sharepointpath", "SharePoint Path", 4000);
         yield return SpoText("fmc_sharepointurl", "SharePoint URL", 4000);
-        yield return SpoInteger("fmc_filesize", "File Size", 0, 5242880);
+        yield return SpoInteger("fmc_filesize", "File Size", 0, SpoMaxFileBytes);
         yield return new FileAttributeMetadata
         {
             SchemaName = "fmc_file",
             DisplayName = new Label("Archived File", 1033),
-            MaxSizeInKB = 5120,
+            MaxSizeInKB = SpoMaxFileSizeInKb,
             RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.None)
         };
         yield return SpoChoice("fmc_status", "Archive Status", SpoArchiveStatuses.Received,

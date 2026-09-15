@@ -7,6 +7,8 @@ $org = 'https://org06cbc9ec.crm5.dynamics.com'
 $solution = 'FMCentralBms'
 $apiName = 'fmc_RequestBmsSync'
 $flowName = 'FMC - App Request BMS Sync Event'
+$spoFlowName = 'FMC - Request SPO Sync'
+$fullFlowName = 'FMC - Request Full Sync'
 $resourceName = 'fmc_/pages/BmsEventDemo.html'
 if ($config.Dataverse.Url.TrimEnd('/') -ne $org) { throw 'Unexpected environment.' }
 $token = (& $config.Dataverse.DeveloperTokenPython $config.Dataverse.DeveloperTokenScript | Out-String).Trim()
@@ -73,8 +75,12 @@ if ($Mode -eq 'Deploy') {
     }
     Add-DemoComponent $flowId 29
     $null=Invoke-DemoDv "workflows($flowId)" PATCH @{statecode=1}
+    $spoFlow=(Invoke-DemoDv "workflows?`$select=workflowid&`$filter=name eq '$spoFlowName' and category eq 5 and type eq 1").value
+    if ($spoFlow.Count -ne 1) { throw 'Expected one FMC - Request SPO Sync flow before deploying the shared page.' }
+    $fullFlow=(Invoke-DemoDv "workflows?`$select=workflowid&`$filter=name eq '$fullFlowName' and category eq 5 and type eq 1").value
+    if ($fullFlow.Count -ne 1) { throw 'Expected one FMC - Request Full Sync flow before deploying the shared page.' }
     $html=Get-Content (Join-Path $repo 'dataverse/app-source/BmsEventDemo.html') -Raw -Encoding UTF8
-    $html=$html.Replace('__FLOW_ID__',$flowId).Replace('__ENVIRONMENT_ID__','5abcb0e5-99b2-e51f-aa0e-90d84405798b')
+    $html=$html.Replace('__FLOW_ID__',$flowId).Replace('__SPO_FLOW_ID__',$spoFlow[0].workflowid).Replace('__FULL_FLOW_ID__',$fullFlow[0].workflowid).Replace('__ENVIRONMENT_ID__','5abcb0e5-99b2-e51f-aa0e-90d84405798b')
     $resourceBody=@{name=$resourceName;displayname='BMS Power Automate Event Demo';webresourcetype=1;content=[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($html))}
     $resourceId=Ensure-DemoRow $resourceSet 'webresourceid' "name eq '$resourceName'" $resourceBody
     $null=Invoke-DemoDv "${resourceSet}($resourceId)" PATCH @{content=$resourceBody.content}
@@ -115,7 +121,11 @@ if ($Mode -ne 'Status') {
     $activeKey=(Invoke-DemoDv "EntityDefinitions(LogicalName='fmc_syncrequest')/Keys?`$select=LogicalName,EntityKeyIndexStatus").value | Where-Object LogicalName -eq 'fmc_syncrequest_activekey'
     if ($null -eq $activeKey -or $activeKey.EntityKeyIndexStatus -ne 'Active') { throw 'Active sync-request alternate key missing.' }
     $keyStatus=$activeKey.EntityKeyIndexStatus
-    $expected=(Get-Content (Join-Path $repo 'dataverse/app-source/BmsEventDemo.html') -Raw -Encoding UTF8).Replace('__FLOW_ID__',$flowId).Replace('__ENVIRONMENT_ID__','5abcb0e5-99b2-e51f-aa0e-90d84405798b')
+    $spoFlow=(Invoke-DemoDv "workflows?`$select=workflowid&`$filter=name eq '$spoFlowName' and category eq 5 and type eq 1").value
+    if ($spoFlow.Count -ne 1) { throw 'Expected one FMC - Request SPO Sync flow.' }
+    $fullFlow=(Invoke-DemoDv "workflows?`$select=workflowid&`$filter=name eq '$fullFlowName' and category eq 5 and type eq 1").value
+    if ($fullFlow.Count -ne 1) { throw 'Expected one FMC - Request Full Sync flow.' }
+    $expected=(Get-Content (Join-Path $repo 'dataverse/app-source/BmsEventDemo.html') -Raw -Encoding UTF8).Replace('__FLOW_ID__',$flowId).Replace('__SPO_FLOW_ID__',$spoFlow[0].workflowid).Replace('__FULL_FLOW_ID__',$fullFlow[0].workflowid).Replace('__ENVIRONMENT_ID__','5abcb0e5-99b2-e51f-aa0e-90d84405798b')
     if ([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($resource.value[0].content)) -ne $expected) { throw 'Page differs from source.' }
     $liveSite=(Invoke-DemoDv 'sitemaps?$select=sitemapxml&$filter=sitemapname eq ''fmc_FMCBMSDemo''').value
     if ($liveSite.Count -ne 1 -or -not $liveSite[0].sitemapxml.Contains('Id="fmc_eventdemo"')) { throw 'Demo sitemap entry missing.' }

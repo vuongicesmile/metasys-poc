@@ -1,0 +1,19 @@
+<customapi uniquename="fmc_RequestSpoSync">
+  <allowedcustomprocessingsteptype>1</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Publishes a business event that scans FMC-Inbox and archives new or updated SharePoint files.">
+    <label description="Publishes a business event that scans FMC-Inbox and archives new or updated SharePoint files." languagecode="1033" />
+  </description>
+  <displayname default="Request SharePoint Sync">
+    <label description="Request SharePoint Sync" languagecode="1033" />
+  </displayname>
+  <executeprivilegename>prvReadfmc_spofile</executeprivilegename>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>fmc_RequestSpoSync</name>
+  <plugintypeid>
+    <plugintypeexportkey>1eb47255-adb0-f111-aaad-00224819a344</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>1</workflowsdkstepenabled>
+</customapi>

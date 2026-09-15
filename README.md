@@ -30,6 +30,13 @@ deployment, Power Automate capture-flow and UI test steps.
 
 When Azure hosting is unavailable, `SpoIngestion.Cli ingest-local` reuses the same
 parser, mapper and Dataverse writer to process local copies of SharePoint files.
+For real SharePoint files without Azure hosting, **Sync SharePoint now** asks Power
+Automate to archive new/updated versions in `fmc_spofile`; `watch-dataverse` then
+downloads and imports that queue from the local machine.
+Double-click [START-ALL-DATAVERSE-SYNC.cmd](START-ALL-DATAVERSE-SYNC.cmd) to open
+both local consumers. The model-driven app's **Sync All now** button calls
+`fmc_RequestFullSync`; `FMC - Request Full Sync` then dispatches the existing SQL
+and SharePoint Custom APIs without combining their retry or delivery state.
 See the [local ingestion runbook](docs/runbooks/spo-local-ingestion.vi.md).
 
 ## SQL to Dataverse (Plan 3.0)

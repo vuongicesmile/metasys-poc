@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="Accepted">
+  <displayname default="Accepted">
+    <label description="Accepted" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>Accepted</name>
+  <type>0</type>
+</customapiresponseproperty>

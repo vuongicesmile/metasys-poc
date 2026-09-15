@@ -9,6 +9,14 @@ spec.loader.exec_module(release)
 
 
 class ReleaseTests(unittest.TestCase):
+    def test_release_workflow_uses_hosted_oidc_not_local_runner(self):
+        workflow = (release.ROOT / ".github/workflows/release-dev.yml").read_text(encoding="utf-8")
+        self.assertIn("runs-on: windows-latest", workflow)
+        self.assertIn("id-token: write", workflow)
+        self.assertIn("--githubFederated", workflow)
+        self.assertIn("Restore last successful release receipt", workflow)
+        self.assertNotIn("runs-on: [self-hosted", workflow)
+
     def test_semantic_tag_maps_to_solution_version(self):
         self.assertEqual((1, 2, 3), release.version("dev-v1.2.3"))
 
@@ -50,6 +58,26 @@ class ReleaseTests(unittest.TestCase):
 
     def test_bom_and_crlf_readback_normalization(self):
         self.assertEqual(release.normalize("\ufeffa\r\nb\r\n"), release.normalize("a\nb\n"))
+
+    def test_pac_access_token_ignores_cli_headers(self):
+        token = "a" * 600 + "." + "b" * 600 + "." + "c" * 600
+        self.assertEqual(token, release.pac_access_token("PAC CLI\nConnected as app\n" + token + "\n"))
+
+    def test_pac_access_token_rejects_missing_or_ambiguous_output(self):
+        token = "a" * 600 + "." + "b" * 600 + "." + "c" * 600
+        for output in ("PAC CLI only", token + "\n" + token):
+            with self.subTest(output_length=len(output)), self.assertRaises(ValueError):
+                release.pac_access_token(output)
+
+    def test_release_config_resolves_all_sync_flow_placeholders(self):
+        self.assertEqual(
+            {
+                "__FLOW_ID__": "FMC - App Request BMS Sync Event",
+                "__SPO_FLOW_ID__": "FMC - Request SPO Sync",
+                "__FULL_FLOW_ID__": "FMC - Request Full Sync",
+            },
+            release.CONFIG["flowPlaceholders"],
+        )
 
     def test_command_failure_propagates(self):
         import subprocess

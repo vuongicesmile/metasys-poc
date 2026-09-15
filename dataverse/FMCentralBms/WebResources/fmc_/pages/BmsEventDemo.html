@@ -15,8 +15,8 @@
     button,.link{font:600 15px Segoe UI,Arial,sans-serif;border-radius:9px;padding:13px 20px;display:inline-block}
     button{background:#136d65;color:white;border:0;cursor:pointer}button:hover{background:#095b54}button:disabled{opacity:.55;cursor:wait}
     .link{color:#136d65;text-decoration:none;margin-left:8px;border:1px solid #d6e3e3}a:hover{text-decoration:underline}
-    #status{border-radius:9px;padding:16px;background:#f0f5f8;margin-top:24px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
-    #status[data-state="accepted"]{background:#e8f6ee;color:#175638}#status[data-state="error"]{background:#fff0ed;color:#923521}
+    .status{border-radius:9px;padding:16px;background:#f0f5f8;margin-top:24px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+    .status[data-state="accepted"]{background:#e8f6ee;color:#175638}.status[data-state="error"]{background:#fff0ed;color:#923521}
     .foot{font-size:13px}.detail{font-family:Consolas,monospace;font-size:13px}
     .header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.language{display:flex;align-items:center;gap:8px;font-size:14px}.language select{font:inherit;color:inherit;background:white;border:1px solid #b9cbd5;border-radius:6px;padding:8px}
     @media(max-width:600px){body{padding:20px 14px}h1{font-size:29px}.card{padding:20px}.steps{flex-direction:column;gap:0}.link{margin:10px 0 0}}
@@ -27,6 +27,18 @@
   <div class="header"><span class="label" data-i18n="eyebrow">FMC BMS · Event demo</span><div class="language"><label for="language" data-i18n="language">Language</label><select id="language"><option value="en">English</option><option value="vi">Tiếng Việt</option></select></div></div>
   <h1 data-i18n="heading">One click, one sync request.</h1>
   <p data-i18n="description">Click to call the Custom API, queue a sync request and send an event to Power Automate. No form is required.</p>
+  <section id="full-card" class="card" aria-label="Sync SQL and SharePoint">
+    <div class="steps">
+      <div class="step"><span data-i18n="fullStep1">01 · One request</span><small>fmc_RequestFullSync</small></div>
+      <div class="step"><span data-i18n="fullStep2">02 · Dispatch both sources</span><small>Power Automate</small></div>
+      <div class="step"><span data-i18n="fullStep3">03 · Import independently</span><small data-i18n="fullStep3Detail">SQL worker + SharePoint worker</small></div>
+    </div>
+    <button id="full-send" type="button" data-i18n="fullSend">Sync All now</button>
+    <a id="full-flow" class="link" data-i18n="fullFlow" target="_blank" rel="noopener noreferrer" href="https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/7c61ab3d-e46e-4c48-9e1b-b7d14438fe08/details">Open Full Sync flow ↗</a>
+    <div id="full-status" class="status" role="status" aria-live="polite">Ready to request SQL and SharePoint sync.</div>
+  </section>
+  <p class="foot" data-i18n="fullFoot">The orchestration flow dispatches both existing Custom APIs. Keep both local workers running; acceptance does not mean ingestion has completed.</p>
+  <p class="detail">Custom API: fmc_RequestFullSync</p>
   <section id="event-card" class="card" aria-label="Send a test event">
     <div class="steps">
       <div class="step"><span data-i18n="step1">01 · Click the button</span><small data-i18n="step1Detail">In FMC BMS Demo</small></div>
@@ -35,16 +47,32 @@
     </div>
     <button id="send" type="button" data-i18n="send">Request BMS Sync</button>
     <a id="flow" class="link" data-i18n="flow" target="_blank" rel="noopener noreferrer" href="https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d13bfe37-ca87-412b-9531-d3ed381b5b21/details">Open Power Automate ↗</a>
-    <div id="status" role="status" aria-live="polite">Ready. Each click sends one event request.</div>
+    <div id="status" class="status" role="status" aria-live="polite">Ready. Each click sends one event request.</div>
   </section>
   <p class="foot"><span data-i18n="footStart">The Custom API queues or reuses an </span><strong>fmc_syncrequest</strong><span data-i18n="footMiddle">. The flow </span><strong>FMC - App Request BMS Sync Event</strong><span data-i18n="footEnd"> records the action in its run history. SQL sync requires the worker to be running.</span></p>
   <p class="detail">Custom API: fmc_RequestBmsSync</p>
+  <section id="spo-card" class="card" aria-label="Sync SharePoint files">
+    <div class="steps">
+      <div class="step"><span data-i18n="spoStep1">01 · Scan FMC-Inbox</span><small>SharePoint Connector</small></div>
+      <div class="step"><span data-i18n="spoStep2">02 · Compare ETag</span><small data-i18n="spoStep2Detail">Archive only changed files</small></div>
+      <div class="step"><span data-i18n="spoStep3">03 · Import Bronze</span><small data-i18n="spoStep3Detail">Local worker parses queued files</small></div>
+    </div>
+    <button id="spo-send" type="button" data-i18n="spoSend">Sync SharePoint now</button>
+    <a id="spo-flow" class="link" data-i18n="spoFlow" target="_blank" rel="noopener noreferrer" href="https://make.powerautomate.com/environments/5abcb0e5-99b2-e51f-aa0e-90d84405798b/flows/d1810c81-d313-46fa-b7be-04ea538bc939/details">Open SPO flow ↗</a>
+    <div id="spo-status" class="status" role="status" aria-live="polite">Ready to scan SharePoint.</div>
+  </section>
+  <p class="foot" data-i18n="spoFoot">Power Automate scans every supported file below FMC-Inbox. A stable source key identifies the file; ETag identifies its version. Keep the local watch command running to parse archived files into existing Bronze tables.</p>
+  <p class="detail">Custom API: fmc_RequestSpoSync</p>
 </main>
 <script>
 (function () {
   'use strict';
   const button = document.getElementById('send');
   const status = document.getElementById('status');
+  const spoButton = document.getElementById('spo-send');
+  const spoStatus = document.getElementById('spo-status');
+  const fullButton = document.getElementById('full-send');
+  const fullStatus = document.getElementById('full-status');
   const languageSelect = document.getElementById('language');
   const languageKey = 'fmc.bms.language';
   const messages = {
@@ -60,6 +88,14 @@
       timeout: 'The result is unknown after 30 seconds. Check Run history before sending again.',
       error: 'The event could not be sent: ', errorHint: 'For network errors, check Run history before sending again.',
       context: 'Open this page from the FMC BMS Demo app in Dataverse.', unknownError: 'Unexpected error.',
+      spoCard: 'Sync SharePoint files', spoStep1: '01 · Scan FMC-Inbox', spoStep2: '02 · Compare ETag', spoStep2Detail: 'Archive only changed files', spoStep3: '03 · Import Bronze', spoStep3Detail: 'Local worker parses queued files',
+      spoSend: 'Sync SharePoint now', spoFlow: 'Open SPO flow ↗', spoFoot: 'Power Automate scans every supported file below FMC-Inbox. A stable source key identifies the file; ETag identifies its version. Keep the local watch command running to parse archived files into existing Bronze tables.',
+      spoReady: 'Ready to scan SharePoint.', spoSending: 'Sending SharePoint scan request…', spoAccepted: 'SharePoint scan accepted.',
+      spoAcceptedHint: 'Open the SPO flow Run history to see files detected. New or updated versions are archived, then the local watch command imports them into Bronze.',
+      fullCard: 'Sync all sources', fullStep1: '01 · One request', fullStep2: '02 · Dispatch both sources', fullStep3: '03 · Import independently', fullStep3Detail: 'SQL worker + SharePoint worker',
+      fullSend: 'Sync All now', fullFlow: 'Open Full Sync flow ↗', fullFoot: 'The orchestration flow dispatches both existing Custom APIs. Keep both local workers running; acceptance does not mean ingestion has completed.',
+      fullReady: 'Ready to request SQL and SharePoint sync.', fullSending: 'Sending full-sync request…', fullAccepted: 'Full sync request accepted.',
+      fullAcceptedHint: 'Open the Full Sync flow Run history to verify both dispatch actions. SQL and SharePoint continue in their own pipelines.',
       statuses: {Queued: 'Queued', Running: 'Running', Completed: 'Completed', Failed: 'Failed'}
     },
     vi: {
@@ -74,6 +110,14 @@
       timeout: 'Chưa xác định được kết quả sau 30 giây. Kiểm tra Run history trước khi gửi lại.',
       error: 'Gửi event chưa thành công: ', errorHint: 'Nếu lỗi mạng, kiểm tra Run history trước khi gửi lại.',
       context: 'Hãy mở trang này từ app FMC BMS Demo trong Dataverse.', unknownError: 'Lỗi không xác định.',
+      spoCard: 'Đồng bộ file SharePoint', spoStep1: '01 · Quét FMC-Inbox', spoStep2: '02 · So sánh ETag', spoStep2Detail: 'Chỉ archive file mới hoặc đã đổi', spoStep3: '03 · Import Bronze', spoStep3Detail: 'Local worker parse file đang chờ',
+      spoSend: 'Đồng bộ SharePoint ngay', spoFlow: 'Mở flow SPO ↗', spoFoot: 'Power Automate quét mọi file được hỗ trợ dưới FMC-Inbox. Source key ổn định nhận diện file; ETag nhận diện phiên bản. Hãy giữ local watch command đang chạy để parse file đã archive vào các Bronze table hiện có.',
+      spoReady: 'Sẵn sàng quét SharePoint.', spoSending: 'Đang gửi yêu cầu quét SharePoint…', spoAccepted: 'Đã nhận yêu cầu quét SharePoint.',
+      spoAcceptedHint: 'Mở Run history của flow SPO để xem file được phát hiện. Phiên bản mới hoặc cập nhật sẽ được archive, sau đó local watch command import vào Bronze.',
+      fullCard: 'Đồng bộ tất cả nguồn', fullStep1: '01 · Một yêu cầu', fullStep2: '02 · Gửi đến hai nguồn', fullStep3: '03 · Import độc lập', fullStep3Detail: 'SQL worker + SharePoint worker',
+      fullSend: 'Đồng bộ tất cả ngay', fullFlow: 'Mở flow Full Sync ↗', fullFoot: 'Flow điều phối gọi hai Custom API hiện có. Hãy giữ cả hai local worker đang chạy; trạng thái đã nhận chưa có nghĩa dữ liệu đã import xong.',
+      fullReady: 'Sẵn sàng yêu cầu đồng bộ SQL và SharePoint.', fullSending: 'Đang gửi yêu cầu đồng bộ tất cả…', fullAccepted: 'Đã nhận yêu cầu đồng bộ tất cả.',
+      fullAcceptedHint: 'Mở Run history của flow Full Sync để kiểm tra hai action dispatch. SQL và SharePoint tiếp tục chạy trong pipeline riêng.',
       statuses: {Queued: 'Đang chờ', Running: 'Đang chạy', Completed: 'Hoàn tất', Failed: 'Thất bại'}
     }
   };
@@ -81,6 +125,8 @@
   let language = 'en';
   try { language = normalizeLanguage(localStorage.getItem(languageKey)); } catch { /* Storage can be unavailable in embedded hosts. */ }
   let current = {state: 'ready'};
+  let spoCurrent = {state: 'ready'};
+  let fullCurrent = {state: 'ready'};
   function renderStatus() {
     const t = messages[language];
     status.dataset.state = current.state;
@@ -96,13 +142,41 @@
       status.textContent = t[current.state];
     }
   }
+  function renderSpoStatus() {
+    const t = messages[language];
+    spoStatus.dataset.state = spoCurrent.state;
+    if (spoCurrent.state === 'accepted') {
+      spoStatus.textContent = t.spoAccepted + '\n' + t.requestId + ': ' + spoCurrent.result.RequestId + '\n' + t.clickId + ': ' + spoCurrent.id + '\n' + t.spoAcceptedHint;
+    } else if (spoCurrent.state === 'error') {
+      const detail = spoCurrent.errorKind === 'context' ? t.context : spoCurrent.errorMessage || t.unknownError;
+      spoStatus.textContent = (spoCurrent.errorKind === 'timeout' ? t.timeout : t.error + detail + '\n' + t.errorHint) + '\n' + t.clickId + ': ' + spoCurrent.id;
+    } else {
+      spoStatus.textContent = t[spoCurrent.state === 'sending' ? 'spoSending' : 'spoReady'];
+    }
+  }
+  function renderFullStatus() {
+    const t = messages[language];
+    fullStatus.dataset.state = fullCurrent.state;
+    if (fullCurrent.state === 'accepted') {
+      fullStatus.textContent = t.fullAccepted + '\n' + t.requestId + ': ' + fullCurrent.result.RequestId + '\n' + t.clickId + ': ' + fullCurrent.id + '\n' + t.fullAcceptedHint;
+    } else if (fullCurrent.state === 'error') {
+      const detail = fullCurrent.errorKind === 'context' ? t.context : fullCurrent.errorMessage || t.unknownError;
+      fullStatus.textContent = (fullCurrent.errorKind === 'timeout' ? t.timeout : t.error + detail + '\n' + t.errorHint) + '\n' + t.clickId + ': ' + fullCurrent.id;
+    } else {
+      fullStatus.textContent = t[fullCurrent.state === 'sending' ? 'fullSending' : 'fullReady'];
+    }
+  }
   function renderLanguage() {
     const t = messages[language];
     document.documentElement.lang = language;
     languageSelect.value = language;
     document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = t[element.dataset.i18n]; });
     document.getElementById('event-card').setAttribute('aria-label', t.card);
+    document.getElementById('spo-card').setAttribute('aria-label', t.spoCard);
+    document.getElementById('full-card').setAttribute('aria-label', t.fullCard);
     renderStatus();
+    renderSpoStatus();
+    renderFullStatus();
   }
   languageSelect.addEventListener('change', function () {
     language = normalizeLanguage(languageSelect.value);
@@ -149,6 +223,74 @@
     } finally {
       clearTimeout(timeout);
       button.disabled = false;
+    }
+  });
+  spoButton.addEventListener('click', async function () {
+    if (spoButton.disabled) return;
+    spoButton.disabled = true;
+    spoCurrent = {state: 'sending'};
+    renderSpoStatus();
+    const id = crypto.randomUUID();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      if (typeof GetGlobalContext !== 'function') {
+        const error = new Error('Dataverse context unavailable');
+        error.kind = 'context';
+        throw error;
+      }
+      const base = GetGlobalContext().getClientUrl();
+      const response = await fetch(base + '/api/data/v9.2/fmc_RequestSpoSync', {
+        method: 'POST', credentials: 'same-origin', signal: controller.signal,
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'OData-Version': '4.0', 'OData-MaxVersion': '4.0'},
+        body: JSON.stringify({ClientRequestId: id})
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error?.message || ('Dataverse HTTP ' + response.status));
+      }
+      spoCurrent = {state: 'accepted', result: await response.json(), id};
+      renderSpoStatus();
+    } catch (error) {
+      spoCurrent = {state: 'error', id, errorKind: error.name === 'AbortError' ? 'timeout' : error.kind, errorMessage: error.message};
+      renderSpoStatus();
+    } finally {
+      clearTimeout(timeout);
+      spoButton.disabled = false;
+    }
+  });
+  fullButton.addEventListener('click', async function () {
+    if (fullButton.disabled) return;
+    fullButton.disabled = true;
+    fullCurrent = {state: 'sending'};
+    renderFullStatus();
+    const id = crypto.randomUUID();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      if (typeof GetGlobalContext !== 'function') {
+        const error = new Error('Dataverse context unavailable');
+        error.kind = 'context';
+        throw error;
+      }
+      const base = GetGlobalContext().getClientUrl();
+      const response = await fetch(base + '/api/data/v9.2/fmc_RequestFullSync', {
+        method: 'POST', credentials: 'same-origin', signal: controller.signal,
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'OData-Version': '4.0', 'OData-MaxVersion': '4.0'},
+        body: JSON.stringify({ClientRequestId: id})
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error?.message || ('Dataverse HTTP ' + response.status));
+      }
+      fullCurrent = {state: 'accepted', result: await response.json(), id};
+      renderFullStatus();
+    } catch (error) {
+      fullCurrent = {state: 'error', id, errorKind: error.name === 'AbortError' ? 'timeout' : error.kind, errorMessage: error.message};
+      renderFullStatus();
+    } finally {
+      clearTimeout(timeout);
+      fullButton.disabled = false;
     }
   });
 }());

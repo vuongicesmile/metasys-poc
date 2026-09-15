@@ -95,6 +95,7 @@
       <RootComponent type="29" id="{1c3eda7d-9bec-4a43-adc3-1426b89d2a84}" behavior="0" />
       <RootComponent type="29" id="{314a0489-54ab-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="29" id="{6fa6c13a-3eab-f111-aaad-00224819a344}" behavior="0" />
+      <RootComponent type="29" id="{7c61ab3d-e46e-4c48-9e1b-b7d14438fe08}" behavior="0" />
       <RootComponent type="29" id="{d13bfe37-ca87-412b-9531-d3ed381b5b21}" behavior="0" />
       <RootComponent type="61" schemaName="fmc_/pages/BmsEventDemo.html" behavior="0" />
       <RootComponent type="61" schemaName="fmc_/scripts/EquipmentPluginTest.js" behavior="0" />
@@ -102,7 +103,7 @@
       <RootComponent type="61" schemaName="fmc_FMCBMSDemo_pagemanifest" behavior="0" />
       <RootComponent type="62" schemaName="fmc_FMCBMSDemo" behavior="0" />
       <RootComponent type="80" schemaName="fmc_FMCBMSDemo" behavior="0" />
-      <RootComponent type="91" id="{a5233bd0-bbac-f111-aaad-00224819a344}" schemaName="FMCentralBms.Plugins, Version=1.0.0.2, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" behavior="0" />
+      <RootComponent type="91" id="{a5233bd0-bbac-f111-aaad-00224819a344}" schemaName="FMCentralBms.Plugins, Version=1.0.0.4, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" behavior="0" />
       <RootComponent type="92" id="{00029f22-bcac-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{27894c29-bcac-f111-aaad-00224819a344}" behavior="0" />
     </RootComponents>

@@ -1,0 +1,19 @@
+<customapi uniquename="fmc_RequestFullSync">
+  <allowedcustomprocessingsteptype>1</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Publishes one business event that dispatches SQL and SharePoint synchronization requests.">
+    <label description="Publishes one business event that dispatches SQL and SharePoint synchronization requests." languagecode="1033" />
+  </description>
+  <displayname default="Request Full Sync">
+    <label description="Request Full Sync" languagecode="1033" />
+  </displayname>
+  <executeprivilegename>prvCreatefmc_syncrequest</executeprivilegename>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>fmc_RequestFullSync</name>
+  <plugintypeid>
+    <plugintypeexportkey>fe50d30b-ddb0-f111-aaad-00224819a344</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>1</workflowsdkstepenabled>
+</customapi>
