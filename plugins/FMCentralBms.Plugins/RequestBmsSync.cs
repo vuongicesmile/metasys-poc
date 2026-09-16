@@ -29,6 +29,7 @@ namespace FMCentralBms.Plugins
             var correlationId = clientRequestId ?? Guid.NewGuid().ToString("D");
             var pipeline = context.OrganizationId.ToString("D") + ":FMC";
             var service = factory.CreateOrganizationService(context.UserId);
+            var requestedBy = ResolveRequestedBy(service, context.InitiatingUserId, trace);
 
             trace.Trace("RequestBmsSync START Pipeline={0}; HasClientRequestId={1}; CorrelationId={2}",
                 pipeline, clientRequestId != null, correlationId);
@@ -58,7 +59,7 @@ namespace FMCentralBms.Plugins
                     ["fmc_pipeline"] = pipeline,
                     ["fmc_activekey"] = pipeline,
                     ["fmc_correlationid"] = correlationId,
-                    ["fmc_requestedby"] = context.InitiatingUserId.ToString("D"),
+                    ["fmc_requestedby"] = requestedBy,
                     ["fmc_status"] = new OptionSetValue(Queued)
                 };
                 request.Id = service.Create(request);
@@ -118,6 +119,26 @@ namespace FMCentralBms.Plugins
         private static Entity First(EntityCollection rows)
         {
             return rows.Entities.Count == 0 ? null : rows.Entities[0];
+        }
+
+        private static string ResolveRequestedBy(
+            IOrganizationService service, Guid userId, ITracingService trace)
+        {
+            try
+            {
+                var user = service.Retrieve("systemuser", userId,
+                    new ColumnSet("internalemailaddress"));
+                var email = user.GetAttributeValue<string>("internalemailaddress");
+                if (!string.IsNullOrWhiteSpace(email) && email.Contains("@"))
+                    return email.Trim();
+            }
+            catch (Exception ex)
+            {
+                trace.Trace("RequestBmsSync could not resolve requester email; UserId={0}; Error={1}",
+                    userId, ex.GetType().Name);
+            }
+
+            return userId.ToString("D");
         }
 
         private static void Respond(IPluginExecutionContext context, Entity request, bool created, string message)

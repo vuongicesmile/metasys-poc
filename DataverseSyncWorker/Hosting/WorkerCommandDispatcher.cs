@@ -76,7 +76,7 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
         if (args.Contains("--register-plugin"))
         {
             var pluginPath = args.FirstOrDefault(a => a.StartsWith("--plugin-path=", StringComparison.OrdinalIgnoreCase))?.Split('=', 2)[1]
-                ?? Path.Combine(Environment.CurrentDirectory, "plugins", "FMCentralBms.Plugins", "bin", "Release", "net48", "FMCentralBms.Plugins.dll");
+                ?? ResolveDefaultPluginPath();
             await services.GetRequiredService<DataversePluginProvisioner>().Register(pluginPath);
             return true;
         }
@@ -102,5 +102,18 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             return true;
         }
         return false;
+    }
+
+    private static string ResolveDefaultPluginPath()
+    {
+        var relative = Path.Combine("plugins", "FMCentralBms.Plugins", "bin", "Release",
+            "net48", "FMCentralBms.Plugins.dll");
+        var candidates = new[]
+        {
+            Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, relative)),
+            Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..", relative)),
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", relative))
+        };
+        return candidates.FirstOrDefault(File.Exists) ?? candidates[0];
     }
 }

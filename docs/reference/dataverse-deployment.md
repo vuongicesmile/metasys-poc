@@ -50,6 +50,17 @@ and an idempotent retry; both corresponding flow runs succeeded. See the
 [implementation receipt](../plans/custom-api-request-bms-sync.vi.md) and
 [UI test runbook](../runbooks/custom-api-bms-sync-demo.vi.md).
 
+On 2026-09-16, solution-aware user email notification was deployed to the same
+Developer environment. A terminal `fmc_syncrequest` now invokes asynchronous
+plug-in `QueueSyncNotification`, creates an idempotent `fmc_notification`
+outbox row, and flow `FMC - Send User Email Notification` sends it through the
+Office 365 Outlook connector before recording a Sent/Failed receipt. The live
+flow ID is `23cc5a60-0e28-4afd-8226-042dfeab84d4`; plug-in assembly version is
+`1.0.0.5`. Direct-outbox and producer-chain tests both reached Sent with one
+attempt. See the [notification plan and receipt](../plans/user-email-notifications.vi.md)
+and [operating runbook](../runbooks/user-email-notifications.vi.md). This dated
+receipt does not prove future mail delivery or production mailbox readiness.
+
 The Building/Equipment extension was verified on 2026-09-09. Request
 `c99f3d86-1fac-f111-aaad-00224819a344` succeeded at SQL cutoff 23377 with zero
 quarantined rows. Live verification passed for 3 Buildings, 4 Equipment, all 5
@@ -94,9 +105,11 @@ The command verifies the organization ID before writes and creates/reuses:
 - Elastic table `fmc_bmsreading`, using its built-in GUID + partition key.
 - Standard table `fmc_syncrequest`, with correlation alternate key and
   `fmc_syncrequest_activekey` to prevent concurrent active requests per pipeline.
+- Standard table `fmc_notification`, with a correlation alternate key and
+  delivery receipts for solution-aware user email notifications.
 - Security role `FM Central BMS Integration`, with organization-level Create,
-  Read and Write on BMS tables and requests, plus Append/Append To needed by the
-  Building/Equipment/Point lookups.
+  Read and Write on BMS tables, requests and notifications, plus Append/Append
+  To needed by the Building/Equipment/Point lookups.
 - Security role `FM Central BMS Sync Requestor`, with Create/Read on requests.
 
 Assign the runtime application user that role. If provisioning used the same app,

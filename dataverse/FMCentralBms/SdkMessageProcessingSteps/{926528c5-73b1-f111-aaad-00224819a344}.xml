@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SdkMessageProcessingStep Name="BMS: Queue notification on Sync Request completion" SdkMessageProcessingStepId="{926528c5-73b1-f111-aaad-00224819a344}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SdkMessageId>20bebb1b-ea3e-db11-86a7-000a3a5473e8</SdkMessageId>
+  <PluginTypeName>FMCentralBms.Plugins.QueueSyncNotification, FMCentralBms.Plugins, Version=1.0.0.5, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d</PluginTypeName>
+  <PluginTypeId>11f22fbf-73b1-f111-aaad-00224819a344</PluginTypeId>
+  <PrimaryEntity>fmc_syncrequest</PrimaryEntity>
+  <AsyncAutoDelete>0</AsyncAutoDelete>
+  <Description>Creates an idempotent email notification outbox record after a terminal sync status.</Description>
+  <FilteringAttributes>fmc_status</FilteringAttributes>
+  <InvocationSource>1</InvocationSource>
+  <Mode>1</Mode>
+  <Rank>10</Rank>
+  <EventHandlerTypeCode>4602</EventHandlerTypeCode>
+  <Stage>40</Stage>
+  <IsCustomizable>1</IsCustomizable>
+  <IsHidden>0</IsHidden>
+  <SupportedDeployment>0</SupportedDeployment>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <SdkMessageProcessingStepImages />
+</SdkMessageProcessingStep>

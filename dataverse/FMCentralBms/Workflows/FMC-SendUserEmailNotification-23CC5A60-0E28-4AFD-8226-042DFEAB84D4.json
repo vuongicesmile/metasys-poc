@@ -1,0 +1,159 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedoffice365outlook"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_a_pending_email_notification_is_created": {
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "SubscribeWebhookTrigger",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "subscriptionRequest/message": 1,
+              "subscriptionRequest/entityname": "fmc_notification",
+              "subscriptionRequest/scope": 4,
+              "subscriptionRequest/filterexpression": "fmc_status eq 789121000 and fmc_channel eq 789120000 and fmc_recipientemail ne null"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runtimeConfiguration": {
+            "concurrency": {
+              "runs": 10
+            }
+          }
+        }
+      },
+      "actions": {
+        "Mark_attempt": {
+          "type": "OpenApiConnection",
+          "runAfter": {},
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "UpdateOnlyRecord"
+            },
+            "parameters": {
+              "entityName": "fmc_notifications",
+              "recordId": "@triggerOutputs()?['body/fmc_notificationid']",
+              "item/fmc_attemptedat": "@utcNow()",
+              "item/fmc_attempts": "@add(coalesce(triggerOutputs()?['body/fmc_attempts'], 0), 1)",
+              "item/fmc_flowrunid": "@workflow()?['run']?['name']",
+              "item/fmc_errormessage": null
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_email": {
+          "type": "OpenApiConnection",
+          "runAfter": {
+            "Mark_attempt": [
+              "Succeeded"
+            ]
+          },
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2"
+            },
+            "parameters": {
+              "emailMessage/To": "@triggerOutputs()?['body/fmc_recipientemail']",
+              "emailMessage/Subject": "@triggerOutputs()?['body/fmc_subject']",
+              "emailMessage/Body": "@triggerOutputs()?['body/fmc_body']",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runtimeConfiguration": {
+            "retryPolicy": {
+              "type": "none"
+            }
+          }
+        },
+        "Mark_sent": {
+          "type": "OpenApiConnection",
+          "runAfter": {
+            "Send_email": [
+              "Succeeded"
+            ]
+          },
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "UpdateOnlyRecord"
+            },
+            "parameters": {
+              "entityName": "fmc_notifications",
+              "recordId": "@triggerOutputs()?['body/fmc_notificationid']",
+              "item/fmc_status": 789121001,
+              "item/fmc_sentat": "@utcNow()",
+              "item/fmc_errormessage": null
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Mark_failed": {
+          "type": "OpenApiConnection",
+          "runAfter": {
+            "Send_email": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "UpdateOnlyRecord"
+            },
+            "parameters": {
+              "entityName": "fmc_notifications",
+              "recordId": "@triggerOutputs()?['body/fmc_notificationid']",
+              "item/fmc_status": 789121002,
+              "item/fmc_errormessage": "EMAIL-001 Office 365 Outlook delivery failed. Inspect the Power Automate run by fmc_flowrunid."
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

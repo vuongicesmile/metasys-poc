@@ -18,6 +18,8 @@
   <EntityRelationship Name="lk_fmc_bmsreading_modifiedby" />
   <EntityRelationship Name="lk_fmc_local_silver_bmspoint_createdby" />
   <EntityRelationship Name="lk_fmc_local_silver_bmspoint_modifiedby" />
+  <EntityRelationship Name="lk_fmc_notification_createdby" />
+  <EntityRelationship Name="lk_fmc_notification_modifiedby" />
   <EntityRelationship Name="lk_fmc_spofile_createdby" />
   <EntityRelationship Name="lk_fmc_spofile_modifiedby" />
   <EntityRelationship Name="lk_fmc_spoimportrow_createdby" />
@@ -28,6 +30,7 @@
   <EntityRelationship Name="organization_fmc_bmsequipment" />
   <EntityRelationship Name="organization_fmc_bmspoint" />
   <EntityRelationship Name="organization_fmc_local_silver_bmspoint" />
+  <EntityRelationship Name="organization_fmc_notification" />
   <EntityRelationship Name="organization_fmc_spofile" />
   <EntityRelationship Name="organization_fmc_spoimportrow" />
   <EntityRelationship Name="organization_fmc_syncrequest" />

@@ -5,6 +5,8 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| Plan | [Notification người dùng qua email](plans/user-email-notifications.vi.md) | Yêu cầu PDF, notification outbox, plug-in producer, Power Automate dispatcher và roadmap approval/escalation |
+| Runbook | [Deploy và test user email notification](runbooks/user-email-notifications.vi.md) | Provision schema/plug-in, cấu hình Outlook connection reference, deploy flow và đọc delivery receipt |
 | Runbook | [Release Dataverse bằng Git tag](runbooks/tag-release-dataverse.vi.md) | Push tag, tự build/test/deploy qua runner local, receipt, retry và rollback |
 | Reference | [Kiến trúc service và hướng dẫn mở rộng](reference/service-architecture.vi.md) | Cấu trúc backend/dashboard, dependency injection, thêm adapter, build và test |
 | Runbook | [FMC BMS Demo hoàn chỉnh](runbooks/model-driven-app-demo.vi.md) | Demo đăng nhập, nhập liệu, SQL sync, Bronze/Silver, SharePoint, phân trang, phân quyền và đăng xuất |

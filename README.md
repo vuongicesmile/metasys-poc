@@ -10,6 +10,8 @@ Start at the [documentation index](docs/README.md):
 - [Power Automate trigger operating runbook](docs/runbooks/power-automate-sql-sync.vi.md)
 - [Custom API + Power Automate UI demo](docs/runbooks/custom-api-bms-sync-demo.vi.md)
 - [Custom API implementation receipt](docs/plans/custom-api-request-bms-sync.vi.md)
+- [User email notification plan and live receipt](docs/plans/user-email-notifications.vi.md)
+- [User email notification operating runbook](docs/runbooks/user-email-notifications.vi.md)
 - [Interactive Custom API lab](docs/interactive/custom-api-lab/index.html)
 - [SQL-to-Dataverse operating runbook](docs/runbooks/sql-to-dataverse-runbook.vi.md)
 - [Dataverse deployment and implemented contract](docs/reference/dataverse-deployment.md)
@@ -108,6 +110,13 @@ production identity guidance, and tests.
 Power Automate queues the request; it does not connect to local SQL directly.
 The worker must therefore be running, or installed as the Windows Service
 described in the [Power Automate runbook](docs/runbooks/power-automate-sql-sync.vi.md).
+
+When a Sync Request reaches `Succeeded`, `CompletedWithIssues` or `Failed`, the
+asynchronous `QueueSyncNotification` plug-in creates one idempotent
+`fmc_notification` outbox record. `FMC - Send User Email Notification` sends it
+through Office 365 Outlook and records `Sent`, `Failed` or `Skipped` in
+Dataverse. Email delivery is isolated from the sync transaction, so a connector
+failure does not roll back an already completed data synchronization.
 
 POC data flow:
 

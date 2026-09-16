@@ -22,6 +22,7 @@ public sealed class DataversePluginProvisioner(DataverseConnection connection, S
     private const string SpoRequestApiName = "fmc_RequestSpoSync";
     private const string FullRequestPluginTypeName = "FMCentralBms.Plugins.RequestFullSync";
     private const string FullRequestApiName = "fmc_RequestFullSync";
+    private const string NotificationPluginTypeName = "FMCentralBms.Plugins.QueueSyncNotification";
     private const string Table = "fmc_bmsequipment";
     private const string Solution = DataverseProvisioner.Solution;
 
@@ -47,6 +48,8 @@ public sealed class DataversePluginProvisioner(DataverseConnection connection, S
             SpoRequestPluginTypeName, "Request SPO Sync");
         var fullRequestPluginType = await EnsurePluginType(client, assembly.Id,
             FullRequestPluginTypeName, "Request Full Sync");
+        var notificationPluginType = await EnsurePluginType(client, assembly.Id,
+            NotificationPluginTypeName, "Queue Sync Notification");
         var solutionId = await FindSolutionId(client);
 
         await AddToSolution(client, solutionId, assembly.Id, PluginAssemblyComponent,
@@ -55,14 +58,22 @@ public sealed class DataversePluginProvisioner(DataverseConnection connection, S
         foreach (var definition in new[]
         {
             new StepDefinition(
-                "BMS: Require Building on Equipment Create", "Create", null),
+                "BMS: Require Building on Equipment Create", "Create", null,
+                Table, validationPluginType.Id, 0, 10,
+                "Validates the Equipment Building lookup before create."),
             new StepDefinition(
-                "BMS: Require Building on Equipment Update", "Update", "fmc_buildingid")
+                "BMS: Require Building on Equipment Update", "Update", "fmc_buildingid",
+                Table, validationPluginType.Id, 0, 10,
+                "Validates the Equipment Building lookup before update."),
+            new StepDefinition(
+                "BMS: Queue notification on Sync Request completion", "Update", "fmc_status",
+                "fmc_syncrequest", notificationPluginType.Id, 1, 40,
+                "Creates an idempotent email notification outbox record after a terminal sync status.")
         })
         {
             var message = await FindMessage(client, definition.Message);
-            var filter = await FindMessageFilter(client, message.Id, Table);
-            var step = await EnsureStep(client, definition, message.Id, filter.Id, validationPluginType.Id);
+            var filter = await FindMessageFilter(client, message.Id, definition.Table);
+            var step = await EnsureStep(client, definition, message.Id, filter.Id, definition.PluginTypeId);
             await AddToSolution(client, solutionId, step.Id, StepComponent,
                 $"step {definition.Name}", addRequiredComponents: true);
             Console.WriteLine($"Ready: {definition.Name} ({step.Id}).");
@@ -399,9 +410,9 @@ public sealed class DataversePluginProvisioner(DataverseConnection connection, S
         var values = new Entity("sdkmessageprocessingstep")
         {
             ["name"] = definition.Name,
-            ["description"] = "FMCentralBms plan: validate Equipment Building lookup.",
-            ["mode"] = new OptionSetValue(0),
-            ["stage"] = new OptionSetValue(10),
+            ["description"] = definition.Description,
+            ["mode"] = new OptionSetValue(definition.Mode),
+            ["stage"] = new OptionSetValue(definition.Stage),
             ["rank"] = 10,
             ["supporteddeployment"] = new OptionSetValue(0),
             ["filteringattributes"] = definition.FilteringAttributes,
@@ -485,5 +496,13 @@ public sealed class DataversePluginProvisioner(DataverseConnection connection, S
         Console.WriteLine($"Added {description} to solution {Solution}.");
     }
 
-    private sealed record StepDefinition(string Name, string Message, string? FilteringAttributes);
+    private sealed record StepDefinition(
+        string Name,
+        string Message,
+        string? FilteringAttributes,
+        string Table,
+        Guid PluginTypeId,
+        int Mode,
+        int Stage,
+        string Description);
 }

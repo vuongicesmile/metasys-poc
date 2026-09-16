@@ -13,12 +13,14 @@
     <RolePrivilege name="prvCreatefmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmspoint" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmsreading" level="Global" />
+    <RolePrivilege name="prvCreatefmc_notification" level="Global" />
     <RolePrivilege name="prvCreatefmc_syncrequest" level="Global" />
     <RolePrivilege name="prvCreateSharePointData" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvReadfmc_bmspoint" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsreading" level="Global" />
+    <RolePrivilege name="prvReadfmc_notification" level="Global" />
     <RolePrivilege name="prvReadfmc_syncrequest" level="Global" />
     <RolePrivilege name="prvReadPluginAssembly" level="Global" />
     <RolePrivilege name="prvReadPluginType" level="Global" />
@@ -31,6 +33,7 @@
     <RolePrivilege name="prvWritefmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvWritefmc_bmspoint" level="Global" />
     <RolePrivilege name="prvWritefmc_bmsreading" level="Global" />
+    <RolePrivilege name="prvWritefmc_notification" level="Global" />
     <RolePrivilege name="prvWritefmc_syncrequest" level="Global" />
     <RolePrivilege name="prvWriteSharePointData" level="Global" />
   </RolePrivileges>

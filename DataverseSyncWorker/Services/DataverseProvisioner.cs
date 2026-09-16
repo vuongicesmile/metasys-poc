@@ -34,7 +34,8 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
         {
             ("fmc_bmspoint", "BMS Point", false, Columns(false)),
             ("fmc_bmsreading", "BMS Reading", true, Columns(true)),
-            ("fmc_syncrequest", "Sync Request", false, SyncRequestColumns())
+            ("fmc_syncrequest", "Sync Request", false, SyncRequestColumns()),
+            ("fmc_notification", "Notification", false, NotificationColumns())
         })
         {
             var existing = all.EntityMetadata.SingleOrDefault(e => e.LogicalName == table);
@@ -117,6 +118,21 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
                     KeyAttributes = ["fmc_activekey"]
                 }
             });
+        var notificationMeta = ((RetrieveEntityResponse)await client.ExecuteAsync(new RetrieveEntityRequest
+        {
+            LogicalName = "fmc_notification", EntityFilters = EntityFilters.All, RetrieveAsIfPublished = true
+        })).EntityMetadata;
+        if (!(notificationMeta.Keys ?? []).Any(k => k.LogicalName == "fmc_notification_correlationkey"))
+            await client.ExecuteAsync(new CreateEntityKeyRequest
+            {
+                EntityName = "fmc_notification", SolutionUniqueName = Solution,
+                EntityKey = new EntityKeyMetadata
+                {
+                    SchemaName = "fmc_notification_correlationkey",
+                    DisplayName = new Label("Notification Correlation Key", 1033),
+                    KeyAttributes = ["fmc_correlationkey"]
+                }
+            });
         // Elastic uses its built-in primary GUID + partitionid key only.
         await ConfigureDefaultView(client, "fmc_bmspoint", "Active BMS Points",
             ["fmc_objectid", "fmc_name", "fmc_objecttype", "fmc_currentvalue", "fmc_unit", "fmc_lastreadingtime", "fmc_building"]);
@@ -124,6 +140,8 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
             ["fmc_objectid", "fmc_objectname", "fmc_objecttype", "fmc_readingvalue", "fmc_unit", "fmc_readingtime", "fmc_building"]);
         await ConfigureDefaultView(client, "fmc_syncrequest", "Active Sync Requests",
             ["fmc_name", "fmc_status", "fmc_requestedcutoffid", "fmc_startedat", "fmc_completedat", "fmc_deliveredrows", "fmc_pendingafter"]);
+        await ConfigureDefaultView(client, "fmc_notification", "Active Notifications",
+            ["fmc_name", "fmc_status", "fmc_eventtype", "fmc_recipientemail", "fmc_attemptedat", "fmc_sentat"]);
         await EnsureRequestView(client, "Queued or Running Sync Requests",
             $"<condition attribute=\"fmc_status\" operator=\"in\"><value>{SyncRequestStatuses.Queued}</value><value>{SyncRequestStatuses.Running}</value></condition>");
         await EnsureRequestView(client, "Failed Sync Requests",
@@ -132,7 +150,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
             $"<condition attribute=\"fmc_status\" operator=\"in\"><value>{SyncRequestStatuses.Succeeded}</value><value>{SyncRequestStatuses.CompletedWithIssues}</value></condition>");
         await client.ExecuteAsync(new PublishXmlRequest
         {
-            ParameterXml = "<importexportxml><entities><entity>fmc_bmspoint</entity><entity>fmc_bmsreading</entity><entity>fmc_syncrequest</entity></entities></importexportxml>"
+            ParameterXml = "<importexportxml><entities><entity>fmc_bmspoint</entity><entity>fmc_bmsreading</entity><entity>fmc_syncrequest</entity><entity>fmc_notification</entity></entities></importexportxml>"
         });
 
         var rootQuery = new QueryExpression("businessunit") { ColumnSet = new ColumnSet("businessunitid") };
@@ -146,7 +164,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
             ["name"] = "FM Central BMS Integration", ["businessunitid"] = new EntityReference("businessunit", root)
         });
         var privileges = new List<RolePrivilege>();
-        foreach (var table in new[] { "fmc_bmspoint", "fmc_bmsreading", "fmc_syncrequest" })
+        foreach (var table in new[] { "fmc_bmspoint", "fmc_bmsreading", "fmc_syncrequest", "fmc_notification" })
         {
             var meta = ((RetrieveEntityResponse)await client.ExecuteAsync(new RetrieveEntityRequest
                 { LogicalName = table, EntityFilters = EntityFilters.Privileges })).EntityMetadata;
@@ -349,6 +367,80 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
         yield return new MemoAttributeMetadata
         {
             SchemaName = "fmc_errormessage", DisplayName = new Label("Error Message", 1033), MaxLength = 4000
+        };
+    }
+
+    public static IEnumerable<AttributeMetadata> NotificationColumns()
+    {
+        yield return new PicklistAttributeMetadata
+        {
+            SchemaName = "fmc_channel", DisplayName = new Label("Channel", 1033),
+            RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.ApplicationRequired),
+            DefaultFormValue = 789120000,
+            OptionSet = new OptionSetMetadata
+            {
+                IsGlobal = false,
+                Options = { new OptionMetadata { Label = new Label("Email", 1033), Value = 789120000 } }
+            }
+        };
+        yield return new PicklistAttributeMetadata
+        {
+            SchemaName = "fmc_status", DisplayName = new Label("Delivery Status", 1033),
+            RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.ApplicationRequired),
+            DefaultFormValue = 789121000,
+            OptionSet = new OptionSetMetadata
+            {
+                IsGlobal = false,
+                Options =
+                {
+                    new OptionMetadata { Label = new Label("Pending", 1033), Value = 789121000 },
+                    new OptionMetadata { Label = new Label("Sent", 1033), Value = 789121001 },
+                    new OptionMetadata { Label = new Label("Failed", 1033), Value = 789121002 },
+                    new OptionMetadata { Label = new Label("Skipped", 1033), Value = 789121003 }
+                }
+            }
+        };
+        yield return new PicklistAttributeMetadata
+        {
+            SchemaName = "fmc_eventtype", DisplayName = new Label("Event Type", 1033),
+            RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.ApplicationRequired),
+            OptionSet = new OptionSetMetadata
+            {
+                IsGlobal = false,
+                Options =
+                {
+                    new OptionMetadata { Label = new Label("Sync succeeded", 1033), Value = 789122000 },
+                    new OptionMetadata { Label = new Label("Sync completed with issues", 1033), Value = 789122001 },
+                    new OptionMetadata { Label = new Label("Sync failed", 1033), Value = 789122002 },
+                    new OptionMetadata { Label = new Label("Submitted", 1033), Value = 789122010 },
+                    new OptionMetadata { Label = new Label("Approved", 1033), Value = 789122011 },
+                    new OptionMetadata { Label = new Label("Rejected", 1033), Value = 789122012 },
+                    new OptionMetadata { Label = new Label("Overdue", 1033), Value = 789122013 },
+                    new OptionMetadata { Label = new Label("Escalated", 1033), Value = 789122014 }
+                }
+            }
+        };
+        yield return Text("fmc_recipientemail", "Recipient Email", 320);
+        yield return Text("fmc_recipientname", "Recipient Name", 200);
+        yield return Text("fmc_subject", "Subject", 300);
+        yield return Text("fmc_correlationkey", "Correlation Key", 200);
+        yield return Text("fmc_regardingtable", "Regarding Table", 100);
+        yield return Text("fmc_regardingid", "Regarding ID", 100);
+        yield return Text("fmc_flowrunid", "Flow Run ID", 100);
+        yield return new MemoAttributeMetadata
+        {
+            SchemaName = "fmc_body", DisplayName = new Label("Email Body", 1033), MaxLength = 10000
+        };
+        yield return new MemoAttributeMetadata
+        {
+            SchemaName = "fmc_errormessage", DisplayName = new Label("Delivery Error", 1033), MaxLength = 4000
+        };
+        yield return Time("fmc_attemptedat", "Attempted At");
+        yield return Time("fmc_sentat", "Sent At");
+        yield return new IntegerAttributeMetadata
+        {
+            SchemaName = "fmc_attempts", DisplayName = new Label("Delivery Attempts", 1033),
+            MinValue = 0, MaxValue = int.MaxValue
         };
     }
 }
