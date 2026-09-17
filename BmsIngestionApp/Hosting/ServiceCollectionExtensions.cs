@@ -1,9 +1,10 @@
-using BmsIngestionApp.Abstractions;
-using BmsIngestionApp.Models;
-using BmsIngestionApp.Services;
+using BMS.Ingestion.Business.Abstractions;
+using BMS.Ingestion.Business.Services;
+using BMS.Ingestion.Common.Configuration;
+using BMS.Ingestion.DataAccess.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BmsIngestionApp.Hosting;
+namespace BMS.IngestionApp.Hosting;
 
 public static class ServiceCollectionExtensions
 {

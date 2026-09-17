@@ -1,5 +1,6 @@
-namespace BmsIngestionApp.Models;
+namespace BMS.Ingestion.Domain.Models;
 
+/// <summary>One source value change. Each persisted event becomes one raw.bms_reading row.</summary>
 public sealed class CovEvent
 {
     public string ObjectId { get; init; } = "";
@@ -22,7 +23,3 @@ public sealed class SubscriptionResponse
 {
     public string SubscriptionId { get; init; } = "";
 }
-
-public sealed record BmsBuilding(string BuildingCode, string Name, string SourceBuilding, string Description);
-public sealed record BmsEquipment(string EquipmentCode, string Name, string EquipmentType,
-    string BuildingCode, string Description);

@@ -1,10 +1,11 @@
-using BmsIngestionApp.Abstractions;
-using BmsIngestionApp.Models;
+using BMS.Ingestion.Business.Abstractions;
+using BMS.Ingestion.Common.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace BmsIngestionApp.Services;
+namespace BMS.Ingestion.Business.Services;
 
+/// <summary>Application orchestration: catalog -> optional SQL -> subscribe -> COV -> optional SQL.</summary>
 public sealed class CovIngestionWorker(
     AppSettings settings,
     IngestionRuntimeOptions runtimeOptions,
@@ -26,8 +27,9 @@ public sealed class CovIngestionWorker(
                 await repository.PersistCatalogAsync(catalog.Buildings, catalog.Equipment, stoppingToken);
                 status.CatalogPersisted(catalog.Buildings.Length, catalog.Equipment.Length);
             }
-            var subscription = await metasys.SubscribeAsync(catalog.Points.Select(p => p.ObjectId), stoppingToken);
 
+            var subscription = await metasys.SubscribeAsync(
+                catalog.Points.Select(point => point.ObjectId), stoppingToken);
             status.Connected(subscription.SubscriptionId);
             logger.LogInformation(
                 "Created {SubscriptionId}; SQL persistence enabled: {SqlEnabled}",

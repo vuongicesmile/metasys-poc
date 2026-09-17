@@ -1,8 +1,8 @@
-using BmsIngestionApp.Models;
+using BMS.Ingestion.Common.Configuration;
+using BMS.IngestionApp.Endpoints;
+using BMS.IngestionApp.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using BmsIngestionApp.Hosting;
-using BmsIngestionApp.Endpoints;
 
 var noSql = args.Contains("--no-sql", StringComparer.OrdinalIgnoreCase);
 var webArgs = args.Where(arg => !arg.Equals("--no-sql", StringComparison.OrdinalIgnoreCase)).ToArray();

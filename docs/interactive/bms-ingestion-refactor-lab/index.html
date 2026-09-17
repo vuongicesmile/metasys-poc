@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive lab refactor BMS ingestion .NET thành Presentation, Business, DataAccess, Common và Domain.">
+  <meta name="theme-color" content="#071b2b">
+  <title>BMS Ingestion Refactor Lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="raw-map.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#step-0"><span class="brand-mark">BMS</span><span>Ingestion Refactor Lab<small>.NET layered architecture</small></span></a>
+    <div class="top-actions"><span class="scope">Implemented · BMS.Ingestion.*</span><button id="theme-toggle" class="icon-button" type="button" aria-label="Đổi giao diện">◐</button></div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="progress-copy"><strong id="done-count">0/12</strong><span>bước đã đánh dấu</span></div>
+    <div class="progress-track"><span id="progress-bar"></span></div>
+    <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Tìm project, DI, test…"></label>
+    <nav id="navigation" aria-label="Các bước refactor"></nav>
+    <div class="sidebar-note"><span>CONTRACT GIỮ NGUYÊN</span><strong>SSE → SQL raw</strong><small>Port 5100 / 5200 · không đụng Dataverse</small></div>
+  </aside>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">HỌC BẰNG SOURCE THẬT · LÀM TỪNG CHECKPOINT</p>
+        <h1>Tách BMS ingestion<br><em>mà không đổi behavior.</em></h1>
+        <p class="lead">Giữ executable hiện tại làm Presentation, chuyển orchestration sang <code>BMS.Ingestion.Business</code>, models sang Domain và cô lập HTTP/SSE cùng SQL trong <code>BMS.Ingestion.DataAccess</code>.</p>
+        <div class="hero-actions"><a class="primary" href="#step-0">Bắt đầu từ baseline →</a><a class="secondary" href="../../plans/bms-ingestion-layered-refactor.vi.md">Mở plan Markdown</a></div>
+      </div>
+      <div class="flow-card" aria-label="Luồng kiến trúc đích">
+        <div class="flow-node presentation"><small>PRESENTATION</small><strong>BmsIngestionApp</strong><span>Program · Endpoints · DI</span></div>
+        <div class="flow-arrow">↓ composition</div>
+        <div class="flow-row"><div class="flow-node business"><small>BMS.Ingestion.Business</small><strong>Worker + Ports</strong><span>Orchestration</span></div><div class="flow-node adapter"><small>BMS.Ingestion.DataAccess</small><strong>Metasys · SQL</strong><span>HTTP/SSE · persistence</span></div></div>
+        <div class="flow-arrow">↓ contracts + configuration</div>
+        <div class="flow-node common"><small>DOMAIN + COMMON</small><strong>Models + Options</strong><span>Không SDK infrastructure</span></div>
+      </div>
+    </section>
+
+    <section class="invariants"><span>Không đổi port</span><span>Không đổi SQL schema</span><span>Không đổi SSE cancellation</span><span>Không chạy Dataverse sync</span></section>
+    <section class="raw-map">
+      <div class="raw-intro"><p class="eyebrow">ĐỌC DATA TRƯỚC KHI ĐỌC CODE</p><h2>Ba bảng raw, ba câu hỏi khác nhau.</h2><p>Đây là SQL system of record của ingestion. Hai bảng đầu là catalog; bảng cuối là lịch sử event append-only.</p></div>
+      <div class="raw-grid">
+        <article class="raw-card building"><span class="table-kind">CATALOG · 1 ROW / BUILDING</span><h3>raw.bms_building</h3><p>Building này là ai? Mã ổn định là gì?</p><code>building_code · name · source_updated_at</code><small>Primary key: building_code</small></article>
+        <article class="raw-card equipment"><span class="table-kind">CATALOG · 1 ROW / EQUIPMENT</span><h3>raw.bms_equipment</h3><p>Thiết bị thuộc Building nào?</p><code>equipment_code · building_code · equipment_type</code><small>FK: building_code → bms_building</small></article>
+        <article class="raw-card reading"><span class="table-kind">EVENT HISTORY · N ROW / POINT</span><h3>raw.bms_reading</h3><p>Point đã đo giá trị gì, vào thời điểm nào?</p><code>id · object_id · reading_time · reading_value</code><small>PK: identity id · DECIMAL(18,4)</small></article>
+      </div>
+      <div class="raw-query"><span>THỨ TỰ ĐỌC KHI DEBUG</span><strong>object_id → reading_time → id → equipment_code → building_code</strong><small>Không dùng name để tìm identity; không dùng MAX(id) để kết luận backlog.</small></div>
+    </section>
+    <section id="step-container" class="steps" aria-live="polite"></section>
+    <section class="finish"><p class="eyebrow">DEFINITION OF DONE</p><h2>Refactor xong khi compiler, test và runtime cùng đồng ý.</h2><div id="acceptance" class="acceptance"></div></section>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

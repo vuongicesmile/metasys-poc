@@ -1,9 +1,10 @@
-using BmsIngestionApp.Models;
-using BmsIngestionApp.Services;
+using BMS.Ingestion.Business.Models;
+using BMS.Ingestion.Business.Services;
+using BMS.Ingestion.Domain.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace BmsIngestionApp.Endpoints;
+namespace BMS.IngestionApp.Endpoints;
 
 public static class IngestionEndpoints
 {

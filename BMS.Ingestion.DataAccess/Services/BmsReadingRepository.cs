@@ -1,10 +1,11 @@
 using System.Data;
-using BmsIngestionApp.Abstractions;
-using BmsIngestionApp.Models;
+using BMS.Ingestion.Business.Abstractions;
+using BMS.Ingestion.Domain.Models;
 using Microsoft.Data.SqlClient;
 
-namespace BmsIngestionApp.Services;
+namespace BMS.Ingestion.DataAccess.Services;
 
+/// <summary>SQL adapter for the raw BMS catalog and append-only reading history.</summary>
 public sealed class BmsReadingRepository(string connectionString) : IBmsReadingRepository
 {
     private const string InsertSql = """
@@ -36,11 +37,7 @@ public sealed class BmsReadingRepository(string connectionString) : IBmsReadingR
 
     public async Task InsertAsync(CovEvent covEvent, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            throw new InvalidOperationException("Sql.ConnectionString must be configured when SQL is enabled.");
-        }
-
+        RequireConnectionString();
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
 
@@ -61,16 +58,20 @@ public sealed class BmsReadingRepository(string connectionString) : IBmsReadingR
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    public async Task PersistCatalogAsync(IReadOnlyList<BmsBuilding> buildings,
-        IReadOnlyList<BmsEquipment> equipment, CancellationToken cancellationToken = default)
+    public async Task PersistCatalogAsync(
+        IReadOnlyList<BmsBuilding> buildings,
+        IReadOnlyList<BmsEquipment> equipment,
+        CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException("Sql.ConnectionString must be configured when SQL is enabled.");
-        var buildingCodes = buildings.Select(b => b.BuildingCode).ToHashSet(StringComparer.Ordinal);
-        if (buildingCodes.Count != buildings.Count || equipment.Select(e => e.EquipmentCode).Distinct(StringComparer.Ordinal).Count() != equipment.Count)
+        RequireConnectionString();
+        var buildingCodes = buildings.Select(building => building.BuildingCode)
+            .ToHashSet(StringComparer.Ordinal);
+        if (buildingCodes.Count != buildings.Count ||
+            equipment.Select(item => item.EquipmentCode).Distinct(StringComparer.Ordinal).Count() != equipment.Count)
             throw new InvalidOperationException("Fake Metasys catalog contains duplicate codes.");
-        if (equipment.Any(e => !buildingCodes.Contains(e.BuildingCode)))
+        if (equipment.Any(item => !buildingCodes.Contains(item.BuildingCode)))
             throw new InvalidOperationException("Fake Metasys equipment refers to a missing building.");
+
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
         await using var transaction = (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken);
@@ -92,6 +93,7 @@ public sealed class BmsReadingRepository(string connectionString) : IBmsReadingR
                 command.Parameters.Add("@updated", SqlDbType.DateTime2).Value = DateTime.UtcNow;
                 await command.ExecuteNonQueryAsync(cancellationToken);
             }
+
             foreach (var item in equipment)
             {
                 const string sql = """
@@ -109,8 +111,19 @@ public sealed class BmsReadingRepository(string connectionString) : IBmsReadingR
                 command.Parameters.Add("@updated", SqlDbType.DateTime2).Value = DateTime.UtcNow;
                 await command.ExecuteNonQueryAsync(cancellationToken);
             }
+
             await transaction.CommitAsync(cancellationToken);
         }
-        catch { await transaction.RollbackAsync(cancellationToken); throw; }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    private void RequireConnectionString()
+    {
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException("Sql.ConnectionString must be configured when SQL is enabled.");
     }
 }

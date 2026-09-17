@@ -1,7 +1,8 @@
 using System.Runtime.CompilerServices;
-using BmsIngestionApp.Abstractions;
-using BmsIngestionApp.Models;
-using BmsIngestionApp.Services;
+using BMS.Ingestion.Business.Abstractions;
+using BMS.Ingestion.Business.Services;
+using BMS.Ingestion.Common.Configuration;
+using BMS.Ingestion.Domain.Models;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace MetasysPoc.Tests;

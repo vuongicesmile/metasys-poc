@@ -19,8 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BMS.Ingestion.Business\BMS.Ingestion.Business.csproj" />
+    <ProjectReference Include="..\..\BMS.Ingestion.Common\BMS.Ingestion.Common.csproj" />
+    <ProjectReference Include="..\..\BMS.Ingestion.DataAccess\BMS.Ingestion.DataAccess.csproj" />
+    <ProjectReference Include="..\..\BMS.Ingestion.Domain\BMS.Ingestion.Domain.csproj" />
     <ProjectReference Include="..\..\DataverseSyncWorker\DataverseSyncWorker.csproj" />
-    <ProjectReference Include="..\..\BmsIngestionApp\BmsIngestionApp.csproj" />
     <ProjectReference Include="..\..\SpoIngestion.Core\SpoIngestion.Core.csproj" />
   </ItemGroup>
 

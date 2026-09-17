@@ -13,6 +13,7 @@ Start at the [documentation index](docs/README.md):
 - [User email notification plan and live receipt](docs/plans/user-email-notifications.vi.md)
 - [User email notification operating runbook](docs/runbooks/user-email-notifications.vi.md)
 - [Interactive Custom API lab](docs/interactive/custom-api-lab/index.html)
+- [BMS ingestion layered refactor lab](docs/interactive/bms-ingestion-refactor-lab/index.html)
 - [SQL-to-Dataverse operating runbook](docs/runbooks/sql-to-dataverse-runbook.vi.md)
 - [Dataverse deployment and implemented contract](docs/reference/dataverse-deployment.md)
 - [FMC BMS Demo model-driven app runbook (Vietnamese)](docs/runbooks/model-driven-app-demo.vi.md)

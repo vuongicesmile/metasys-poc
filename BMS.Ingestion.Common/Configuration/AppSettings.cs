@@ -1,7 +1,8 @@
 using System.Text.Json;
 
-namespace BmsIngestionApp.Models;
+namespace BMS.Ingestion.Common.Configuration;
 
+/// <summary>Configuration contract shared by the host and infrastructure adapters.</summary>
 public sealed class AppSettings
 {
     public MetasysSettings Metasys { get; init; } = new();
@@ -13,9 +14,7 @@ public sealed class AppSettings
     {
         var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
         if (!File.Exists(path))
-        {
             throw new FileNotFoundException("The ingestion app configuration file was not found.", path);
-        }
 
         return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path), JsonOptions)
             ?? throw new InvalidOperationException("appsettings.json is empty or invalid.");
@@ -32,3 +31,5 @@ public sealed class SqlSettings
     public bool Enabled { get; init; } = true;
     public string ConnectionString { get; init; } = "";
 }
+
+public sealed record IngestionRuntimeOptions(bool SqlEnabled);

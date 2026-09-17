@@ -1,7 +1,9 @@
-using BmsIngestionApp.Models;
+using BMS.Ingestion.Business.Models;
+using BMS.Ingestion.Domain.Models;
 
-namespace BmsIngestionApp.Services;
+namespace BMS.Ingestion.Business.Services;
 
+/// <summary>Thread-safe in-memory runtime state shared by the worker and status endpoints.</summary>
 public sealed class IngestionStatusTracker
 {
     private const int RecentEventLimit = 25;
@@ -49,25 +51,22 @@ public sealed class IngestionStatusTracker
             _lastEvent = covEvent;
             _lastEventAt = DateTime.UtcNow;
             _recentEvents.Enqueue(covEvent);
-
-            while (_recentEvents.Count > RecentEventLimit)
-            {
-                _recentEvents.Dequeue();
-            }
+            while (_recentEvents.Count > RecentEventLimit) _recentEvents.Dequeue();
         }
     }
 
     public void RowInserted()
     {
-        lock (_sync)
-        {
-            _rowsInserted++;
-        }
+        lock (_sync) _rowsInserted++;
     }
 
     public void CatalogPersisted(int buildings, int equipment)
     {
-        lock (_sync) { _buildingsUpserted = buildings; _equipmentUpserted = equipment; }
+        lock (_sync)
+        {
+            _buildingsUpserted = buildings;
+            _equipmentUpserted = equipment;
+        }
     }
 
     public void Failed(Exception exception)
@@ -103,9 +102,6 @@ public sealed class IngestionStatusTracker
 
     public IReadOnlyList<CovEvent> GetRecentEvents()
     {
-        lock (_sync)
-        {
-            return _recentEvents.Reverse().ToArray();
-        }
+        lock (_sync) return _recentEvents.Reverse().ToArray();
     }
 }

@@ -1,5 +1,8 @@
-namespace BmsIngestionApp.Models;
+using BMS.Ingestion.Domain.Models;
 
+namespace BMS.Ingestion.Business.Models;
+
+/// <summary>Read-only operational snapshot returned by the Presentation endpoints.</summary>
 public sealed class IngestionStatusSnapshot
 {
     public string State { get; init; } = "Starting";
@@ -15,5 +18,3 @@ public sealed class IngestionStatusSnapshot
     public CovEvent? LastEvent { get; init; }
     public string? Error { get; init; }
 }
-
-public sealed record IngestionRuntimeOptions(bool SqlEnabled);

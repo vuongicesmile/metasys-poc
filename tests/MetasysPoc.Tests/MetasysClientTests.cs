@@ -1,7 +1,8 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using BmsIngestionApp.Services;
+using BMS.Ingestion.DataAccess.Services;
+using BMS.Ingestion.Domain.Models;
 
 namespace MetasysPoc.Tests;
 
@@ -46,7 +47,7 @@ public sealed class MetasysClientTests
                 ": heartbeat\nevent: cov\ndata: {\"objectId\":\"P-1\",\"currentValue\":12.3456}\n\n" +
                 "retry: 1000\ndata: {\"objectId\":\"P-2\",\"currentValue\":0}\n\n", Encoding.UTF8, "text/event-stream") };
         });
-        var values = new List<BmsIngestionApp.Models.CovEvent>();
+        var values = new List<CovEvent>();
         await foreach (var value in client.ReadEventsAsync("sub-1", default)) values.Add(value);
         Assert.Equal(new[] { "P-1", "P-2" }, values.Select(v => v.ObjectId));
         Assert.Equal(12.3456m, values[0].CurrentValue);

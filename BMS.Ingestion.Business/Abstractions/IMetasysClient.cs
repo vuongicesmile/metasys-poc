@@ -1,7 +1,8 @@
-using BmsIngestionApp.Models;
+using BMS.Ingestion.Domain.Models;
 
-namespace BmsIngestionApp.Abstractions;
+namespace BMS.Ingestion.Business.Abstractions;
 
+/// <summary>Business-facing port for the BMS source; HTTP and SSE details stay in DataAccess.</summary>
 public interface IMetasysClient
 {
     Task<MetasysCatalog> ReadCatalogAsync(CancellationToken ct);
