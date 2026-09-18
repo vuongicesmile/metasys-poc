@@ -19,10 +19,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BMS.Ingestion.Business\BMS.Ingestion.Business.csproj" />
-    <ProjectReference Include="..\..\BMS.Ingestion.Common\BMS.Ingestion.Common.csproj" />
-    <ProjectReference Include="..\..\BMS.Ingestion.DataAccess\BMS.Ingestion.DataAccess.csproj" />
-    <ProjectReference Include="..\..\BMS.Ingestion.Domain\BMS.Ingestion.Domain.csproj" />
+    <ProjectReference Include="..\..\BMS.Fake\BMS.Fake.App\BMS.Fake.App.csproj" />
+    <ProjectReference Include="..\..\BMS.Fake\BMS.Fake.Business\BMS.Fake.Business.csproj" />
+    <ProjectReference Include="..\..\BMS.Fake\BMS.Fake.DataAccess\BMS.Fake.DataAccess.csproj" />
+    <ProjectReference Include="..\..\BMS.Fake\BMS.Fake.Domain\BMS.Fake.Domain.csproj" />
+    <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.Business\BMS.Ingestion.Business.csproj" />
+    <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.Common\BMS.Ingestion.Common.csproj" />
+    <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.DataAccess\BMS.Ingestion.DataAccess.csproj" />
+    <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.Domain\BMS.Ingestion.Domain.csproj" />
     <ProjectReference Include="..\..\DataverseSyncWorker\DataverseSyncWorker.csproj" />
     <ProjectReference Include="..\..\SpoIngestion.Core\SpoIngestion.Core.csproj" />
   </ItemGroup>

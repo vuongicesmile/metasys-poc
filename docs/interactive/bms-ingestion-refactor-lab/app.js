@@ -7,11 +7,11 @@
       lesson: `<h3>Tên thật trong source</h3><p><strong>Project</strong> là compilation boundary tạo DLL. <strong>Solution</strong> chỉ gom project để build/debug.</p><p>Không tạo solution ingestion riêng, không chia DataAccess thành hai project. HTTP/SSE và SQL cùng nằm trong <code>BMS.Ingestion.DataAccess</code>.</p>`,
       codeTitle: 'Target tree · đã áp dụng',
       code: `MetasysPoc.sln
-├─ BmsIngestionApp/BMS.IngestionApp.csproj
-├─ BMS.Ingestion.Domain
-├─ BMS.Ingestion.Common
-├─ BMS.Ingestion.Business
-└─ BMS.Ingestion.DataAccess`,
+├─ BMS.Ingestion/BMS.Ingestion.App/BMS.Ingestion.App.csproj
+├─ BMS.Ingestion/BMS.Ingestion.Domain
+├─ BMS.Ingestion/BMS.Ingestion.Common
+├─ BMS.Ingestion/BMS.Ingestion.Business
+└─ BMS.Ingestion/BMS.Ingestion.DataAccess`,
       check: 'Tên project trên UI khớp chính xác với project đang có trong MetasysPoc.sln.'
     },
     {
@@ -38,14 +38,14 @@ KHÔNG: Domain → SQL / HTTP / ASP.NET`,
 dotnet build .\MetasysPoc.sln -c Release -p:SignAssembly=false
 dotnet test .\tests\MetasysPoc.Tests\MetasysPoc.Tests.csproj -c Release
 
-Get-ChildItem .\BMS.Ingestion.*\*.csproj`,
-      check: 'Solution liệt kê đúng bốn library và BMS.IngestionApp; framework là net10.0.'
+Get-ChildItem .\BMS.Ingestion\*\*.csproj`,
+      check: 'Solution liệt kê đúng bốn library và BMS.Ingestion.App; framework là net10.0.'
     },
     {
       group: 'Move source',
       title: 'Tách domain models trước',
       summary: 'CovEvent, Building, Equipment, Point và subscription models chuyển vào Domain.',
-      lesson: `<h3>Domain là dữ liệu nghiệp vụ thuần</h3><p>Move layer đáy trước vì các layer khác đều dùng nó. Chỉ đổi namespace và path; không đổi JSON shape, <code>decimal</code>, timestamp hoặc identity.</p><h3>Before → After</h3><p><code>BmsIngestionApp/Models/CovEvent.cs</code><br>→ <code>BMS.Ingestion.Domain/Models/CovEvent.cs</code></p><p><code>MetasysCatalog.cs</code><br>→ <code>BMS.Ingestion.Domain/Models/BmsCatalog.cs</code></p>`,
+      lesson: `<h3>Domain là dữ liệu nghiệp vụ thuần</h3><p>Move layer đáy trước vì các layer khác đều dùng nó. Chỉ đổi namespace và path; không đổi JSON shape, <code>decimal</code>, timestamp hoặc identity.</p><h3>Before → After</h3><p><code>BMS.Ingestion.App/Models/CovEvent.cs</code><br>→ <code>BMS.Ingestion/BMS.Ingestion.Domain/Models/CovEvent.cs</code></p><p><code>MetasysCatalog.cs</code><br>→ <code>BMS.Ingestion/BMS.Ingestion.Domain/Models/BmsCatalog.cs</code></p>`,
       codeTitle: 'C# · namespace mới',
       code: `namespace BMS.Ingestion.Domain.Models;
 
@@ -102,9 +102,9 @@ public interface IBmsReadingRepository
       lesson: `<h3>Workflow phải giữ nguyên</h3><ol><li>Đọc catalog.</li><li>Nếu SQL bật, persist Building rồi Equipment.</li><li>Subscribe danh sách Point.</li><li>Đọc từng COV event.</li><li>Cập nhật status, rồi insert nếu SQL bật.</li></ol><p><code>IngestionStatusTracker</code> cũng chuyển vào Business vì nó mô tả trạng thái của use case.</p>`,
       codeTitle: 'PowerShell · boundary check',
       code: `rg -n "SqlConnection|Microsoft.Data.SqlClient|System.Net.Http.Json|HttpClient" \
-  .\BMS.Ingestion.Business \
-  .\BMS.Ingestion.Common \
-  .\BMS.Ingestion.Domain -g "*.cs"
+  .\BMS.Ingestion\BMS.Ingestion.Business \
+  .\BMS.Ingestion\BMS.Ingestion.Common \
+  .\BMS.Ingestion\BMS.Ingestion.Domain -g "*.cs"
 
 # Kỳ vọng: không có match`,
       check: 'Business vẫn compile và boundary search không trả kết quả.'
@@ -147,7 +147,7 @@ await command.ExecuteNonQueryAsync(cancellationToken);`,
     {
       group: 'Presentation',
       title: 'Rewire Dependency Injection',
-      summary: 'BMS.IngestionApp chỉ giữ startup, endpoint và chỗ chọn implementation thật.',
+      summary: 'BMS.Ingestion.App chỉ giữ startup, endpoint và chỗ chọn implementation thật.',
       lesson: `<h3>Composition root</h3><p>Presentation được reference Business và DataAccess vì đây là nơi nối port với adapter.</p><ul><li>Tracker là singleton để endpoint và worker dùng cùng instance.</li><li>Named HttpClient giữ BaseUrl/timeout ngoài Business.</li><li>Hosted service chạy worker theo lifecycle của host.</li></ul>`,
       codeTitle: 'C# · ServiceCollectionExtensions',
       code: `services.AddSingleton<IngestionStatusTracker>();
@@ -181,10 +181,10 @@ git diff --check`,
       lesson: `<h3>Receipt đã kiểm tra</h3><p><code>State = Listening</code><br><code>SqlEnabled = False</code><br><code>SubscriptionId = SUB-001</code><br><code>EventsReceived = 32</code><br><code>RowsInserted = 0</code><br><code>RecentCount = 25</code></p><p>Sau đó bỏ <code>--no-sql</code> để test SQL local; không cần chạy DataverseSyncWorker trong scope refactor này.</p>`,
       codeTitle: 'PowerShell · 3 terminals',
       code: `# Terminal 1
-dotnet run --project .\FakeMetasysApi -c Release --no-build
+dotnet run --project .\BMS.Fake\BMS.Fake.App\BMS.Fake.App.csproj -c Release --no-build
 
 # Terminal 2
-dotnet run --project .\BmsIngestionApp\BMS.IngestionApp.csproj \
+dotnet run --project .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj \
   -c Release --no-build -- --no-sql
 
 # Terminal 3

@@ -24,8 +24,8 @@ relevant changes, verification and any remaining limitation.
 
 ## Project boundaries
 
-- FakeMetasysApi is the simulator on port 5100.
-- BmsIngestionApp consumes COV over SSE on port 5200 and appends to SQL.
+- `BMS.Fake.App` is the simulator on port 5100.
+- `BMS.Ingestion.App` consumes COV over SSE on port 5200 and appends to SQL.
 - SQL Server database FM_Central, table raw.bms_reading, is the system of record
   and holds full history.
 - DataverseSyncWorker on port 5300 sends current state and retained history to

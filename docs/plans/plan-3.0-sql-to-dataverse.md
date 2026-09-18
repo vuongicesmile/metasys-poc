@@ -28,7 +28,7 @@ Fake Metasys API :5100
           |
           | COV / SSE
           v
-BmsIngestionApp :5200
+BMS.Ingestion.App :5200
           |
           | INSERT
           v
@@ -358,8 +358,10 @@ concurrency trong cửa sổ trượt. Không hard-code throughput dựa trên c
 metasys-poc/
 |
 |-- MetasysPoc.sln
-|-- FakeMetasysApi/
-|-- BmsIngestionApp/
+|-- BMS.Fake/
+|   |-- BMS.Fake.App/
+|-- BMS.Ingestion/
+|   |-- BMS.Ingestion.App/
 |-- DataverseSyncWorker/
 |   |-- Models/
 |   |   |-- BmsReading.cs

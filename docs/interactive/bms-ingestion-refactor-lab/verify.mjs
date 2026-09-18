@@ -25,10 +25,10 @@ test('markdown plan is scoped and references files that exist', async () => {
   const plan = await readFile(resolve(root, 'docs/plans/bms-ingestion-layered-refactor.vi.md'), 'utf8');
   assert.match(plan, /đã triển khai trong source local/); assert.match(plan, /Ngoài phạm vi/); assert.match(plan, /Definition of Done/);
   for (const path of [
-    'BMS.Ingestion.Business/Services/CovIngestionWorker.cs',
-    'BMS.Ingestion.DataAccess/Services/MetasysClient.cs',
-    'BMS.Ingestion.DataAccess/Services/BmsReadingRepository.cs',
-    'BMS.Ingestion.Domain/Models/CovEvent.cs',
+    'BMS.Ingestion/BMS.Ingestion.Business/Services/CovIngestionWorker.cs',
+    'BMS.Ingestion/BMS.Ingestion.DataAccess/Services/MetasysClient.cs',
+    'BMS.Ingestion/BMS.Ingestion.DataAccess/Services/BmsReadingRepository.cs',
+    'BMS.Ingestion/BMS.Ingestion.Domain/Models/CovEvent.cs',
     'tests/MetasysPoc.Tests/CovIngestionWorkerTests.cs'
   ]) await readFile(resolve(root,path),'utf8');
 });

@@ -33,7 +33,7 @@
         <div class="hero-actions"><a class="primary" href="#step-0">Bắt đầu từ baseline →</a><a class="secondary" href="../../plans/bms-ingestion-layered-refactor.vi.md">Mở plan Markdown</a></div>
       </div>
       <div class="flow-card" aria-label="Luồng kiến trúc đích">
-        <div class="flow-node presentation"><small>PRESENTATION</small><strong>BmsIngestionApp</strong><span>Program · Endpoints · DI</span></div>
+        <div class="flow-node presentation"><small>PRESENTATION</small><strong>BMS.Ingestion.App</strong><span>Program · Endpoints · DI</span></div>
         <div class="flow-arrow">↓ composition</div>
         <div class="flow-row"><div class="flow-node business"><small>BMS.Ingestion.Business</small><strong>Worker + Ports</strong><span>Orchestration</span></div><div class="flow-node adapter"><small>BMS.Ingestion.DataAccess</small><strong>Metasys · SQL</strong><span>HTTP/SSE · persistence</span></div></div>
         <div class="flow-arrow">↓ contracts + configuration</div>

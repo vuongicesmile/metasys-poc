@@ -62,7 +62,7 @@ def classify(files):
     plugin = any(p.startswith("plugins/") for p in paths)
     web = [p for p in CONFIG["webResources"] if p in paths]
     dashboard = solution or plugin or infrastructure or any(p.startswith(CONFIG["pageDirectory"] + "/") for p in paths)
-    backend = infrastructure or any(p.startswith(("BmsIngestionApp/", "DataverseSyncWorker/", "FakeMetasysApi/", "tests/", "sql/"))
+    backend = infrastructure or any(p.startswith(("BMS.Ingestion/", "DataverseSyncWorker/", "BMS.Fake/", "tests/", "sql/"))
                                    or p.endswith((".sln", "Directory.Build.props", "Directory.Packages.props")) for p in paths)
     if CONFIG["pageDirectory"] + "/app-spec.json" in paths and not solution:
         raise ValueError("app-spec changed: build/export the model-driven solution into dataverse/FMCentralBms before tagging")
@@ -120,9 +120,13 @@ def get_plan(tag):
 def validate(plan, out):
     if plan["backend"] or plan["plugin"]:
         command("dotnet", "test", "tests/MetasysPoc.Tests/MetasysPoc.Tests.csproj", "-c", "Release")
-        for project in ("FakeMetasysApi", "BmsIngestionApp", "DataverseSyncWorker"):
+        for project, project_file in (
+            ("BMS.Fake.App", "BMS.Fake/BMS.Fake.App/BMS.Fake.App.csproj"),
+            ("BMS.Ingestion.App", "BMS.Ingestion/BMS.Ingestion.App/BMS.Ingestion.App.csproj"),
+            ("DataverseSyncWorker", "DataverseSyncWorker/DataverseSyncWorker.csproj"),
+        ):
             dest = out / "workers" / project
-            command("dotnet", "publish", f"{project}/{project}.csproj", "-c", "Release", "-o", dest)
+            command("dotnet", "publish", project_file, "-c", "Release", "-o", dest)
             # Worker packages are explicit handoff artifacts, not automatic data-sync execution.
     if plan["dashboard"]:
         app = ROOT / CONFIG["pageDirectory"]

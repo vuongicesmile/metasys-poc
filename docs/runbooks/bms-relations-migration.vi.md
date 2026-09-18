@@ -32,11 +32,11 @@ Seed SQL là fixture dự phòng trùng với Fake API. Luồng runtime chuẩn 
 Mở hai terminal:
 
 ```powershell
-dotnet run --project .\FakeMetasysApi
+dotnet run --project .\BMS.Fake\BMS.Fake.App\BMS.Fake.App.csproj
 ```
 
 ```powershell
-dotnet run --project .\BmsIngestionApp
+dotnet run --project .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj
 ```
 
 Kiểm tra:

@@ -2,9 +2,9 @@
 
 Trạng thái: **đã triển khai trong source local ngày 2026-09-17**
 
-Phạm vi: `BMS.IngestionApp` và bốn class library phục vụ ingestion
+Phạm vi: `BMS.Ingestion.App` và bốn class library phục vụ ingestion
 
-Không đổi: `FakeMetasysApi`, SQL schema, port 5100/5200, COV/SSE contract hoặc `DataverseSyncWorker`
+Không đổi: `BMS.Fake.App`, SQL schema, port 5100/5200, COV/SSE contract hoặc `DataverseSyncWorker`
 
 Tài liệu này vừa là implementation reference, vừa là bài thực hành để có thể tự làm lại.
 Docs UI tương tác nằm tại `docs/interactive/bms-ingestion-refactor-lab/index.html`.
@@ -15,20 +15,20 @@ Tên project dùng đúng theo source hiện tại:
 
 ```text
 MetasysPoc.sln
-├─ BmsIngestionApp/BMS.IngestionApp.csproj       Presentation / executable
-├─ BMS.Ingestion.Business/                       use case, ports, worker
-├─ BMS.Ingestion.Common/                         configuration dùng chung
-├─ BMS.Ingestion.Domain/                         model nghiệp vụ thuần
-└─ BMS.Ingestion.DataAccess/                     HTTP/SSE và SQL adapters
+├─ BMS.Ingestion/BMS.Ingestion.App/BMS.Ingestion.App.csproj       Presentation / executable
+├─ BMS.Ingestion/BMS.Ingestion.Business/                           use case, ports, worker
+├─ BMS.Ingestion/BMS.Ingestion.Common/                             configuration dùng chung
+├─ BMS.Ingestion/BMS.Ingestion.Domain/                             model nghiệp vụ thuần
+└─ BMS.Ingestion/BMS.Ingestion.DataAccess/                         HTTP/SSE và SQL adapters
 ```
 
 Luồng runtime không đổi:
 
 ```text
-FakeMetasysApi :5100
+BMS.Fake.App :5100
   └─ catalog JSON + COV SSE
           ↓
-BMS.IngestionApp :5200
+BMS.Ingestion.App :5200
   ├─ Presentation khởi động host và expose status API
   ├─ Business điều phối catalog → subscribe → event
   └─ DataAccess ghi SQL
@@ -50,12 +50,12 @@ phân biệt bằng class/folder `Services`.
 | `BMS.Ingestion.Common` | `AppSettings`, `MetasysSettings`, `SqlSettings`, runtime options | SQL command, HTTP call, business workflow |
 | `BMS.Ingestion.Business` | ports, `CovIngestionWorker`, status use case | `SqlConnection`, JSON/SSE implementation |
 | `BMS.Ingestion.DataAccess` | `MetasysClient`, `BmsReadingRepository` | endpoint, UI, app startup |
-| `BMS.IngestionApp` | `Program`, endpoint, DI/composition root, appsettings | SQL query và SSE parser |
+| `BMS.Ingestion.App` | `Program`, endpoint, DI/composition root, appsettings | SQL query và SSE parser |
 
 Quy tắc dependency:
 
 ```text
-BMS.IngestionApp
+BMS.Ingestion.App
   ├─→ DataAccess ─→ Business ─→ Domain
   │       ├───────────────┬───→ Common
   │       └───────────────└───→ Domain
@@ -70,7 +70,7 @@ Thực tế các project reference được phép:
 
 - `Business -> Common + Domain`
 - `DataAccess -> Business + Common + Domain`
-- `BMS.IngestionApp -> Business + Common + Domain + DataAccess`
+- `BMS.Ingestion.App -> Business + Common + Domain + DataAccess`
 - `Domain` không reference project nội bộ nào.
 
 Ý nghĩa quan trọng: Business khai báo nhu cầu qua interface; DataAccess implement nhu
@@ -151,7 +151,7 @@ Không dùng `MAX(id)` để kết luận Dataverse backlog đã giao xong.
 
 ## 4. Bản đồ file cũ sang file mới
 
-| File ban đầu trong `BmsIngestionApp` | File mới | Tại sao tách |
+| File ban đầu trong `BMS.Ingestion.App` | File mới | Tại sao tách |
 | --- | --- | --- |
 | `Models/CovEvent.cs` | `BMS.Ingestion.Domain/Models/CovEvent.cs` | Event là khái niệm nghiệp vụ thuần |
 | `Models/MetasysCatalog.cs` | `BMS.Ingestion.Domain/Models/BmsCatalog.cs` | Building/Equipment/Point là domain models |
@@ -163,7 +163,7 @@ Không dùng `MAX(id)` để kết luận Dataverse backlog đã giao xong.
 | `Services/IngestionStatusTracker.cs` | `BMS.Ingestion.Business/Services/IngestionStatusTracker.cs` | Theo dõi trạng thái use case |
 | `Services/MetasysClient.cs` | `BMS.Ingestion.DataAccess/Services/MetasysClient.cs` | HTTP/JSON/SSE là infrastructure |
 | `Services/BmsReadingRepository.cs` | `BMS.Ingestion.DataAccess/Services/BmsReadingRepository.cs` | SQL là infrastructure |
-| `Program.cs`, `Endpoints/`, `Hosting/` | giữ tại `BmsIngestionApp` | Presentation và composition root |
+| `Program.cs`, `Endpoints/`, `Hosting/` | giữ tại `BMS.Ingestion.App` | Presentation và composition root |
 
 ## 5. Làm lại từng bước
 
@@ -183,7 +183,7 @@ catalog trước subscription và `--no-sql` đều phải giữ nguyên.
 Các project đã được tạo sẵn, SDK-style, target `net10.0`:
 
 ```powershell
-Get-ChildItem .\BMS.Ingestion.*\*.csproj
+Get-ChildItem .\BMS.Ingestion\*\*.csproj
 dotnet sln .\MetasysPoc.sln list
 ```
 
@@ -196,32 +196,32 @@ dotnet new classlib -n BMS.Ingestion.Business -f net10.0
 dotnet new classlib -n BMS.Ingestion.DataAccess -f net10.0
 ```
 
-Không dùng template `.NET Framework 4.6.2`. Bốn skeleton cũ tên `BmsIngestion.*`
+Không dùng template `.NET Framework 4.6.2`. Bốn skeleton cũ tên `BMS.Ingestion.*`
 chỉ có `Class1.cs` đã được loại bỏ; chúng không phải bốn project hiện tại.
 
 ### Bước 2 — thêm project references đúng chiều
 
 ```powershell
-dotnet add .\BMS.Ingestion.Business reference .\BMS.Ingestion.Common
-dotnet add .\BMS.Ingestion.Business reference .\BMS.Ingestion.Domain
+dotnet add .\BMS.Ingestion\BMS.Ingestion.Business reference .\BMS.Ingestion\BMS.Ingestion.Common
+dotnet add .\BMS.Ingestion\BMS.Ingestion.Business reference .\BMS.Ingestion\BMS.Ingestion.Domain
 
-dotnet add .\BMS.Ingestion.DataAccess reference .\BMS.Ingestion.Business
-dotnet add .\BMS.Ingestion.DataAccess reference .\BMS.Ingestion.Common
-dotnet add .\BMS.Ingestion.DataAccess reference .\BMS.Ingestion.Domain
+dotnet add .\BMS.Ingestion\BMS.Ingestion.DataAccess reference .\BMS.Ingestion\BMS.Ingestion.Business
+dotnet add .\BMS.Ingestion\BMS.Ingestion.DataAccess reference .\BMS.Ingestion\BMS.Ingestion.Common
+dotnet add .\BMS.Ingestion\BMS.Ingestion.DataAccess reference .\BMS.Ingestion\BMS.Ingestion.Domain
 
-dotnet add .\BmsIngestionApp\BMS.IngestionApp.csproj reference .\BMS.Ingestion.Business
-dotnet add .\BmsIngestionApp\BMS.IngestionApp.csproj reference .\BMS.Ingestion.Common
-dotnet add .\BmsIngestionApp\BMS.IngestionApp.csproj reference .\BMS.Ingestion.Domain
-dotnet add .\BmsIngestionApp\BMS.IngestionApp.csproj reference .\BMS.Ingestion.DataAccess
+dotnet add .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj reference .\BMS.Ingestion\BMS.Ingestion.Business
+dotnet add .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj reference .\BMS.Ingestion\BMS.Ingestion.Common
+dotnet add .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj reference .\BMS.Ingestion\BMS.Ingestion.Domain
+dotnet add .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj reference .\BMS.Ingestion\BMS.Ingestion.DataAccess
 ```
 
 Business cần hosting/logging abstractions; DataAccess cần HTTP factory và SqlClient:
 
 ```powershell
-dotnet add .\BMS.Ingestion.Business package Microsoft.Extensions.Hosting.Abstractions --version 10.0.0
-dotnet add .\BMS.Ingestion.Business package Microsoft.Extensions.Logging.Abstractions --version 10.0.0
-dotnet add .\BMS.Ingestion.DataAccess package Microsoft.Extensions.Http --version 10.0.0
-dotnet add .\BMS.Ingestion.DataAccess package Microsoft.Data.SqlClient --version 7.0.2
+dotnet add .\BMS.Ingestion\BMS.Ingestion.Business package Microsoft.Extensions.Hosting.Abstractions --version 10.0.0
+dotnet add .\BMS.Ingestion\BMS.Ingestion.Business package Microsoft.Extensions.Logging.Abstractions --version 10.0.0
+dotnet add .\BMS.Ingestion\BMS.Ingestion.DataAccess package Microsoft.Extensions.Http --version 10.0.0
+dotnet add .\BMS.Ingestion\BMS.Ingestion.DataAccess package Microsoft.Data.SqlClient --version 7.0.2
 ```
 
 ### Bước 3 — tách Domain trước
@@ -307,7 +307,7 @@ Business không được import SQL/HTTP implementation. Kiểm tra:
 
 ```powershell
 rg -n "SqlConnection|Microsoft.Data.SqlClient|System.Net.Http.Json|HttpClient" `
-  .\BMS.Ingestion.Business .\BMS.Ingestion.Common .\BMS.Ingestion.Domain -g "*.cs"
+  .\BMS.Ingestion\BMS.Ingestion.Business .\BMS.Ingestion\BMS.Ingestion.Common .\BMS.Ingestion\BMS.Ingestion.Domain -g "*.cs"
 ```
 
 Kết quả mong đợi: không có match.
@@ -340,7 +340,7 @@ Không chuyển SQL string vào worker hoặc endpoint.
 
 ### Bước 8 — để Presentation chỉ compose ứng dụng
 
-`BmsIngestionApp` còn:
+`BMS.Ingestion.App` còn:
 
 ```text
 Program.cs
@@ -374,10 +374,10 @@ services.AddHostedService<CovIngestionWorker>();
 Tests reference trực tiếp project chứa type:
 
 ```powershell
-dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion.Domain
-dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion.Common
-dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion.Business
-dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion.DataAccess
+dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion\BMS.Ingestion.Domain
+dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion\BMS.Ingestion.Common
+dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion\BMS.Ingestion.Business
+dotnet add .\tests\MetasysPoc.Tests reference .\BMS.Ingestion\BMS.Ingestion.DataAccess
 ```
 
 Chỉ sửa `using`; không nới assertion để test pass. `CovIngestionWorkerTests` tiếp tục
@@ -395,7 +395,7 @@ git diff --check
 Receipt tại thời điểm triển khai:
 
 ```text
-Build: 4 BMS projects + BMS.IngestionApp thành công
+Build: 4 BMS.Ingestion libraries + BMS.Ingestion.App thành công
 Warnings: 0
 Errors: 0
 Tests: 35 passed, 0 failed, 0 skipped
@@ -406,13 +406,13 @@ Tests: 35 passed, 0 failed, 0 skipped
 Terminal 1:
 
 ```powershell
-dotnet run --project .\FakeMetasysApi -c Release --no-build
+dotnet run --project .\BMS.Fake\BMS.Fake.App\BMS.Fake.App.csproj -c Release --no-build
 ```
 
 Terminal 2:
 
 ```powershell
-dotnet run --project .\BmsIngestionApp\BMS.IngestionApp.csproj `
+dotnet run --project .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj `
   -c Release --no-build -- --no-sql
 ```
 
@@ -461,8 +461,8 @@ service độc lập và nằm ngoài scope.
 3. `BMS.Ingestion.Business/Services/CovIngestionWorker.cs`: luồng use case.
 4. `BMS.Ingestion.DataAccess/Services/MetasysClient.cs`: HTTP/SSE đáp ứng source port.
 5. `BMS.Ingestion.DataAccess/Services/BmsReadingRepository.cs`: SQL đáp ứng persistence port.
-6. `BmsIngestionApp/Hosting/ServiceCollectionExtensions.cs`: nối interface với class thật.
-7. `BmsIngestionApp/Endpoints/IngestionEndpoints.cs`: UI/API quan sát trạng thái.
+6. `BMS.Ingestion/BMS.Ingestion.App/Hosting/ServiceCollectionExtensions.cs`: nối interface với class thật.
+7. `BMS.Ingestion/BMS.Ingestion.App/Endpoints/IngestionEndpoints.cs`: UI/API quan sát trạng thái.
 8. Tests: xác nhận behavior không đổi sau refactor.
 
 ## 7. Ngoài phạm vi
@@ -471,12 +471,12 @@ service độc lập và nằm ngoài scope.
 - Không đổi deterministic identity/delivery ledger của `DataverseSyncWorker`.
 - Không provision/deploy Dataverse.
 - Không triển khai Azure hosting.
-- Không chứng minh kết nối Johnson Controls Metasys thật; `FakeMetasysApi` vẫn là simulator.
+- Không chứng minh kết nối Johnson Controls Metasys thật; `BMS.Fake.App` vẫn là simulator.
 
 ## 8. Definition of Done
 
 - Tất cả project dùng đúng prefix/name `BMS.Ingestion.*`.
-- Không còn source runtime dưới `BmsIngestionApp/Models`, `Services`, `Abstractions`.
+- Không còn source runtime dưới `BMS.Ingestion/BMS.Ingestion.App/Models`, `Services`, `Abstractions`.
 - Dependency đi đúng chiều; Business/Domain/Common không biết DataAccess.
 - Build Release thành công, không warning/error.
 - 35 tests pass.

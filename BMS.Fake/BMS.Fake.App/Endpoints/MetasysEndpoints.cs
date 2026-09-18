@@ -1,0 +1,129 @@
+using BMS.Ingestion.Domain.Models;
+using BMS.Fake.Business.Abstractions;
+using BMS.Fake.Business.Models;
+using System.Text.Json;
+
+
+namespace BMS.Fake.App.Endpoints;
+
+public static class MetasysEndpoints
+{
+    public static WebApplication MapMetasysEndpoints(this WebApplication app)
+    {
+        var sseJsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Fake Metasys API v1");
+            options.DocumentTitle = "Fake Metasys API";
+            options.DisplayRequestDuration();
+        });
+
+        app.MapGet("/", () => Results.Redirect("/swagger"))
+            .ExcludeFromDescription();
+
+        app.MapGet("/api/metasys/objects", (IMetasysPointStore store) => Results.Ok(store.GetAll()))
+            .WithTags("Metasys Objects")
+            .WithSummary("List all BMS points")
+            .Produces<IReadOnlyList<MetasysPoint>>();
+
+        app.MapGet("/api/metasys/buildings", (IMetasysPointStore store) => Results.Ok(store.GetBuildings()))
+            .WithTags("Metasys Catalog")
+            .WithSummary("List BMS buildings")
+            .Produces<IReadOnlyList<BmsBuilding>>();
+
+        app.MapGet("/api/metasys/equipment", (IMetasysPointStore store) => Results.Ok(store.GetEquipment()))
+            .WithTags("Metasys Catalog")
+            .WithSummary("List BMS equipment")
+            .Produces<IReadOnlyList<BmsEquipment>>();
+
+        app.MapGet("/api/metasys/objects/{objectId}", (string objectId, IMetasysPointStore store) =>
+        {
+            var point = store.Get(objectId);
+            return point is null
+                ? Results.NotFound(new { message = $"BMS point '{objectId}' was not found." })
+                : Results.Ok(point);
+        })
+            .WithTags("Metasys Objects")
+            .WithSummary("Get the current value of one BMS point")
+            .Produces<MetasysPoint>()
+            .Produces(StatusCodes.Status404NotFound);
+
+        app.MapPost("/api/metasys/subscriptions", (
+            SubscriptionRequest request,
+            IMetasysPointStore store,
+            ISubscriptionManager subscriptions) =>
+        {
+            var objectIds = request.ObjectIds
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            if (objectIds.Length == 0)
+            {
+                return Results.BadRequest(new { message = "At least one objectId is required." });
+            }
+
+            var unknownIds = objectIds.Where(id => !store.Exists(id)).ToArray();
+            if (unknownIds.Length > 0)
+            {
+                return Results.BadRequest(new
+                {
+                    message = "One or more BMS points do not exist.",
+                    unknownObjectIds = unknownIds
+                });
+            }
+
+            return Results.Ok(subscriptions.Create(objectIds));
+        })
+            .WithTags("COV Subscriptions")
+            .WithSummary("Subscribe to one or more BMS points")
+            .Produces<SubscriptionResponse>()
+            .Produces(StatusCodes.Status400BadRequest);
+
+        app.MapGet("/api/metasys/subscriptions/{subscriptionId}/stream", async (
+            string subscriptionId,
+            HttpContext context,
+            ISubscriptionManager subscriptions) =>
+        {
+            var subscription = subscriptions.Get(subscriptionId);
+            if (subscription is null)
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                await context.Response.WriteAsJsonAsync(
+                    new { message = $"Subscription '{subscriptionId}' was not found." },
+                    context.RequestAborted);
+                return;
+            }
+
+            context.Response.StatusCode = StatusCodes.Status200OK;
+            context.Response.ContentType = "text/event-stream";
+            context.Response.Headers.CacheControl = "no-cache";
+            context.Response.Headers.Connection = "keep-alive";
+
+            await context.Response.WriteAsync("retry: 3000\n\n", context.RequestAborted);
+            await context.Response.Body.FlushAsync(context.RequestAborted);
+
+            try
+            {
+                await foreach (var covEvent in subscription.Events.Reader.ReadAllAsync(context.RequestAborted))
+                {
+                    await context.Response.WriteAsync("event: cov\n", context.RequestAborted);
+                    await context.Response.WriteAsync(
+                        $"data: {JsonSerializer.Serialize(covEvent, sseJsonOptions)}\n\n",
+                        context.RequestAborted);
+                    await context.Response.Body.FlushAsync(context.RequestAborted);
+                }
+            }
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            {
+                // The SSE client closed the connection.
+            }
+        })
+            .WithTags("COV Subscriptions")
+            .WithSummary("Open the Server-Sent Events COV stream")
+            .Produces(StatusCodes.Status200OK, contentType: "text/event-stream")
+            .Produces(StatusCodes.Status404NotFound);
+        return app;
+    }
+}

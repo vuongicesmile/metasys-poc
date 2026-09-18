@@ -73,7 +73,7 @@ IF COL_LENGTH('raw.bms_reading', 'equipment_code') IS NULL
 GO
 
 -- Deterministic compatibility backfill for the five POC points. Catalog rows are
--- ingested from FakeMetasysApi; this only fills the relationship on old readings.
+-- ingested from BMS.Fake.App; this only fills the relationship on old readings.
 UPDATE raw.bms_reading
 SET equipment_code = CASE object_id
     WHEN 'WATER-001' THEN 'EQ-A-WM-001'

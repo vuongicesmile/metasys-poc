@@ -14,6 +14,7 @@ Start at the [documentation index](docs/README.md):
 - [User email notification operating runbook](docs/runbooks/user-email-notifications.vi.md)
 - [Interactive Custom API lab](docs/interactive/custom-api-lab/index.html)
 - [BMS ingestion layered refactor lab](docs/interactive/bms-ingestion-refactor-lab/index.html)
+- [Fake BMS services refactor plan](docs/plans/fake-bms-services-refactor.vi.md)
 - [SQL-to-Dataverse operating runbook](docs/runbooks/sql-to-dataverse-runbook.vi.md)
 - [Dataverse deployment and implemented contract](docs/reference/dataverse-deployment.md)
 - [FMC BMS Demo model-driven app runbook (Vietnamese)](docs/runbooks/model-driven-app-demo.vi.md)
@@ -138,13 +139,13 @@ idempotent and creates the database, schema, and table when missing. If it finds
 the earlier wide-table POC schema, it preserves its rows/columns and backfills
 the generic Plan 2.0 columns.
 
-Update `BmsIngestionApp/appsettings.json` if the SQL Server connection string is
+Update `BMS.Ingestion/BMS.Ingestion.App/appsettings.json` if the SQL Server connection string is
 different from the local Windows-authenticated default.
 
 ## 2. Start the fake Metasys API
 
 ```powershell
-dotnet run --project .\FakeMetasysApi
+dotnet run --project .\BMS.Fake\BMS.Fake.App\BMS.Fake.App.csproj
 ```
 
 The API listens on `http://localhost:5100` and exposes:
@@ -164,7 +165,7 @@ The API listens on `http://localhost:5100` and exposes:
 In a second terminal:
 
 ```powershell
-dotnet run --project .\BmsIngestionApp
+dotnet run --project .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj
 ```
 
 The ingestion service listens on `http://localhost:5200`:
@@ -177,7 +178,7 @@ The ingestion service listens on `http://localhost:5200`:
 For an API/SSE-only smoke test that does not connect to SQL Server:
 
 ```powershell
-dotnet run --project .\BmsIngestionApp -- --no-sql
+dotnet run --project .\BMS.Ingestion\BMS.Ingestion.App\BMS.Ingestion.App.csproj -- --no-sql
 ```
 
 The simulator updates the five in-memory BMS points every three seconds. Ingestion

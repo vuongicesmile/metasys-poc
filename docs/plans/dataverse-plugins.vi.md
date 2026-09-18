@@ -41,7 +41,7 @@ Point; thêm `fmc_bmsreading` elastic để giữ history theo retention.
 
 Các điểm quyết định thiết kế:
 
-- [Fake store](../../FakeMetasysApi/Services/MetasysPointStore.cs) định nghĩa catalog và mapping mặc định.
+- [Fake store](../../BMS.Fake/BMS.Fake.DataAccess/Services/MetasysPointStore.cs) định nghĩa catalog và mapping mặc định.
 - [Provisioner](../../DataverseSyncWorker/Services/DataverseProvisioner.BmsRelations.cs) đặt `fmc_buildingid` là `ApplicationRequired`; Point → Equipment vẫn optional để hỗ trợ dữ liệu cũ.
 - [ReadingMapper](../../DataverseSyncWorker/Services/ReadingMapper.cs) tạo GUID từ SourceId và source key; payload Equipment luôn có Building lookup.
 - [DataverseWriter](../../DataverseSyncWorker/Services/DataverseWriter.cs) dùng `UpsertRequest` cho standard tables; elastic history dùng `UpsertMultiple`.

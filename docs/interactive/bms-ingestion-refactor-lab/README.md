@@ -1,6 +1,6 @@
 # BMS Ingestion Refactor Lab
 
-Trang thực hành local cho kế hoạch tách `BmsIngestionApp` thành Presentation,
+Trang thực hành local cho kế hoạch tách `BMS.Ingestion.App` thành Presentation,
 Business, Common, Metasys adapter và SQL adapter. Trang không gọi SQL, Dataverse
 hoặc dịch vụ cloud.
 

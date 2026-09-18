@@ -1,8 +1,8 @@
 USE [FM_Central];
 GO
 
--- Idempotent demo fixture matching FakeMetasysApi. The normal runtime path is
--- Fake API -> BmsIngestionApp -> these SQL catalog tables.
+-- Idempotent demo fixture matching BMS.Fake.App. The normal runtime path is
+-- Fake API -> BMS.Ingestion.App -> these SQL catalog tables.
 MERGE raw.bms_building AS target
 USING (VALUES
     ('BLDG-A',    N'Building A',    'Building A',    N'Building in the Fake Metasys BMS fixture.'),

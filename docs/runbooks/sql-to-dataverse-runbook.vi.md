@@ -152,7 +152,7 @@ Dữ liệu đã giao không bị tạo bản sao chỉ vì mở lại worker. D
 TTL được bỏ qua có chủ đích, còn SQL vẫn giữ lịch sử đầy đủ.
 
 Nguồn phát sinh SQL hoạt động độc lập. Nếu cần dữ liệu giả mới cho demo, chạy
-FakeMetasysApi và BmsIngestionApp theo [README](../../README.md). File kích hoạt này
+`BMS.Fake.App` và `BMS.Ingestion.App` theo [README](../../README.md). File kích hoạt này
 chỉ vận hành đoạn SQL → Dataverse, không tạo thêm dữ liệu giả.
 
 ## 6. Kiểm tra kết quả và xử lý tình huống

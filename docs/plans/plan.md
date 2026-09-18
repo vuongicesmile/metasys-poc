@@ -8,7 +8,7 @@ Mở rộng dữ liệu giả lập thành ba thực thể nghiệp vụ và gi�
 
 ```mermaid
 flowchart LR
-    F[FakeMetasysApi<br/>3 Building / 4 Equipment / 5 Point] --> I[BmsIngestionApp]
+    F[BMS.Fake.App<br/>3 Building / 4 Equipment / 5 Point] --> I[BMS.Ingestion.App]
     I --> B[(raw.bms_building)]
     I --> E[(raw.bms_equipment)]
     I --> R[(raw.bms_reading)]
@@ -66,4 +66,4 @@ Quan hệ: `Building 1:N Equipment 1:N Point`. Hai Point test cùng trỏ vào m
 
 ## Giới hạn
 
-Dữ liệu là fixture của FakeMetasysApi, chưa chứng minh kết nối đến Johnson Controls Metasys thật. SQL vẫn là system of record cho full history; Dataverse history có TTL.
+Dữ liệu là fixture của BMS.Fake.App, chưa chứng minh kết nối đến Johnson Controls Metasys thật. SQL vẫn là system of record cho full history; Dataverse history có TTL.

@@ -10,9 +10,9 @@ Refactor ngày 2026-09-12–13 tách phần khởi tạo ứng dụng, điều p
 | Dependency injection | `Hosting/ServiceCollectionExtensions.cs` | Chọn implementation, cấu hình và lifetime |
 | API HTTP | `Endpoints/` | Route, request/response, Swagger; gọi service xử lý |
 | Hợp đồng service | `Abstractions/` | Interface tại các ranh giới cần thay thế hoặc kiểm thử |
-| Ingestion | `BmsIngestionApp/Services/CovIngestionWorker.cs` | Đọc catalog → lưu catalog nếu bật SQL → subscribe → nhận event → lưu reading |
-| Metasys transport | `BmsIngestionApp/Services/MetasysClient.cs` | HTTP, JSON, subscription, đọc SSE và giải phóng connection |
-| Lưu dữ liệu nguồn | `BmsIngestionApp/Services/BmsReadingRepository.cs` | Upsert catalog và append SQL readings |
+| Ingestion | `BMS.Ingestion/BMS.Ingestion.Business/Services/CovIngestionWorker.cs` | Đọc catalog → lưu catalog nếu bật SQL → subscribe → nhận event → lưu reading |
+| Metasys transport | `BMS.Ingestion/BMS.Ingestion.DataAccess/Services/MetasysClient.cs` | HTTP, JSON, subscription, đọc SSE và giải phóng connection |
+| Lưu dữ liệu nguồn | `BMS.Ingestion/BMS.Ingestion.DataAccess/Services/BmsReadingRepository.cs` | Upsert catalog và append SQL readings |
 | Xử lý request sync | `DataverseSyncWorker/Services/CommandProcessor.cs` | Claim request, chốt cutoff, điều phối batch, progress, requeue và completion |
 | Đồng bộ một batch | `DataverseSyncWorker/Services/SyncEngine.cs` | Lock, đọc ledger, mapping, ghi Dataverse, Ack/quarantine |
 | Lệnh bảo trì | `DataverseSyncWorker/Hosting/WorkerCommandLine.cs`, `WorkerCommandDispatcher.cs` | Tách cờ CLI khỏi host và thực thi lệnh trước khi khởi động background worker |
@@ -25,7 +25,7 @@ Không ép mọi class có interface. `ISyncLedger` chỉ cung cấp hai phép �
 
 ## 2. Luồng dữ liệu và lifetime
 
-1. `FakeMetasysApi` phát catalog và COV qua SSE.
+1. `BMS.Fake.App` phát catalog và COV qua SSE.
 2. `CovIngestionWorker` gọi `IMetasysClient.ReadCatalogAsync`, lưu catalog rồi subscribe các Object ID.
 3. `MetasysClient.ReadEventsAsync` chuyển từng dòng SSE thành `CovEvent`. Worker cập nhật trạng thái và gọi repository khi bật SQL. Chế độ `--no-sql` không gọi persistence.
 4. SQL giữ đầy đủ lịch sử nguồn. `SyncWorker` chạy liên tục hoặc nhận yêu cầu ở chế độ CommandDriven.
