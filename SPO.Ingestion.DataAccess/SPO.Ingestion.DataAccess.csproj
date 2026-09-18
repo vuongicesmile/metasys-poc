@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SPO.Ingestion.Business\SPO.Ingestion.Business.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Domain\SPO.Ingestion.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.29.2" />
+    <PackageReference Include="Azure.Storage.Queues" Version="12.27.1" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.2.27" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
+  </ItemGroup>
+</Project>

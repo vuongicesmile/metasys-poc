@@ -2,8 +2,10 @@
 
 Ngày cập nhật: 2026-09-14. Trạng thái: **Core/CLI/Azure Functions và hạ tầng Bicep đã implement local; chưa deploy cloud**.
 
-Implementation hiện nằm tại `SpoIngestion.Core`, `SpoIngestion.Cli`,
-`SpoIngestion.Functions`, `config/spo-ingestion.json` và `infra/spo-ingestion`.
+Implementation hiện nằm tại các layer `SPO.Ingestion.Domain`,
+`SPO.Ingestion.Common`, `SPO.Ingestion.Business`, `SPO.Ingestion.DataAccess`,
+`SPO.Ingestion.App`, cùng `SPO.Ingestion.Cli`,
+`SPO.Ingestion.Functions`, `config/spo-ingestion.json` và `infra/spo-ingestion`.
 Runbook triển khai/test là [spo-cloud-ingestion-service.vi.md](../runbooks/spo-cloud-ingestion-service.vi.md).
 Account Azure được kiểm tra ngày 2026-09-14 chỉ có tenant-level context, không có
 subscription; vì vậy chưa tạo Storage/Function App/flow và chưa ghi SPO data vào Dataverse.
@@ -238,7 +240,7 @@ và status UI vẫn phải tạo/bind sau khi có Azure subscription và connect
 | SpoBronzeWriter | Identity, ownership, dependency và Dataverse writes |
 | SpoDeliveryLedger | Row outcomes, target GUID/partition trong Blob receipts |
 | SpoReconciler | Ready jobs, retry, scan/checkpoint recovery |
-| SpoIngestion.Functions | Azure host, queue consumer, scheduler, telemetry |
+| SPO.Ingestion.Functions | Azure host, queue consumer, scheduler, telemetry |
 
 Reuse behavior đã kiểm chứng từ
 [DataverseWriter](../../DataverseSyncWorker/Services/DataverseWriter.cs) và

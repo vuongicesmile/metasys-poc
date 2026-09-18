@@ -35,7 +35,7 @@ Không tạo table/column Dataverse mới. Target vẫn là:
 | Water meter | `fmc_bmsequipment` | Enabled dưới Choice `WaterMeter` |
 | Electricity readings | `fmc_bmspoint`, `fmc_bmsreading` | Enabled |
 | Water readings | `fmc_bmspoint`, `fmc_bmsreading` | Enabled |
-| Electric meter catalog | Không có target chuẩn | Disabled |
+| Electric meter catalog | `fmc_bmsequipment` | Enabled dưới Choice `ElectricMeter` |
 | Fault/Maintenance/KPI | Không có target chuẩn | Disabled |
 
 Các file chính:
@@ -43,12 +43,12 @@ Các file chính:
 | File/project | Ý nghĩa |
 | --- | --- |
 | `config/spo-ingestion.json` | Route folder → mapper, allowlist extension, row/file limits, UTC offset |
-| `SpoIngestion.Core/TabularParser.cs` | CSV quoted newline, JSON array, XLSX sheet; reject formula và zip expansion quá lớn |
-| `SpoIngestion.Core/SpoBronzeMapper.cs` | Typed Dataverse `Entity`, decimal 4 số, UTC, stable GUID/partition, TTL |
-| `SpoIngestion.Core/DataverseBronzeWriter.cs` | Resolve alternate key/lookup, ownership, current-state concurrency và batch history |
-| `SpoIngestion.Core/BlobJobStore.cs` | Raw hash, JobKey, manifest, queue, lease, receipt |
-| `SpoIngestion.Core/SpoJobProcessor.cs` | Validate-first, chunk file lớn, dependency retry và terminal status |
-| `SpoIngestion.Functions/Functions.cs` | HTTP finalizer, queue consumer và 5-minute reconciler |
+| `SPO.Ingestion.Business/TabularParser.cs` | CSV quoted newline, JSON array, XLSX sheet; reject formula và zip expansion quá lớn |
+| `SPO.Ingestion.Business/SpoBronzeMapper.cs` | Typed Dataverse `Entity`, decimal 4 số, UTC, stable GUID/partition, TTL |
+| `SPO.Ingestion.DataAccess/DataverseBronzeWriter.cs` | Resolve alternate key/lookup, ownership, current-state concurrency và batch history |
+| `SPO.Ingestion.DataAccess/BlobJobStore.cs` | Raw hash, JobKey, manifest, queue, lease, receipt |
+| `SPO.Ingestion.Business/SpoJobProcessor.cs` | Validate-first, chunk file lớn, dependency retry và terminal status |
+| `SPO.Ingestion.Functions/Functions.cs` | HTTP finalizer, queue consumer và 5-minute reconciler |
 | `infra/spo-ingestion/main.bicep` | Storage, containers, queue, Windows Consumption Function App và Application Insights |
 | `scripts/deploy-spo-ingestion.ps1` | Deploy hạ tầng, publish ZIP và deploy Function code |
 
@@ -61,7 +61,8 @@ Các file chính:
 - Point dùng identity tương thích SQL worker: `metasys-point|FMC|objectId`.
 - SPO history dùng identity riêng: `spo-reading|sourceNamespace|meter|UTC timestamp|metric`; ordinal/file name không phải business identity.
 - History TTL tính từ event time. Event hết hạn vẫn có thể cập nhật current Point nhưng không được cấp TTL mới.
-- Water Point phải resolve `fmc_bmsequipment` theo alternate key thật. Equipment phải resolve Building thật. File con đến trước file cha chuyển `WaitingDependency`, reconciler thử lại mỗi 5 phút, tối đa 12 attempt.
+- Water và Electricity Point phải resolve `fmc_bmsequipment` theo alternate key thật. Equipment phải resolve Building thật. File con đến trước file cha chuyển `WaitingDependency`, reconciler thử lại mỗi 5 phút, tối đa 12 attempt.
+- Điện được chuẩn hóa còn hai Object Type: `Energy` dùng `kWh` và `Demand` dùng `kW`. Cột `voltage_v` và `power_factor` không tạo Point để tránh làm danh mục Object Type khó hiểu.
 - Point đã có nhưng `fmc_sourcesystem` không phải `SharePoint` trả `SourceOwnershipConflict`, không overwrite source SQL tùy ý.
 - Job được lease 60 giây và renew mỗi 35 giây. Save terminal state bắt buộc đúng lease; stale worker không thể complete manifest.
 
@@ -73,7 +74,7 @@ Chạy từ root repository:
 dotnet restore .\MetasysPoc.sln
 dotnet build .\MetasysPoc.sln -c Release --no-restore
 dotnet test .\tests\MetasysPoc.Tests\MetasysPoc.Tests.csproj -c Release --no-restore
-dotnet run --project .\SpoIngestion.Cli -c Release --no-restore -- `
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-restore -- `
   preview-all --root .\data --config .\config\spo-ingestion.json `
   --utc-now 2026-09-14T00:00:00Z
 ```
@@ -91,7 +92,7 @@ dotnet test .\tests\MetasysPoc.Tests\MetasysPoc.Tests.csproj -c Release --no-bui
 Remove-Item Env:\RUN_SPO_AZURITE_TESTS
 ```
 
-Kết quả hiện tại: 34/34 tests pass, gồm raw SHA-256, cùng capture → cùng Job ID,
+Kết quả hiện tại: 40/40 tests pass, gồm raw SHA-256, cùng capture → cùng Job ID,
 conditional manifest save dưới Blob lease và cleanup containers/queue test riêng.
 
 Dry-run cố định trên bộ `data/` ngày 2026-09-14:
@@ -101,11 +102,13 @@ Dry-run cố định trên bộ `data/` ngày 2026-09-14:
 | Building | 120 | Ready → 120 Buildings |
 | Equipment | 1.921 | Invalid → 132 valid candidates, 1.789 `SPO-CHOICE`; validate-first nên ghi 0 |
 | Water meter | 120 | Ready → 120 Equipment |
-| Electricity | 172.800 | Ready → 960 Points, 360.960 retained Readings, 330.240 expired metrics |
+| Electric meter | 240 | Ready → 240 Equipment loại Electric Meter |
+| Electricity | 172.800 | Ready → 480 Points; retained/expired Readings tính theo 2 metrics và TTL tại thời điểm chạy |
 | Water | 86.400 | Ready → 240 Points, 90.240 retained Readings, 82.560 expired metrics |
 
-`equipment.csv` có AHU, Chiller, Fire Pump... nhưng Dataverse hiện chỉ chuẩn hóa
-`WaterMeter=789100000`, `TemperatureSensor=789100001`, `TestRig=789100002`.
+`equipment.xlsx` có AHU, Chiller, Fire Pump... nhưng Dataverse hiện chỉ chuẩn hóa
+`WaterMeter=789100000`, `TemperatureSensor=789100001`, `TestRig=789100002`,
+`ElectricMeter=789100003`.
 Config nhận thêm display aliases `Temperature Sensor` và `Test Rig` vào đúng value cũ.
 Do yêu cầu không đổi schema/Choice, service reject rõ thay vì ghi sai semantic.
 
@@ -205,13 +208,14 @@ cho phép và vẫn giữ giới hạn service 50 MiB.
 
 Flow event không tự ăn các file đã tồn tại trước khi bật. Sau khi flow On, dùng SharePoint UI:
 
-1. Upload lại hoặc sửa `building.csv` trong `FMC-Inbox/01-Master/Building`.
+1. Upload lại hoặc sửa `building.xlsx` trong `FMC-Inbox/01-Master/Building`.
 2. Đợi manifest Completed; mở Model-driven app → BMS Buildings, kiểm tra code/name.
-3. Upload lại `water_meter.csv`; sau Completed, kiểm tra BMS Equipment.
-4. Upload `water_reading_hourly.csv`; kiểm tra BMS Points trước, rồi retained BMS Readings.
-5. Upload `electricity_reading_hourly.csv`; kiểm tra 960 current points và history theo TTL.
-6. Upload lại đúng bytes/ETag event: có thể thêm queue message nhưng target identity không duplicate.
-7. Upload `equipment.csv`: run phải fail validation `SPO-CHOICE`, không có partial Equipment write.
+3. Upload lại `water_meter.xlsx`; sau Completed, kiểm tra BMS Equipment.
+4. Upload `water_reading_hourly.xlsx`; kiểm tra BMS Points trước, rồi retained BMS Readings.
+5. Upload `electric_meter.xlsx`; kiểm tra 240 Equipment có type `Electric Meter` và Building lookup.
+6. Upload `electricity_reading_hourly.xlsx`; kiểm tra 480 current points, chỉ có `Energy/kWh` và `Demand/kW`, tất cả có Equipment lookup.
+7. Upload lại đúng bytes/ETag event: có thể thêm queue message nhưng target identity không duplicate.
+8. Upload `equipment.xlsx`: run phải fail validation `SPO-CHOICE`, không có partial Equipment write.
 
 Trong Azure Portal:
 
@@ -227,7 +231,7 @@ Trong Azure Portal:
 - Chưa tạo event flow vì Blob connection và Function URL chưa tồn tại.
 - Chưa implement SharePoint List adapter/source registration, initial full-library scan,
   scan cursor, status/retry UI hoặc Silver refresh grouping (Phase 5-6).
-- Chưa mở rộng Choice Equipment; `equipment.csv` chủ động bị reject theo contract hiện tại.
+- Chưa mở rộng Choice Equipment; `equipment.xlsx` chủ động bị reject theo contract hiện tại.
 - Chưa chạy live Dataverse write/replay/load test; build và dry-run không thay thế deployment evidence.
 
 Khi có subscription, thực hiện section 4-7, lưu deployment outputs/run IDs dưới

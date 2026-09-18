@@ -5,8 +5,9 @@ using System.Text.Json;
 using ClosedXML.Excel;
 using CsvHelper;
 using CsvHelper.Configuration;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Core;
+namespace SPO.Ingestion.Business;
 
 public sealed class TabularParser
 {
@@ -70,6 +71,7 @@ public sealed class TabularParser
         if (range.CellsUsed().Any(cell => cell.HasFormula))
             throw new InvalidDataException("XLSX formulas are not accepted; upload materialized values.");
         var headers = range.FirstRow().Cells().Select(c => c.GetString()).ToArray();
+        if (headers.Length > 0) headers[0] = headers[0].TrimStart('\uFEFF');
         EnsureUnique(headers);
         var rows = new List<ParsedRow>();
         foreach (var row in range.RowsUsed().Skip(1))

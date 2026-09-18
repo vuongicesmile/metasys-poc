@@ -3,13 +3,11 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using SPO.Ingestion.Business.Abstractions;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Core;
-
-public interface ISpoBronzeWriter
-{
-    Task<BronzeWriteResult> Write(IReadOnlyList<BronzeRecord> records, CancellationToken cancellationToken);
-}
+namespace SPO.Ingestion.DataAccess;
 
 public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOptions options) : ISpoBronzeWriter
 {

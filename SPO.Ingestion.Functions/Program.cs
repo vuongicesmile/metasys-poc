@@ -1,7 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using SpoIngestion.Core;
+using SPO.Ingestion.App.Hosting;
+using SPO.Ingestion.Common;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -14,13 +15,7 @@ var host = new HostBuilder()
             ?? throw new InvalidOperationException("SpoStorage app setting is required.");
         var dataverse = Environment.GetEnvironmentVariable("DataverseConnectionString")
             ?? throw new InvalidOperationException("DataverseConnectionString app setting is required.");
-        services.AddSingleton(options);
-        services.AddSingleton(new BlobJobStore(storage, options));
-        services.AddSingleton<TabularParser>();
-        services.AddSingleton<SpoBronzeMapper>();
-        services.AddSingleton(new ServiceClient(dataverse));
-        services.AddSingleton<ISpoBronzeWriter, DataverseBronzeWriter>();
-        services.AddSingleton<SpoJobProcessor>();
+        services.AddSpoIngestionServices(options, storage, dataverse);
     })
     .Build();
 

@@ -3,9 +3,12 @@ using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using SpoIngestion.Core;
+using SPO.Ingestion.Business;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.DataAccess;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Functions;
+namespace SPO.Ingestion.Functions;
 
 public sealed class Functions(BlobJobStore store, SpoJobProcessor processor, SpoIngestionOptions options, ILogger<Functions> logger)
 {

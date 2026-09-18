@@ -3,7 +3,10 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using ClosedXML.Excel;
 using Microsoft.Xrm.Sdk;
-using SpoIngestion.Core;
+using SPO.Ingestion.Business;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.DataAccess;
+using SPO.Ingestion.Domain;
 
 namespace MetasysPoc.Tests;
 
@@ -14,7 +17,11 @@ public sealed class SpoIngestionTests
         SourceNamespace = "spo-test",
         SourceId = "FMC",
         HistoryTtlSeconds = 2_592_000,
-        EquipmentTypeChoices = new(StringComparer.OrdinalIgnoreCase) { ["WaterMeter"] = 789100000 }
+        EquipmentTypeChoices = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["WaterMeter"] = 789100000,
+            ["ElectricMeter"] = 789100003
+        }
     };
 
     [Fact]
@@ -78,6 +85,25 @@ public sealed class SpoIngestionTests
     }
 
     [Fact]
+    public void Xlsx_parser_strips_utf8_bom_from_the_first_header()
+    {
+        using var workbook = new XLWorkbook();
+        var sheet = workbook.AddWorksheet("Buildings");
+        sheet.Cell(1, 1).Value = "\uFEFFbuilding_id";
+        sheet.Cell(1, 2).Value = "building_name";
+        sheet.Cell(2, 1).Value = "BLD001";
+        sheet.Cell(2, 2).Value = "Demo";
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+
+        var rows = new TabularParser().Parse(stream, "xlsx", Source("building-v1") with { Sheet = "Buildings" });
+
+        Assert.Single(rows);
+        Assert.Equal("BLD001", rows[0].Values["building_id"]);
+    }
+
+    [Fact]
     public void Building_mapping_uses_the_existing_contract_and_deterministic_identity()
     {
         var row = Row(("building_id", "BLD001"), ("building_name", "Head Office"), ("city", "HCM"));
@@ -102,14 +128,33 @@ public sealed class SpoIngestionTests
         var result = new SpoBronzeMapper(Options).Map(source, [row], new DateTime(2026, 9, 14, 2, 0, 0, DateTimeKind.Utc));
 
         Assert.Empty(result.Issues);
-        Assert.Equal(8, result.Records.Count);
+        Assert.Equal(4, result.Records.Count);
+        Assert.Equal(2, result.Records.Count(x => x.Kind == BronzeRecordKind.Point));
+        Assert.DoesNotContain(result.Records, x => x.Entity.GetAttributeValue<string>("fmc_objecttype") is "Voltage" or "Power Factor");
         var point = result.Records.First(x => x.Kind == BronzeRecordKind.Point).Entity;
         var history = result.Records.First(x => x.Kind == BronzeRecordKind.History).Entity;
         Assert.Equal(new DateTime(2026, 9, 14, 1, 0, 0, DateTimeKind.Utc), point["fmc_lastreadingtime"]);
         Assert.Equal(1.2346m, point["fmc_currentvalue"]);
         Assert.False(point.Attributes.ContainsKey("fmc_lastsqlid"));
+        Assert.Equal("fmc_bmsequipment", point.GetAttributeValue<EntityReference>("fmc_equipmentid").LogicalName);
         Assert.False(history.Attributes.ContainsKey("fmc_sqlreadingid"));
         Assert.False(history.Attributes.ContainsKey("fmc_sqlingestedat"));
+    }
+
+    [Fact]
+    public void Electric_meter_mapping_creates_equipment_with_the_electric_meter_choice()
+    {
+        var row = Row(("electric_meter_id", "EM001"), ("building_id", "BLD001"),
+            ("meter_level", "Building"), ("meter_type", "Main"), ("voltage_level_v", "380"));
+
+        var result = new SpoBronzeMapper(Options).Map(Source("electric-meter-v1") with { OwnedKeyPrefix = "EM" }, [row], DateTime.UtcNow);
+
+        Assert.Empty(result.Issues);
+        var record = Assert.Single(result.Records);
+        Assert.Equal(BronzeRecordKind.Equipment, record.Kind);
+        Assert.Equal("EM001", record.Identity);
+        Assert.Equal("BLD001", record.ParentIdentity);
+        Assert.Equal(789100003, record.Entity.GetAttributeValue<OptionSetValue>("fmc_equipmenttype").Value);
     }
 
     [Fact]

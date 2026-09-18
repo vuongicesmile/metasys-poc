@@ -14,7 +14,11 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SpoIngestion.Core\SpoIngestion.Core.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.App\SPO.Ingestion.App.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Business\SPO.Ingestion.Business.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.DataAccess\SPO.Ingestion.DataAccess.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Domain\SPO.Ingestion.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\config\spo-ingestion.json" Link="config\spo-ingestion.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />

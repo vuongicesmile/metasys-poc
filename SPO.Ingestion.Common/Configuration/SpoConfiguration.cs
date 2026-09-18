@@ -1,7 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Core;
+namespace SPO.Ingestion.Common;
 
 public static class SpoConfiguration
 {

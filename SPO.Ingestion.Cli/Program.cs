@@ -1,15 +1,18 @@
 using System.Text.Json;
 using DataverseSyncWorker.Models;
 using DataverseSyncWorker.Services;
-using SpoIngestion.Core;
+using SPO.Ingestion.Business;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.DataAccess;
+using SPO.Ingestion.Domain;
 
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
     Console.WriteLine("Usage:");
-    Console.WriteLine("  SpoIngestion.Cli preview-all [--root <folder>] [--config <file>] [--utc-now <ISO timestamp>]");
-    Console.WriteLine("  SpoIngestion.Cli ingest-local [--root <folder>] [--config <file>] [--appsettings <file>] [--source <source-key>] [--utc-now <ISO timestamp>]");
-    Console.WriteLine("  SpoIngestion.Cli ingest-dataverse-once [--config <file>] [--appsettings <file>] [--max <1..100>] [--utc-now <ISO timestamp>]");
-    Console.WriteLine("  SpoIngestion.Cli watch-dataverse [--config <file>] [--appsettings <file>] [--max <1..100>] [--poll-seconds <seconds>]");
+    Console.WriteLine("  SPO.Ingestion.Cli preview-all [--root <folder>] [--config <file>] [--utc-now <ISO timestamp>]");
+    Console.WriteLine("  SPO.Ingestion.Cli ingest-local [--root <folder>] [--config <file>] [--appsettings <file>] [--source <source-key>] [--utc-now <ISO timestamp>] [--current-only]");
+    Console.WriteLine("  SPO.Ingestion.Cli ingest-dataverse-once [--config <file>] [--appsettings <file>] [--max <1..100>] [--utc-now <ISO timestamp>]");
+    Console.WriteLine("  SPO.Ingestion.Cli watch-dataverse [--config <file>] [--appsettings <file>] [--max <1..100>] [--poll-seconds <seconds>]");
     return;
 }
 string Arg(string name, string fallback)
@@ -66,6 +69,7 @@ if (args[0] == "ingest-local")
 {
     var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "DataverseSyncWorker", "appsettings.json")));
     var sourceKey = Arg("--source", "");
+    var currentOnly = args.Contains("--current-only", StringComparer.Ordinal);
     var dataverse = LoadDataverseOptions(appsettingsPath);
     using var connection = new DataverseConnection(dataverse);
     var writer = new DataverseBronzeWriter(connection.Get(), options);
@@ -74,7 +78,7 @@ if (args[0] == "ingest-local")
         .Where(x => x.Enabled && x.LocalSample is not null)
         .Where(x => string.IsNullOrWhiteSpace(sourceKey) || x.Key.Equals(sourceKey, StringComparison.OrdinalIgnoreCase))
         .OrderBy(x => x.Mapping.EndsWith("building-v1", StringComparison.Ordinal) ? 0 :
-            x.Mapping is "equipment-v1" or "water-meter-v1" ? 1 : 2)
+            x.Mapping is "equipment-v1" or "water-meter-v1" or "electric-meter-v1" ? 1 : 2)
         .ToArray();
     if (selected.Length == 0) throw new InvalidOperationException($"No enabled local sample matched source '{sourceKey}'.");
 
@@ -85,7 +89,7 @@ if (args[0] == "ingest-local")
         if (!File.Exists(file)) throw new FileNotFoundException($"Local sample not found for {source.Key}.", file);
         await using var content = File.OpenRead(file);
         var sourcePath = source.PathPrefix.TrimEnd('/') + "/" + Path.GetFileName(file);
-        var result = await runner.Process(content, sourcePath, utcNow, CancellationToken.None);
+        var result = await runner.Process(content, sourcePath, utcNow, CancellationToken.None, currentOnly);
         ingestResults.Add(result);
         Console.WriteLine(JsonSerializer.Serialize(new
         {

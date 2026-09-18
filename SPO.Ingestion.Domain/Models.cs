@@ -1,6 +1,6 @@
 using Microsoft.Xrm.Sdk;
 
-namespace SpoIngestion.Core;
+namespace SPO.Ingestion.Domain;
 
 public sealed record SpoSourceDefinition(
     string Key,

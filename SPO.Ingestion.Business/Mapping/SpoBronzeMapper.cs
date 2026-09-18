@@ -2,8 +2,9 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Xrm.Sdk;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Core;
+namespace SPO.Ingestion.Business;
 
 public sealed class SpoBronzeMapper(SpoIngestionOptions options)
 {
@@ -45,12 +46,15 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         return source.Mapping switch
         {
             "building-v1" => [Building(source, row)],
-            "equipment-v1" => [Equipment(source, row, false)],
-            "water-meter-v1" => [Equipment(source, row, true)],
+            "equipment-v1" => [Equipment(source, row, "equipment_id", null,
+                ["system_category", "floor_or_zone", "manufacturer", "model", "install_year", "rated_power_kw", "status", "criticality"])],
+            "water-meter-v1" => [Equipment(source, row, "water_meter_id", "WaterMeter",
+                ["meter_type", "pipe_diameter_mm", "status"])],
+            "electric-meter-v1" => [Equipment(source, row, "electric_meter_id", "ElectricMeter",
+                ["meter_level", "meter_type", "voltage_level_v", "contract_demand_kw", "utility_region", "status", "data_origin"])],
             "electricity-reading-v1" => Reading(row, "electric_meter_id",
-                [("energy_kwh", "Energy", "kWh"), ("demand_kw", "Demand", "kW"),
-                 ("voltage_v", "Voltage", "V"), ("power_factor", "Power Factor", "ratio")],
-                false, source, utcNow, expired),
+                [("energy_kwh", "Energy", "kWh"), ("demand_kw", "Demand", "kW")],
+                true, source, utcNow, expired),
             "water-reading-v1" => Reading(row, "water_meter_id",
                 [("consumption_m3", "Consumption", "m3"), ("flow_m3h", "Flow", "m3/h")],
                 true, source, utcNow, expired),
@@ -73,13 +77,13 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         return new(row.Ordinal, code, BronzeRecordKind.Building, entity);
     }
 
-    private BronzeRecord Equipment(SpoSourceDefinition source, ParsedRow row, bool waterMeter)
+    private BronzeRecord Equipment(SpoSourceDefinition source, ParsedRow row, string codeField,
+        string? fixedType, string[] descriptionFields)
     {
-        var codeField = waterMeter ? "water_meter_id" : "equipment_id";
         var code = Required(row, codeField, 100);
         RequireOwnedKey(source, row, code);
         var building = Required(row, "building_id", 50);
-        var type = waterMeter ? "WaterMeter" : Required(row, "equipment_type", 100);
+        var type = fixedType ?? Required(row, "equipment_type", 100);
         if (!options.EquipmentTypeChoices.TryGetValue(type, out var typeValue))
             throw new SpoContractException("SPO-CHOICE", row.Ordinal,
                 $"Equipment type '{type}' is not present in fmc_equipmenttype configuration.");
@@ -89,9 +93,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
             ["fmc_equipmentcode"] = code,
             ["fmc_equipmenttype"] = new OptionSetValue(typeValue),
             ["fmc_buildingid"] = new EntityReference("fmc_bmsbuilding", StableGuid($"metasys-building|{options.SourceId}|{building}")),
-            ["fmc_description"] = waterMeter
-                ? Describe(row, "meter_type", "pipe_diameter_mm", "status")
-                : Describe(row, "system_category", "floor_or_zone", "manufacturer", "model", "install_year", "rated_power_kw", "status", "criticality")
+            ["fmc_description"] = Describe(row, descriptionFields)
         };
         return new(row.Ordinal, code, BronzeRecordKind.Equipment, entity, ParentIdentity: building);
     }

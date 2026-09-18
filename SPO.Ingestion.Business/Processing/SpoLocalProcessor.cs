@@ -1,6 +1,9 @@
 using Microsoft.Xrm.Sdk;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.Business.Abstractions;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Core;
+namespace SPO.Ingestion.Business;
 
 public sealed record LocalIngestionResult(
     string Status,
@@ -29,11 +32,20 @@ public sealed class SpoLocalProcessor(
         Stream content,
         string sourcePath,
         DateTime utcNow,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool currentOnly = false)
     {
         var source = SpoConfiguration.Resolve(options, sourcePath);
         var rows = parser.Parse(content, Path.GetExtension(sourcePath), source);
         var validation = Validate(source, rows, utcNow);
+        if (currentOnly && source.Mapping.EndsWith("reading-v1", StringComparison.Ordinal))
+            validation = validation with
+            {
+                ExpiredHistory = 0,
+                TargetCounts = validation.TargetCounts
+                    .Where(x => x.Key == "fmc_bmspoint")
+                    .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase)
+            };
         if (validation.Issues.Count > 0)
         {
             return new("Invalid", source.Key, source.Mapping, sourcePath, rows.Count, 0,
@@ -64,6 +76,10 @@ public sealed class SpoLocalProcessor(
         var delivered = pointResult.Delivered;
         var skipped = pointResult.Skipped + validation.ExpiredHistory;
         var deliveredEvents = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (currentOnly)
+            return new("Completed", source.Key, source.Mapping, sourcePath, rows.Count,
+                delivered, skipped, validation.TargetCounts, [], receipts);
 
         foreach (var chunk in rows.Chunk(1000))
         {
@@ -117,7 +133,7 @@ public sealed class SpoLocalProcessor(
         if (pointIdentities.Count > 0) counts["fmc_bmspoint"] = pointIdentities.Count;
         if (historyIdentities.Count > 0) counts["fmc_bmsreading"] = historyIdentities.Count;
         if (source.Mapping is "building-v1") counts["fmc_bmsbuilding"] = catalogCount;
-        if (source.Mapping is "equipment-v1" or "water-meter-v1") counts["fmc_bmsequipment"] = catalogCount;
+        if (source.Mapping is "equipment-v1" or "water-meter-v1" or "electric-meter-v1") counts["fmc_bmsequipment"] = catalogCount;
         if (expired > 0) counts["SkippedExpiredHistory"] = expired;
         return new(issues, expired, counts);
     }

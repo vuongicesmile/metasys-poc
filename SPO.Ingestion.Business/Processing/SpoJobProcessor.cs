@@ -1,8 +1,12 @@
-namespace SpoIngestion.Core;
+using SPO.Ingestion.Business.Abstractions;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.Domain;
+
+namespace SPO.Ingestion.Business;
 
 public sealed class SpoJobProcessor(
     SpoIngestionOptions options,
-    BlobJobStore store,
+    ISpoJobStore store,
     TabularParser parser,
     SpoBronzeMapper mapper,
     ISpoBronzeWriter writer)

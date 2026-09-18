@@ -4,8 +4,10 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Core;
+namespace SPO.Ingestion.Business;
 
 public sealed record SpoInboxFileResult(
     Guid FileId,
@@ -230,7 +232,7 @@ public sealed class SpoDataverseInboxProcessor(
     private static int SourceOrder(SpoSourceDefinition? source) => source?.Mapping switch
     {
         "building-v1" => 0,
-        "equipment-v1" or "water-meter-v1" => 1,
+        "equipment-v1" or "water-meter-v1" or "electric-meter-v1" => 1,
         _ => 2
     };
 

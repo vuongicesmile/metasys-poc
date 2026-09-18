@@ -7,10 +7,13 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
+using SPO.Ingestion.Business.Abstractions;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.Domain;
 
-namespace SpoIngestion.Core;
+namespace SPO.Ingestion.DataAccess;
 
-public sealed class BlobJobStore
+public sealed class BlobJobStore : ISpoJobStore
 {
     private readonly BlobContainerClient raw;
     private readonly BlobContainerClient control;
@@ -74,12 +77,12 @@ public sealed class BlobJobStore
     public async Task<Stream> OpenRaw(SpoJobManifest job, CancellationToken ct) =>
         await raw.GetBlobClient(job.RawBlobName).OpenReadAsync(cancellationToken: ct);
 
-    public async Task<JobLease?> TryLease(string jobId, CancellationToken ct)
+    public async Task<SPO.Ingestion.Business.Abstractions.JobLease?> TryLease(string jobId, CancellationToken ct)
     {
         var lease = Manifest(jobId).GetBlobLeaseClient();
         try { await lease.AcquireAsync(TimeSpan.FromSeconds(60), cancellationToken: ct); }
         catch (RequestFailedException ex) when (ex.Status is 409 or 412) { return null; }
-        return new JobLease(lease, ct);
+        return new BlobJobLease(lease, ct);
     }
 
     public async Task Save(SpoJobManifest manifest, CancellationToken ct)
@@ -88,7 +91,7 @@ public sealed class BlobJobStore
         await Manifest(manifest.JobId).UploadAsync(BinaryData.FromObjectAsJson(manifest, SpoConfiguration.Json), overwrite: true, cancellationToken: ct);
     }
 
-    public async Task Save(SpoJobManifest manifest, JobLease lease, CancellationToken ct)
+    public async Task Save(SpoJobManifest manifest, SPO.Ingestion.Business.Abstractions.JobLease lease, CancellationToken ct)
     {
         manifest = manifest with { UpdatedAt = DateTimeOffset.UtcNow };
         await Manifest(manifest.JobId).UploadAsync(BinaryData.FromObjectAsJson(manifest, SpoConfiguration.Json),
@@ -117,14 +120,14 @@ public sealed class BlobJobStore
     private BlobClient Manifest(string jobId) => control.GetBlobClient($"manifests/{jobId}.json");
     private static string Hash(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
 
-    public sealed class JobLease : IAsyncDisposable
+    private sealed class BlobJobLease : IAsyncDisposable, SPO.Ingestion.Business.Abstractions.JobLease
     {
         private readonly BlobLeaseClient lease;
         private readonly CancellationTokenSource stop = new();
         private readonly CancellationTokenSource linked;
         private readonly Task renew;
         public string LeaseId => lease.LeaseId;
-        internal JobLease(BlobLeaseClient lease, CancellationToken outer)
+        internal BlobJobLease(BlobLeaseClient lease, CancellationToken outer)
         {
             this.lease = lease;
             linked = CancellationTokenSource.CreateLinkedTokenSource(stop.Token, outer);

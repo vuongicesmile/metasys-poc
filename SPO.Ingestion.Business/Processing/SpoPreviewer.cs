@@ -1,4 +1,7 @@
-namespace SpoIngestion.Core;
+using SPO.Ingestion.Common;
+using SPO.Ingestion.Domain;
+
+namespace SPO.Ingestion.Business;
 
 public sealed class SpoPreviewer(TabularParser parser, SpoBronzeMapper mapper)
 {

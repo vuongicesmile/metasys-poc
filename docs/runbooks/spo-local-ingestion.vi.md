@@ -9,10 +9,11 @@ ghi trực tiếp vào các Bronze table hiện có trong Dataverse.
 Không dùng flow archive cũ `FMC - Copy SPO Demo File (Manual)`. Flow cũ chỉ ghi
 binary vào `fmc_spofile`; local runner này ghi dữ liệu nghiệp vụ vào:
 
-- `building.csv` -> `fmc_bmsbuilding`
-- `water_meter.csv` -> `fmc_bmsequipment`
-- `electricity_reading_hourly.csv` -> `fmc_bmspoint` + `fmc_bmsreading`
-- `water_reading_hourly.csv` -> `fmc_bmspoint` + `fmc_bmsreading`
+- `building.xlsx` -> `fmc_bmsbuilding`
+- `electric_meter.xlsx` -> `fmc_bmsequipment` với Equipment Type `Electric Meter`
+- `water_meter.xlsx` -> `fmc_bmsequipment`
+- `electricity_reading_hourly.xlsx` -> `fmc_bmspoint` + `fmc_bmsreading`
+- `water_reading_hourly.xlsx` -> `fmc_bmspoint` + `fmc_bmsreading`
 
 ## Điều kiện
 
@@ -29,25 +30,32 @@ Từ repository root:
 ```powershell
 dotnet build .\MetasysPoc.sln -c Release
 
-dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json `
   --source spo-building --utc-now 2026-09-14T00:00:00Z
 ```
 
 `--source` là tùy chọn. Bỏ `--source` để chạy tất cả source enabled; runner tự
-xếp thứ tự Building -> Equipment/WaterMeter -> readings để lookup parent tồn tại
+xếp thứ tự Building -> Equipment/ElectricMeter/WaterMeter -> readings để lookup parent tồn tại
 trước. Receipt đầy đủ được lưu dưới `.artifacts/spo-local/`.
 
 Ví dụ chạy từng bước:
 
 ```powershell
-dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-building
 
-dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-water-meter
 
-dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+  ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-electric-meter
+
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+  ingest-local --root .\data --config .\config\spo-ingestion.json `
+  --source spo-electricity-reading --current-only
+
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-water-reading
 ```
 
@@ -63,13 +71,28 @@ dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
 5. Chạy lại cùng file không tạo duplicate; receipt phân biệt Delivered,
    SkippedOlderCurrent và duplicate.
 
+## Chuẩn dữ liệu điện
+
+- Mỗi row `electric_meter.xlsx` tạo một `fmc_bmsequipment` với Choice
+  `ElectricMeter=789100003` và lookup về Building.
+- Mỗi meter trong `electricity_reading_hourly.xlsx` chỉ tạo hai Point nghiệp vụ:
+  `Energy` (`kWh`) và `Demand` (`kW`). `voltage_v` và `power_factor` vẫn có thể
+  tồn tại trong file nguồn nhưng không được materialize thành Point.
+- Object ID ổn định là `<electric_meter_id>/energy_kwh` và
+  `<electric_meter_id>/demand_kw`. Cả hai Point bắt buộc lookup về Electric Meter.
+- Phải ingest `spo-electric-meter` trước `spo-electricity-reading`; nếu thiếu meter,
+  writer trả `WaitingDependency` thay vì tạo Point mồ côi.
+- `--current-only` chỉ materialize trạng thái mới nhất của từng Point và không replay
+  `fmc_bmsreading`. Dùng mode này khi cần dựng lại current state sau cleanup; bỏ flag
+  khi cần ingest đầy đủ history theo TTL.
+
 ## Kiểm tra sau khi chạy
 
 - Mở model-driven app, xem `BMS Buildings`, `BMS Equipment`, `BMS Points`.
 - Với readings, kiểm tra Point trước rồi kiểm tra `BMS Readings`.
 - Đọc file receipt mới nhất trong `.artifacts/spo-local/` để biết số row đã
   delivered/skipped và GUID Dataverse.
-- `equipment.csv` hiện có nhiều `equipment_type` ngoài Choice contract nên phải
+- `equipment.xlsx` hiện có nhiều `equipment_type` ngoài Choice contract nên phải
   trả `Invalid/SPO-CHOICE`; đó là hành vi đúng, không tự mở rộng schema.
 
 ## Nút Sync SharePoint với dữ liệu cloud thật
@@ -106,7 +129,7 @@ nút có thể quét lại an toàn mà không import lại phiên bản cũ.
 Launcher mở hai cửa sổ độc lập:
 
 - `DataverseSyncWorker` chạy `CommandDriven` và chờ `fmc_syncrequest` của SQL.
-- `SpoIngestion.Cli watch-dataverse` chờ phiên bản file đã archive trong `fmc_spofile`.
+- `SPO.Ingestion.Cli watch-dataverse` chờ phiên bản file đã archive trong `fmc_spofile`.
 
 Sau đó mở `FMC BMS Demo` → `Power Automate Demo` → bấm **Sync All now**:
 
@@ -130,7 +153,7 @@ chưa hoàn tất cho đến khi worker tương ứng chạy lại.
 Chạy liên tục trước khi bấm nút trong app:
 
 ```powershell
-dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   watch-dataverse --config .\config\spo-ingestion.json `
   --appsettings .\DataverseSyncWorker\appsettings.json `
   --max 20 --poll-seconds 10
@@ -146,7 +169,7 @@ dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
 Muốn test một vòng rồi thoát:
 
 ```powershell
-dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-dataverse-once --config .\config\spo-ingestion.json `
   --appsettings .\DataverseSyncWorker\appsettings.json --max 20
 ```
@@ -167,7 +190,7 @@ dotnet run --project .\SpoIngestion.Cli -c Release --no-build -- `
 File mới:
 
 1. Upload một file vào đúng folder mapping, ví dụ
-   `FMC-Inbox/01-Master/Building/building.csv`.
+   `FMC-Inbox/01-Master/Building/building.xlsx`.
 2. Bấm nút; flow tạo một `fmc_spofile`, archive binary và local consumer import.
 
 File cập nhật:
@@ -181,10 +204,11 @@ File cập nhật:
 
 ### 4. Folder được nhận
 
-Flow chỉ archive `.csv`, `.json`, `.xlsx` trong các prefix đang enabled:
+Flow chỉ archive `.xlsx` trong các prefix đang enabled:
 
 - `/Shared Documents/FMC-Inbox/01-Master/Building/`
 - `/Shared Documents/FMC-Inbox/01-Master/Equipment/`
+- `/Shared Documents/FMC-Inbox/01-Master/ElectricMeter/`
 - `/Shared Documents/FMC-Inbox/01-Master/WaterMeter/`
 - `/Shared Documents/FMC-Inbox/02-Telemetry/Electricity/`
 - `/Shared Documents/FMC-Inbox/02-Telemetry/Water/`

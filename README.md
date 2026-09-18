@@ -24,7 +24,9 @@ Start at the [documentation index](docs/README.md):
 
 ## SharePoint cloud ingestion
 
-`SpoIngestion.Core`, `SpoIngestion.Cli` and `SpoIngestion.Functions` implement the
+`SPO.Ingestion.Domain`, `SPO.Ingestion.Common`, `SPO.Ingestion.Business`,
+`SPO.Ingestion.DataAccess`, `SPO.Ingestion.App`, `SPO.Ingestion.Cli` and
+`SPO.Ingestion.Functions` implement the
 cloud-ready SharePoint file path: CSV/JSON/XLSX raw snapshots in Azure Blob Storage,
 durable queue/lease processing and typed writes into the existing BMS Bronze tables.
 No new Dataverse table or column is provisioned. Azure deployment is currently
@@ -32,7 +34,7 @@ prepared but not executed because the checked account has no Azure subscription.
 See the [SPO runbook](docs/runbooks/spo-cloud-ingestion-service.vi.md) for dry-run,
 deployment, Power Automate capture-flow and UI test steps.
 
-When Azure hosting is unavailable, `SpoIngestion.Cli ingest-local` reuses the same
+When Azure hosting is unavailable, `SPO.Ingestion.Cli ingest-local` reuses the same
 parser, mapper and Dataverse writer to process local copies of SharePoint files.
 For real SharePoint files without Azure hosting, **Sync SharePoint now** asks Power
 Automate to archive new/updated versions in `fmc_spofile`; `watch-dataverse` then

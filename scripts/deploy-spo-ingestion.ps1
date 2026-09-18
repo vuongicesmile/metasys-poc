@@ -56,7 +56,7 @@ if (Test-Path -LiteralPath $publishFolder) {
     Remove-Item -LiteralPath $resolved -Recurse -Force
 }
 New-Item -ItemType Directory -Path $publishFolder -Force | Out-Null
-dotnet publish (Join-Path $repository 'SpoIngestion.Functions\SpoIngestion.Functions.csproj') -c Release -o $publishFolder
+dotnet publish (Join-Path $repository 'SPO.Ingestion.Functions\SPO.Ingestion.Functions.csproj') -c Release -o $publishFolder
 Assert-NativeCommand 'Publish SPO Function project'
 
 if (Test-Path -LiteralPath $package) {

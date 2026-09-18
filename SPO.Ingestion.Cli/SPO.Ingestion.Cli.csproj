@@ -6,7 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SpoIngestion.Core\SpoIngestion.Core.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.App\SPO.Ingestion.App.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Business\SPO.Ingestion.Business.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.DataAccess\SPO.Ingestion.DataAccess.csproj" />
+    <ProjectReference Include="..\SPO.Ingestion.Domain\SPO.Ingestion.Domain.csproj" />
     <ProjectReference Include="..\DataverseSyncWorker\DataverseSyncWorker.csproj" />
   </ItemGroup>
   <ItemGroup>
