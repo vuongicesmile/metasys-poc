@@ -2,6 +2,8 @@ using DataverseSyncWorker.Abstractions;
 using DataverseSyncWorker.Models;
 using System.ServiceModel;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace DataverseSyncWorker.Services;
 
@@ -31,7 +33,7 @@ public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, S
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
             catch (Exception ex) when (ex is InvalidOperationException ||
-                ex is FaultException<OrganizationServiceFault> && !DataverseWriter.IsTransient(ex))
+                ex is FaultException<OrganizationServiceFault> && !DataverseRetryPolicy.IsTransient(ex))
             {
                 status.Set(new("Blocked", DateTime.UtcNow, Error: "Configuration, authentication, schema or permanent Dataverse error. Correct the cause and restart; SQL delivery remains pending."));
                 logger.LogWarning("Sync requires attention ({ErrorType}). No automatic retry for permanent failures", ex.GetType().Name);

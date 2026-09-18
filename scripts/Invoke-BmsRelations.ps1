@@ -22,7 +22,7 @@ $relationDll = Join-Path $relationOutput 'DataverseSyncWorker.dll'
 if (-not $Manifest) { $Manifest = Join-Path $relationRepo 'config\bms-relations.seed.json' }
 if ($Receipt -and $Mode -ne 'Apply') { throw 'Receipt can only be supplied with Mode Apply.' }
 if (-not $NoBuild) {
-    & dotnet build (Join-Path $relationRepo 'DataverseSyncWorker\DataverseSyncWorker.csproj') --configuration Release --artifacts-path (Join-Path $relationRepo '.artifacts\bms-relations\build') --output $relationOutput -p:UseAppHost=false
+    & dotnet build (Join-Path $relationRepo 'Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj') --configuration Release --artifacts-path (Join-Path $relationRepo '.artifacts\bms-relations\build') --output $relationOutput -p:UseAppHost=false
     if ($LASTEXITCODE -ne 0) { throw "Build failed: $LASTEXITCODE" }
 }
 if (-not (Test-Path -LiteralPath $relationDll)) { throw 'Relationship command has not been built. Run without -NoBuild.' }

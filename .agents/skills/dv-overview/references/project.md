@@ -21,25 +21,25 @@ when a task depends on it.
 | Worker mode | CommandDriven (Dataverse request queue) |
 
 Read [deployment notes](../../../../docs/reference/dataverse-deployment.md),
-[options](../../../../DataverseSyncWorker/Models/SyncOptions.cs) and
-[configuration](../../../../DataverseSyncWorker/appsettings.json) for changes
+[options](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.Common/Configuration/SyncOptions.cs) and
+[configuration](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json) for changes
 to this baseline. Public identifiers above do not supply credentials.
 
 ## Implementation map
 
 | Concern | File |
 | --- | --- |
-| Auth and WhoAmI organization guard | [DataverseConnection.cs](../../../../DataverseSyncWorker/Services/DataverseConnection.cs) |
-| Schema, solution, role and view provisioning | [DataverseProvisioner.cs](../../../../DataverseSyncWorker/Services/DataverseProvisioner.cs) |
-| Deterministic identity, UTC, values and TTL | [ReadingMapper.cs](../../../../DataverseSyncWorker/Services/ReadingMapper.cs) |
-| Source reads, delivery ledger and locks | [SqlStore.cs](../../../../DataverseSyncWorker/Services/SqlStore.cs) |
-| Batch orchestration and acknowledgement | [SyncEngine.cs](../../../../DataverseSyncWorker/Services/SyncEngine.cs) |
-| Remote writes and retry handling | [DataverseWriter.cs](../../../../DataverseSyncWorker/Services/DataverseWriter.cs) |
-| Self-test and live sample checks | [Verification.cs](../../../../DataverseSyncWorker/Services/Verification.cs) |
-| Command modes and endpoints | [Program.cs](../../../../DataverseSyncWorker/Program.cs) |
-| Request claim, lease and progress | [SyncRequestStore.cs](../../../../DataverseSyncWorker/Services/SyncRequestStore.cs) |
-| Command-driven orchestration | [CommandProcessor.cs](../../../../DataverseSyncWorker/Services/CommandProcessor.cs) |
-| Flow/connection/environment-variable provisioning | [PowerAutomateProvisioner.cs](../../../../DataverseSyncWorker/Services/PowerAutomateProvisioner.cs) |
+| Auth and WhoAmI organization guard | [DataverseConnection.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseConnection.cs) |
+| Schema, solution, role and view provisioning | [DataverseProvisioner.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseProvisioner.cs) |
+| Deterministic identity, UTC, values and TTL | [ReadingMapper.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/ReadingMapper.cs) |
+| Source reads, delivery ledger and locks | [SqlStore.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SqlStore.cs) |
+| Batch orchestration and acknowledgement | [SyncEngine.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs) |
+| Remote writes and retry handling | [DataverseWriter.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseWriter.cs) |
+| Self-test and live sample checks | [Verification.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/Verification.cs) |
+| Command modes and endpoints | [Program.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.App/Program.cs) |
+| Request claim, lease and progress | [SyncRequestStore.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncRequestStore.cs) |
+| Command-driven orchestration | [CommandProcessor.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/CommandProcessor.cs) |
+| Flow/connection/environment-variable provisioning | [PowerAutomateProvisioner.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/PowerAutomateProvisioner.cs) |
 | SQL integration schema | [create-dataverse-sync-tables.sql](../../../../sql/create-dataverse-sync-tables.sql) |
 
 History GUID is derived from SourceId + SQL id; point GUID from SourceId +
@@ -61,7 +61,7 @@ invokes Azure CLI to obtain a token. Do not display its normal stdout.
 A token-only probe, when diagnosing authentication:
 
 ```powershell
-$syncConfig = Get-Content -LiteralPath .\DataverseSyncWorker\appsettings.json -Raw | ConvertFrom-Json
+$syncConfig = Get-Content -LiteralPath .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json -Raw | ConvertFrom-Json
 & $syncConfig.Dataverse.DeveloperTokenPython $syncConfig.Dataverse.DeveloperTokenScript --probe
 ```
 

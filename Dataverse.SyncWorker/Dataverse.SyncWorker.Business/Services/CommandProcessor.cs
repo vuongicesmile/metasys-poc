@@ -1,6 +1,7 @@
 using DataverseSyncWorker.Abstractions;
 using System.Diagnostics;
 using DataverseSyncWorker.Models;
+using Microsoft.Extensions.Logging;
 
 namespace DataverseSyncWorker.Services;
 

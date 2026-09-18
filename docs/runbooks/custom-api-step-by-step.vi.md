@@ -74,12 +74,12 @@ Tên parameter phân biệt hoa thường trong code. `ClientRequestId` khác
 Khi làm một Custom API tương tự, không chỉ copy một DLL. Cần hiểu mỗi artifact:
 
 ```text
-plugins/FMCentralBms.Plugins/
+Dataverse.Plugin/FMCentralBms.Plugins/
   RequestBmsSync.cs                 # business handler
   FMCentralBms.Plugins.csproj       # net48, signing, assembly version
   FMCentralBms.Plugins.snk          # private signing key; không đưa vào docs/download
 
-DataverseSyncWorker/
+Dataverse.SyncWorker/
   Program.cs                        # route --register-plugin
   Services/DataversePluginProvisioner.cs
                                       # upload DLL + tạo Custom API/parameters
@@ -106,7 +106,7 @@ sinh ra.
 DLL của project này sau Release build nằm ở:
 
 ```text
-plugins/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll
+Dataverse.Plugin/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll
 ```
 
 Thư mục `publish` có thể tồn tại do Power Apps MSBuild target. Path trong Visual Studio
@@ -180,14 +180,14 @@ name, version, culture và public key token.
 Build từ root:
 
 ```powershell
-dotnet build .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj `
+dotnet build .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj `
   --configuration Release
 ```
 
 Kiểm tra file:
 
 ```powershell
-Get-Item .\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll |
+Get-Item .\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll |
   Select-Object FullName, Length, LastWriteTime
 ```
 
@@ -244,7 +244,7 @@ Lệnh triển khai:
 ```powershell
 dotnet run --project .\DataverseSyncWorker --configuration Release -- `
   --register-plugin `
-  .\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
+  .\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
 ```
 
 Đây là lệnh **ghi cloud**. Helper cố tình không chạy khi worker startup bình thường.

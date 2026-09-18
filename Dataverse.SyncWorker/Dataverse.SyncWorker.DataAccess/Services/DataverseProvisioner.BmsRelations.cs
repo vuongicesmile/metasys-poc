@@ -43,7 +43,8 @@ public sealed partial class DataverseProvisioner
                     {
                         new(new Label("Water Meter", 1033), BmsRelationManifest.TypeValue("WaterMeter")),
                         new(new Label("Temperature Sensor", 1033), BmsRelationManifest.TypeValue("TemperatureSensor")),
-                        new(new Label("Test Rig", 1033), BmsRelationManifest.TypeValue("TestRig"))
+                        new(new Label("Test Rig", 1033), BmsRelationManifest.TypeValue("TestRig")),
+                        new(new Label("Electric Meter", 1033), BmsRelationManifest.TypeValue("ElectricMeter"))
                     }
                 }
             };
@@ -100,7 +101,7 @@ public sealed partial class DataverseProvisioner
                 {
                     if (requireReady) throw new InvalidOperationException($"Missing {table}.{desired.SchemaName}.");
                 }
-                else ValidateRelationColumn(table, actual, desired);
+                else ValidateRelationColumn(table, actual, desired, requireReady);
             }
             var keyColumn = table == BuildingTable ? "fmc_buildingcode" : "fmc_equipmentcode";
             var keyName = table + (table == BuildingTable ? "_buildingcode" : "_equipmentcode");
@@ -120,14 +121,18 @@ public sealed partial class DataverseProvisioner
         return result;
     }
 
-    internal static void ValidateRelationColumn(string table, AttributeMetadata actual, AttributeMetadata desired)
+    internal static void ValidateRelationColumn(string table, AttributeMetadata actual, AttributeMetadata desired, bool requireReady)
     {
         var mismatch = actual.GetType() != desired.GetType() || actual.RequiredLevel?.Value != desired.RequiredLevel?.Value;
         if (actual is StringAttributeMetadata a && desired is StringAttributeMetadata b) mismatch |= a.MaxLength != b.MaxLength;
         if (actual is MemoAttributeMetadata m && desired is MemoAttributeMetadata n) mismatch |= m.MaxLength != n.MaxLength;
         if (actual is PicklistAttributeMetadata p && desired is PicklistAttributeMetadata q)
-            mismatch |= p.OptionSet.IsGlobal != false || !p.OptionSet.Options.Select(o => o.Value).Order()
-                .SequenceEqual(q.OptionSet.Options.Select(o => o.Value).Order());
+        {
+            var actualValues = p.OptionSet.Options.Select(o => o.Value).ToHashSet();
+            var desiredValues = q.OptionSet.Options.Select(o => o.Value).ToHashSet();
+            mismatch |= p.OptionSet.IsGlobal != false ||
+                (requireReady ? !actualValues.SetEquals(desiredValues) : !actualValues.IsSubsetOf(desiredValues));
+        }
         if (mismatch) throw new InvalidOperationException($"Existing metadata differs: {table}.{desired.SchemaName}. Review a migration; no destructive repair is attempted.");
     }
 
@@ -211,6 +216,8 @@ public sealed partial class DataverseProvisioner
                 if (!metadata.Attributes.Any(a => a.LogicalName == column.SchemaName))
                     await client.ExecuteAsync(new CreateAttributeRequest
                         { EntityName = table, Attribute = column, SolutionUniqueName = Solution });
+            if (table == EquipmentTable)
+                await EnsureEquipmentTypeOptions();
             var keyColumn = table == BuildingTable ? "fmc_buildingcode" : "fmc_equipmentcode";
             var keyName = table + (table == BuildingTable ? "_buildingcode" : "_equipmentcode");
             if (!(metadata.Keys ?? []).Any(k => k.LogicalName == keyName))
@@ -243,6 +250,28 @@ public sealed partial class DataverseProvisioner
         await ReadBmsRelationMetadata(true);
         await VerifyBmsRelationUi();
         Console.WriteLine("BMS relationship schema, UI and existing runtime-role privileges published and verified.");
+    }
+
+    private async Task EnsureEquipmentTypeOptions()
+    {
+        var desired = ((PicklistAttributeMetadata)RelationColumns(EquipmentTable)
+            .Single(x => x.SchemaName == "fmc_equipmenttype")).OptionSet.Options;
+        var actual = (PicklistAttributeMetadata)(await RelationMetadata(EquipmentTable)).Attributes
+            .Single(x => x.LogicalName == "fmc_equipmenttype");
+        var existing = actual.OptionSet.Options.Select(x => x.Value).ToHashSet();
+        foreach (var option in desired.Where(x => !existing.Contains(x.Value)))
+        {
+            await connection.Get().ExecuteAsync(new InsertOptionValueRequest
+            {
+                EntityLogicalName = EquipmentTable,
+                AttributeLogicalName = "fmc_equipmenttype",
+                Label = option.Label,
+                Value = option.Value,
+                SolutionUniqueName = Solution
+            });
+            var label = option.Label.UserLocalizedLabel?.Label ?? option.Label.LocalizedLabels.FirstOrDefault()?.Label;
+            Console.WriteLine($"Added Equipment Type option: {label} ({option.Value}).");
+        }
     }
 
     private async Task EnsureBmsRelationRolePrivileges()

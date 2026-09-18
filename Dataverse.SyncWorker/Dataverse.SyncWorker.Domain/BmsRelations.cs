@@ -31,6 +31,7 @@ public sealed record BmsRelationManifest(
         "WaterMeter" => 789100000,
         "TemperatureSensor" => 789100001,
         "TestRig" => 789100002,
+        "ElectricMeter" => 789100003,
         _ => throw new InvalidOperationException($"Unknown equipment type: {type}.")
     };
 

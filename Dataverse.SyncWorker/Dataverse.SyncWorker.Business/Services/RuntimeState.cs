@@ -2,8 +2,6 @@ using DataverseSyncWorker.Models;
 
 namespace DataverseSyncWorker.Services;
 
-public sealed record RuntimeSnapshot(string State, DateTime? LastRunAt = null, BatchResult? LastBatch = null,
-    string? Error = null, Guid? RequestId = null);
 public sealed class RuntimeState
 {
     private RuntimeSnapshot _snapshot = new("Starting");

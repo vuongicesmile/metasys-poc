@@ -61,13 +61,13 @@ Mở PowerShell ở `D:\metasys-poc`:
 
 ```powershell
 Set-Location D:\metasys-poc
-Test-Path .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
-Test-Path .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.snk
+Test-Path .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
+Test-Path .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.snk
 pac org who --environment https://org06cbc9ec.crm5.dynamics.com/
 ```
 
 Hai `Test-Path` phải trả `True`. Khóa `.snk` được giữ ở local; nếu clone trên
-máy khác, xem [hướng dẫn signing key](../../plugins/FMCentralBms.Plugins/README.md).
+máy khác, xem [hướng dẫn signing key](../../Dataverse.Plugin/FMCentralBms.Plugins/README.md).
 Giữ nguyên key và assembly name để update đúng assembly đã triển khai.
 
 Đối chiếu organization ID `ab191700-b99e-f111-aaa0-000d3a80bb96`, environment
@@ -89,7 +89,7 @@ Developer, chọn đúng organization URL trên. [Microsoft: tải/mở PRT](htt
 Trong VS Code/Visual Studio, tạo file:
 
 ```text
-D:\metasys-poc\plugins\FMCentralBms.Plugins\PreventEquipmentCodeChange.cs
+D:\metasys-poc\Dataverse.Plugin\FMCentralBms.Plugins\PreventEquipmentCodeChange.cs
 ```
 
 Giữ nguyên file `RequireEquipmentBuilding.cs`. Hai class sẽ cùng nằm trong
@@ -190,7 +190,7 @@ thực sự đã thay đổi. Vì vậy vẫn cần so sánh `oldCode` và `newC
 
 ## 6. Build DLL mới
 
-Mở `plugins/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj`. Nếu version hiện
+Mở `Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj`. Nếu version hiện
 tại vẫn là `1.0.0.0`, đổi hai dòng thành:
 
 ```xml
@@ -204,15 +204,15 @@ hai dòng trên. Tăng revision giúp nhận biết bản build; PRT cũng hỗ 
 assembly cùng version. Quy tắc SDK helper của repo là trường hợp riêng.
 
 ```powershell
-dotnet build .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
-Get-Item .\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll |
+dotnet build .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
+Get-Item .\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll |
     Select-Object FullName, Length, LastWriteTime
 ```
 
 Chỉ tiếp tục khi build thành công. File chọn trong PRT là:
 
 ```text
-D:\metasys-poc\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
+D:\metasys-poc\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
 ```
 
 | File | Làm gì với nó? |

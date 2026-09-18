@@ -42,10 +42,10 @@ không tạo flow cho từng reading, không đưa toàn bộ lịch sử SQL l�
   chưa đăng ký vì production identity/certificate và quyền SQL của service account chưa sẵn sàng.
 
 Nguồn baseline: [hợp đồng implementation](../reference/dataverse-deployment.md),
-[Program.cs](../../DataverseSyncWorker/Program.cs),
-[SyncOptions.cs](../../DataverseSyncWorker/Models/SyncOptions.cs),
-[SyncEngine.cs](../../DataverseSyncWorker/Services/SyncEngine.cs) và
-[SqlStore.cs](../../DataverseSyncWorker/Services/SqlStore.cs).
+[Program.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.App/Program.cs),
+[SyncOptions.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Common/Configuration/SyncOptions.cs),
+[SyncEngine.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs) và
+[SqlStore.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SqlStore.cs).
 [Plan 3.0](plan-3.0-sql-to-dataverse.md) chỉ là thiết kế lịch sử.
 
 ## 2. Kiến trúc đề xuất

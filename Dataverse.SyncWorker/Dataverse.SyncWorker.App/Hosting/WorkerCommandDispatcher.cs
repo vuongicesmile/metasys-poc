@@ -106,7 +106,7 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
 
     private static string ResolveDefaultPluginPath()
     {
-        var relative = Path.Combine("plugins", "FMCentralBms.Plugins", "bin", "Release",
+        var relative = Path.Combine("Dataverse.Plugin", "FMCentralBms.Plugins", "bin", "Release",
             "net48", "FMCentralBms.Plugins.dll");
         var candidates = new[]
         {

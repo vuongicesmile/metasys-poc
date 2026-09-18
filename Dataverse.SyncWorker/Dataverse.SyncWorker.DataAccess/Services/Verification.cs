@@ -1,8 +1,12 @@
+using DataverseSyncWorker.Abstractions;
 using DataverseSyncWorker.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DataverseSyncWorker.Services;
 

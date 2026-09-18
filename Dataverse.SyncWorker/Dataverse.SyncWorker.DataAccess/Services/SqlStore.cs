@@ -3,6 +3,7 @@ using System.Data;
 using System.Text.Json;
 using DataverseSyncWorker.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace DataverseSyncWorker.Services;
 

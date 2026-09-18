@@ -42,10 +42,10 @@ Point; thêm `fmc_bmsreading` elastic để giữ history theo retention.
 Các điểm quyết định thiết kế:
 
 - [Fake store](../../BMS.Fake/BMS.Fake.DataAccess/Services/MetasysPointStore.cs) định nghĩa catalog và mapping mặc định.
-- [Provisioner](../../DataverseSyncWorker/Services/DataverseProvisioner.BmsRelations.cs) đặt `fmc_buildingid` là `ApplicationRequired`; Point → Equipment vẫn optional để hỗ trợ dữ liệu cũ.
-- [ReadingMapper](../../DataverseSyncWorker/Services/ReadingMapper.cs) tạo GUID từ SourceId và source key; payload Equipment luôn có Building lookup.
-- [DataverseWriter](../../DataverseSyncWorker/Services/DataverseWriter.cs) dùng `UpsertRequest` cho standard tables; elastic history dùng `UpsertMultiple`.
-- [SyncEngine](../../DataverseSyncWorker/Services/SyncEngine.cs) ghi Building, Equipment rồi Point/history; SQL acknowledgement sau khi các write cần thiết thành công.
+- [Provisioner](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseProvisioner.BmsRelations.cs) đặt `fmc_buildingid` là `ApplicationRequired`; Point → Equipment vẫn optional để hỗ trợ dữ liệu cũ.
+- [ReadingMapper](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/ReadingMapper.cs) tạo GUID từ SourceId và source key; payload Equipment luôn có Building lookup.
+- [DataverseWriter](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseWriter.cs) dùng `UpsertRequest` cho standard tables; elastic history dùng `UpsertMultiple`.
+- [SyncEngine](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs) ghi Building, Equipment rồi Point/history; SQL acknowledgement sau khi các write cần thiết thành công.
 
 ## 2. Nên làm những plug-in nào?
 
@@ -114,10 +114,10 @@ Worker hiện dùng `net10.0` và là project riêng.
 Chạy PowerShell từ `D:\metasys-poc`. Tạo project một lần:
 
 ```powershell
-pac plugin init --outputDirectory .\plugins\FMCentralBms.Plugins
+pac plugin init --outputDirectory .\Dataverse.Plugin\FMCentralBms.Plugins
 ```
 
-Trong `plugins/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj`, sửa:
+Trong `Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj`, sửa:
 
 ```xml
 <TargetFramework>net48</TargetFramework>
@@ -188,17 +188,17 @@ lại instance. [Microsoft: write a plug-in](https://learn.microsoft.com/en-us/p
 Build:
 
 ```powershell
-dotnet build .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
+dotnet build .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
 ```
 
 DLL cần dùng:
-`plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll`.
+`Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll`.
 
 Template có thể sinh thêm `.nupkg`; hướng dẫn này đăng ký DLL.
 Khi đưa project vào implementation của repo, thêm project vào solution rồi build cả solution:
 
 ```powershell
-dotnet sln .\MetasysPoc.sln add .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
+dotnet sln .\MetasysPoc.sln add .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
 dotnet build .\MetasysPoc.sln -c Release
 ```
 
@@ -230,7 +230,7 @@ triển khai này không phụ thuộc PRT interactive:
 ```powershell
 dotnet run --project .\DataverseSyncWorker -c Release --no-launch-profile -- `
   --register-plugin `
-  --plugin-path=..\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
+    --plugin-path=..\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
 ```
 
 Command chỉ chạy khi truyền `--register-plugin`; worker startup bình thường
@@ -281,7 +281,7 @@ Chạy sau khi đã đăng ký hai steps. Helper cần phiên Azure CLI còn đ�
 Token được giữ trong biến, không in ra terminal.
 
 ```powershell
-$pluginConfig = Get-Content .\DataverseSyncWorker\appsettings.json -Raw | ConvertFrom-Json
+$pluginConfig = Get-Content .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json -Raw | ConvertFrom-Json
 $pluginOrg = 'https://org06cbc9ec.crm5.dynamics.com'
 if ($pluginConfig.Dataverse.Url.TrimEnd('/') -ne $pluginOrg) {
     throw 'Worker config khong tro toi Developer organization cua bai demo.'
@@ -407,7 +407,7 @@ Point vẫn có Equipment mapping, pending trong cutoff được xử lý.
 112 Object ID đã được đối soát. Các lỗi/dead-letter có sẵn cần phân biệt với
 lỗi do plug-in mới.
 
-**Khoảng trống đang có trong code:** [CommandProcessor.cs](../../DataverseSyncWorker/Services/CommandProcessor.cs)
+**Khoảng trống đang có trong code:** [CommandProcessor.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/CommandProcessor.cs)
 kết thúc request trước khi gọi `SyncEngine` nếu `EligiblePendingRows == 0`.
 Do đó trigger chỉ có thay đổi catalog và không có reading pending có thể báo
 Succeeded mà chưa ghi lại catalog. Cần sửa worker riêng để bảo đảm mỗi request
@@ -497,7 +497,7 @@ Một lần triển khai chỉ hoàn tất khi có:
 
 ## 11. Deployment receipt — Developer environment (2026-09-10)
 
-- Đã thêm project `plugins/FMCentralBms.Plugins` vào `MetasysPoc.sln`; giữ
+- Đã thêm project `Dataverse.Plugin/FMCentralBms.Plugins` vào `MetasysPoc.sln`; giữ
   strong-name key và build target `net48` theo supported framework.
 - `dotnet build .\MetasysPoc.sln -c Release --no-restore`: pass, 0 warnings,
   0 errors. 7 local handler checks cũng pass, không gọi Dataverse.

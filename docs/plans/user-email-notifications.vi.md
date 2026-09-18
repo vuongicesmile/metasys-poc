@@ -105,9 +105,9 @@ Table mới: `fmc_notification` (Standard, Organization-owned).
 
 ## 7. Artifact triển khai
 
-- `DataverseSyncWorker/Services/DataverseProvisioner.cs`
-- `DataverseSyncWorker/Services/DataversePluginProvisioner.cs`
-- `plugins/FMCentralBms.Plugins/QueueSyncNotification.cs`
+- `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseProvisioner.cs`
+- `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataversePluginProvisioner.cs`
+- `Dataverse.Plugin/FMCentralBms.Plugins/QueueSyncNotification.cs`
 - `scripts/provision-user-notification-flow.py`
 - `scripts/tests/test_user_notification_flow.py`
 - [Runbook vận hành và test](../runbooks/user-email-notifications.vi.md)

@@ -73,9 +73,9 @@ cùng lần chạy, không so bản nguồn mới với bản archive cũ.
 
 ## 2. Code và artifact đã tạo
 
-- `DataverseSyncWorker/Services/DataverseProvisioner.SpoIngestion.cs`: schema, choices,
+- `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseProvisioner.SpoIngestion.cs`: schema, choices,
   keys, relationship, forms, views, environment variables, role, sitemap và verification.
-- `DataverseSyncWorker/Program.cs`: ba command provision/status/verify.
+- `Dataverse.SyncWorker/Dataverse.SyncWorker.App/Program.cs`: ba command provision/status/verify.
 - `dataverse/FMCentralBms`: source solution được export lại từ Developer environment.
 - `docs/examples/spo-import`: một JSON hợp lệ và sáu JSON lỗi có expected result.
 - `scripts/Test-SpoImportFixtures.ps1`: kiểm tra schemaVersion, số item, kiểu/range,
@@ -112,10 +112,10 @@ Token helper mặc định trong repo có thể mang đường dẫn của máy 
 $env:Dataverse__DeveloperTokenPython = 'D:\Coder\AI-AGENT-PLATFORM\.tools\azure-cli\Scripts\python.exe'
 $env:Dataverse__DeveloperTokenScript = 'D:\Coder\metasys-poc\scripts\get-dataverse-token.py'
 
-dotnet build .\DataverseSyncWorker\DataverseSyncWorker.csproj --configuration Release
-dotnet run --project .\DataverseSyncWorker\DataverseSyncWorker.csproj `
+dotnet build .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj --configuration Release
+dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj `
   --configuration Release --no-build -- --spo-ingestion-status
-dotnet run --project .\DataverseSyncWorker\DataverseSyncWorker.csproj `
+dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj `
   --configuration Release --no-build -- --verify-spo-ingestion
 ```
 
@@ -123,7 +123,7 @@ Khi triển khai vào environment mới, dùng command mutation sau một lần.
 idempotent nên có thể chạy lại sau lỗi giữa chừng:
 
 ```powershell
-dotnet run --project .\DataverseSyncWorker\DataverseSyncWorker.csproj `
+dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj `
   --configuration Release --no-build -- --provision-spo-ingestion
 ```
 

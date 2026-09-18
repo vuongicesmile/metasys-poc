@@ -87,7 +87,7 @@ dùng identity developer đã cấu hình trong dự án.
 Kiểm tra trước:
 
 ```powershell
-Test-Path .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
+Test-Path .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
 ```
 
 **Trong repo hiện tại kết quả là `True`: mở project và tiếp tục bước 4.**
@@ -96,7 +96,7 @@ Không chạy `init` đè lên nó; đây là project của plugin đã deploy.
 Nếu đang dựng lại từ đầu ở một workspace chưa có project đó, chạy một lần:
 
 ```powershell
-pac plugin init --outputDirectory .\plugins\FMCentralBms.Plugins
+pac plugin init --outputDirectory .\Dataverse.Plugin\FMCentralBms.Plugins
 ```
 
 Lệnh sinh project, code mẫu và signing key. Template của PAC 2.11.2 sinh
@@ -112,7 +112,7 @@ nên không cần kế thừa base class đó.
 Cấu trúc cần hiểu:
 
 ```text
-plugins/FMCentralBms.Plugins/
+Dataverse.Plugin/FMCentralBms.Plugins/
   FMCentralBms.Plugins.csproj    cấu hình build/dependencies/version
   FMCentralBms.Plugins.snk       key ký assembly, giữ ổn định khi cập nhật
   RequireEquipmentBuilding.cs   logic nghiệp vụ
@@ -121,7 +121,7 @@ plugins/FMCentralBms.Plugins/
   obj/                         file trung gian do build sinh
 ```
 
-Các dòng quan trọng trong [project thật](../../plugins/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj):
+Các dòng quan trọng trong [project thật](../../Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj):
 
 ```xml
 <TargetFramework>net48</TargetFramework>
@@ -159,7 +159,7 @@ nhưng chưa có source để sửa rule.
 
 ## 4. Copy code và hiểu từng dòng
 
-Mở [RequireEquipmentBuilding.cs](../../plugins/FMCentralBms.Plugins/RequireEquipmentBuilding.cs).
+Mở [RequireEquipmentBuilding.cs](../../Dataverse.Plugin/FMCentralBms.Plugins/RequireEquipmentBuilding.cs).
 Dưới đây là toàn bộ 47 dòng của source tại thời điểm soạn; copy **nội dung
 code**, không copy dấu hàng rào Markdown.
 
@@ -275,9 +275,9 @@ Rule hiện tại không cần truy vấn thêm và không tự gọi `Update` t
 ## 5. Build: từ code thành đúng DLL để upload
 
 ```powershell
-dotnet build .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
+dotnet build .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
 if ($LASTEXITCODE -ne 0) { throw 'Build failed; khong deploy DLL cu.' }
-$pluginDll = (Resolve-Path .\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll).Path
+$pluginDll = (Resolve-Path .\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll).Path
 Get-Item -LiteralPath $pluginDll | Select-Object FullName, Length, LastWriteTime
 [System.Reflection.AssemblyName]::GetAssemblyName($pluginDll).FullName
 Get-FileHash -LiteralPath $pluginDll -Algorithm SHA256
@@ -290,7 +290,7 @@ build, assembly identity và hash của chính file sẽ upload.
 Đường dẫn đầy đủ:
 
 ```text
-D:\metasys-poc\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
+D:\metasys-poc\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
 ```
 
 Khi dùng PRT trên cùng máy, chọn trực tiếp file này trong hộp Browse.
@@ -314,7 +314,7 @@ và dependency packaging là hai việc khác nhau.
 Project hiện đã có trong `MetasysPoc.sln`. Chỉ khi dựng mới, thêm một lần:
 
 ```powershell
-dotnet sln .\MetasysPoc.sln add .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
+dotnet sln .\MetasysPoc.sln add .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj
 ```
 
 `.sln` là nhóm project để build chung, không phải Dataverse solution ZIP.
@@ -429,7 +429,7 @@ không cần thực hiện cả hai để deploy cùng một phiên bản.
 Sau build thành công, ở PowerShell tại root:
 
 ```powershell
-$pluginDll = (Resolve-Path .\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll).Path
+$pluginDll = (Resolve-Path .\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll).Path
 dotnet run --project .\DataverseSyncWorker -c Release --no-launch-profile -- --register-plugin "--plugin-path=$pluginDll"
 if ($LASTEXITCODE -ne 0) { throw 'Registration failed; doc loi truoc khi tiep tuc.' }
 ```
@@ -448,8 +448,8 @@ một argument, kể cả khi đường dẫn có dấu cách.
 | `--register-plugin` | Vào nhánh deployment ở `Program.cs`, rồi thoát trước khi chạy background sync. |
 | `--plugin-path=...` | Chỉ DLL đã build cần đọc/upload. |
 
-[Program.cs](../../DataverseSyncWorker/Program.cs) gọi
-[DataversePluginProvisioner.Register](../../DataverseSyncWorker/Services/DataversePluginProvisioner.cs).
+[Program.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.App/Program.cs) gọi
+[DataversePluginProvisioner.Register](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataversePluginProvisioner.cs).
 Các bước bên trong tương ứng thao tác tay như sau:
 
 | Code/helper | Việc nó thực hiện |

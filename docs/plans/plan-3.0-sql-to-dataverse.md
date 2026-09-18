@@ -362,7 +362,7 @@ metasys-poc/
 |   |-- BMS.Fake.App/
 |-- BMS.Ingestion/
 |   |-- BMS.Ingestion.App/
-|-- DataverseSyncWorker/
+|-- Dataverse.SyncWorker/
 |   |-- Models/
 |   |   |-- BmsReading.cs
 |   |   |-- DataverseOptions.cs

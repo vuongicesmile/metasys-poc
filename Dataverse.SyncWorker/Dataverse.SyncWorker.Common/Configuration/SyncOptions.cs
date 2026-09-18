@@ -65,7 +65,9 @@ public sealed record SyncSummary(long SourceRows, long DeliveredRows, long Pendi
     long DeadLetterRows, long LastSuccessfulId);
 public sealed record BatchResult(int Read, int Delivered, int Quarantined, bool Busy = false);
 public sealed record DeadLetter(long ReadingId, string Error, int Attempts, DateTime LastFailedAt);
-public sealed record SyncStatusResponse(Services.RuntimeSnapshot Runtime, SyncSummary Sql,
+public sealed record RuntimeSnapshot(string State, DateTime? LastRunAt = null, BatchResult? LastBatch = null,
+    string? Error = null, Guid? RequestId = null);
+public sealed record SyncStatusResponse(RuntimeSnapshot Runtime, SyncSummary Sql,
     string DataverseUrl, bool HistoryEnabled);
 
 public static class SyncRequestStatuses

@@ -22,7 +22,7 @@ chưa đăng ký service vì application identity/certificate runtime chưa sẵ
 
 ## 1. Xác nhận cấu hình — làm khi thiết lập hoặc đổi môi trường
 
-Cấu hình ở [appsettings.json](../../DataverseSyncWorker/appsettings.json).
+Cấu hình ở [appsettings.json](../../Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json).
 
 | Thành phần | Cấu hình POC hiện tại |
 | --- | --- |
@@ -85,7 +85,7 @@ user phải còn dùng được. Kiểm tra khả năng lấy token mà không i
 
 ```powershell
 Set-Location D:\metasys-poc
-$syncConfig = Get-Content -LiteralPath .\DataverseSyncWorker\appsettings.json -Raw | ConvertFrom-Json
+$syncConfig = Get-Content -LiteralPath .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json -Raw | ConvertFrom-Json
 & $syncConfig.Dataverse.DeveloperTokenPython $syncConfig.Dataverse.DeveloperTokenScript --probe
 ```
 
@@ -113,7 +113,7 @@ truyền rõ ràng. Dùng certificate không hỏi client secret. Nếu chỉ tr
 launcher hỏi secret ở hidden prompt; cách đó không phù hợp cho tác vụ tự chạy.
 
 Nếu gọi worker trực tiếp thay vì launcher, phải tự chọn đúng cấu hình auth; xem
-[DataverseConnection](../../DataverseSyncWorker/Services/DataverseConnection.cs).
+[DataverseConnection](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseConnection.cs).
 Code đã hỗ trợ Windows Service và có installer. Để chạy sau khởi động hoặc khi
 chưa đăng nhập, cần application identity/certificate và service account có quyền
 SQL/private key theo [Power Automate runbook](power-automate-sql-sync.vi.md).

@@ -125,10 +125,10 @@ Flow không thực hiện SQL sync; worker xử lý request độc lập.
 
 | File | Vai trò |
 | --- | --- |
-| `plugins/FMCentralBms.Plugins/RequestBmsSync.cs` | Main Operation plug-in |
-| `DataverseSyncWorker/Services/DataversePluginProvisioner.cs` | Register assembly/type và provision Custom API contract |
-| `DataverseSyncWorker/Services/DataverseProvisioner.cs` | Provision `fmc_activekey` và alternate key |
-| `DataverseSyncWorker/Services/SyncRequestStore.cs` | Enqueue/complete theo active-key contract |
+| `Dataverse.Plugin/FMCentralBms.Plugins/RequestBmsSync.cs` | Main Operation plug-in |
+| `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataversePluginProvisioner.cs` | Register assembly/type và provision Custom API contract |
+| `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseProvisioner.cs` | Provision `fmc_activekey` và alternate key |
+| `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncRequestStore.cs` | Enqueue/complete theo active-key contract |
 | `dataverse/app-source/BmsEventDemo.html` | Source trang/nút trong app |
 | `scripts/Invoke-BmsEventDemo.ps1` | Deploy, verify và test app/flow demo |
 | `dataverse/FMCentralBms/customapis/` | Custom API đã export |

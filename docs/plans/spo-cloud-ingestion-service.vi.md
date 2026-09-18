@@ -23,7 +23,7 @@ tầng mới cần triển khai, không phải hạ tầng đã có.
 
 ## 2. Baseline và table đích
 
-[ReadingMapper](../../DataverseSyncWorker/Services/ReadingMapper.cs) và
+[ReadingMapper](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/ReadingMapper.cs) và
 [deployment contract](../reference/dataverse-deployment.md) xác nhận các table sau
 trong repository. Metadata live phải được đối chiếu trước triển khai.
 
@@ -121,7 +121,7 @@ mỗi file không cần flow riêng. Verify subfolder coverage trong cả trigge
 | buildingCode | fmc_bmsequipment.fmc_buildingid | Resolve GUID, gán EntityReference |
 | description | fmc_bmsequipment.fmc_description | Optional |
 
-[BmsRelations](../../DataverseSyncWorker/Models/BmsRelations.cs) hiện map:
+[BmsRelations](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Domain/BmsRelations.cs) hiện map:
 WaterMeter=789100000, TemperatureSensor=789100001, TestRig=789100002.
 Verify choices live; không tự thêm AHU/CHILLER option nếu chuẩn chưa có.
 
@@ -243,8 +243,8 @@ và status UI vẫn phải tạo/bind sau khi có Azure subscription và connect
 | SPO.Ingestion.Functions | Azure host, queue consumer, scheduler, telemetry |
 
 Reuse behavior đã kiểm chứng từ
-[DataverseWriter](../../DataverseSyncWorker/Services/DataverseWriter.cs) và
-[CommandProcessor](../../DataverseSyncWorker/Services/CommandProcessor.cs).
+[DataverseWriter](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseWriter.cs) và
+[CommandProcessor](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/CommandProcessor.cs).
 Không reuse mù ReadingMapper.Point/History cho event SPO vì chúng stamp SQL fields;
 tách helper/conversion phù hợp và chạy SQL regression tests nếu refactor.
 

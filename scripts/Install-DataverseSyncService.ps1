@@ -19,7 +19,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $normalizedThumbprint = $CertificateThumbprint.Replace(' ', '').ToUpperInvariant()
 $root = Split-Path $PSScriptRoot -Parent
-$project = Join-Path $root 'DataverseSyncWorker\DataverseSyncWorker.csproj'
+$project = Join-Path $root 'Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj'
 $expectedRoot = [System.IO.Path]::GetFullPath('C:\ProgramData\FMCentralBms')
 $resolvedInstall = [System.IO.Path]::GetFullPath($InstallDirectory)
 if (-not $resolvedInstall.StartsWith($expectedRoot + [System.IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {

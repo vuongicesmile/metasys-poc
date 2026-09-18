@@ -20,7 +20,7 @@ binary vào `fmc_spofile`; local runner này ghi dữ liệu nghiệp vụ vào:
 - Đã đăng nhập developer Dataverse token theo cấu hình hiện có của
   `DataverseSyncWorker`.
 - File mẫu nằm trong thư mục `data/`.
-- Organization trong `DataverseSyncWorker/appsettings.json` là environment dev
+- Organization trong `Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json` là environment dev
   đã được kiểm tra.
 
 ## Chạy
@@ -155,7 +155,7 @@ Chạy liên tục trước khi bấm nút trong app:
 ```powershell
 dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   watch-dataverse --config .\config\spo-ingestion.json `
-  --appsettings .\DataverseSyncWorker\appsettings.json `
+  --appsettings .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json `
   --max 20 --poll-seconds 10
 ```
 
@@ -171,7 +171,7 @@ Muốn test một vòng rồi thoát:
 ```powershell
 dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-dataverse-once --config .\config\spo-ingestion.json `
-  --appsettings .\DataverseSyncWorker\appsettings.json --max 20
+  --appsettings .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json --max 20
 ```
 
 ### 2. Bấm nút trong app
@@ -225,7 +225,7 @@ dotnet run --project .\DataverseSyncWorker -c Release --no-build -- `
   --provision-spo-ingestion
 
 dotnet run --project .\DataverseSyncWorker -c Release --no-build -- `
-  --register-plugin --plugin-path=.\plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
+  --register-plugin --plugin-path=.\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
 
 python .\scripts\provision-spo-sync-flow.py render
 python .\scripts\provision-spo-sync-flow.py deploy

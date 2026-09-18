@@ -42,7 +42,7 @@ Write-Host "Log file: $logPath"
     --configuration Release --no-launch-profile -- `
     watch-dataverse `
     --config (Join-Path $repo 'config/spo-ingestion.json') `
-    --appsettings (Join-Path $repo 'DataverseSyncWorker/appsettings.json') `
+    --appsettings (Join-Path $repo 'Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json') `
     --max $MaxFiles `
     --poll-seconds $PollSeconds 2>&1 | Tee-Object -FilePath $logPath -Append
 $exitCode = $LASTEXITCODE

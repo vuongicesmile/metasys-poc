@@ -33,7 +33,7 @@ py -m py_compile .\scripts\provision-user-notification-flow.py
 DLL cần đăng ký:
 
 ```text
-plugins\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
+Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll
 ```
 
 Version hiện tại: `1.0.0.5`.

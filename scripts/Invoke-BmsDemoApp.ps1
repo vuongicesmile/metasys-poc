@@ -2,7 +2,7 @@
 param([ValidateSet('Status','Deploy','Verify')][string]$Mode = 'Status')
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
-$config = Get-Content (Join-Path $repo 'DataverseSyncWorker/appsettings.json') -Raw | ConvertFrom-Json
+$config = Get-Content (Join-Path $repo 'Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json') -Raw | ConvertFrom-Json
 $org = 'https://org06cbc9ec.crm5.dynamics.com'
 $solution = 'FMCentralBms'
 if ($config.Dataverse.Url.TrimEnd('/') -ne $org) { throw 'Unexpected configured environment.' }

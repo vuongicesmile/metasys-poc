@@ -27,7 +27,11 @@
     <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.Common\BMS.Ingestion.Common.csproj" />
     <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.DataAccess\BMS.Ingestion.DataAccess.csproj" />
     <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.Domain\BMS.Ingestion.Domain.csproj" />
-    <ProjectReference Include="..\..\DataverseSyncWorker\DataverseSyncWorker.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.Business\Dataverse.SyncWorker.Business.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.Common\Dataverse.SyncWorker.Common.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.DataAccess\Dataverse.SyncWorker.DataAccess.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.Domain\Dataverse.SyncWorker.Domain.csproj" />
     <ProjectReference Include="..\..\SPO.Ingestion.Business\SPO.Ingestion.Business.csproj" />
     <ProjectReference Include="..\..\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />
     <ProjectReference Include="..\..\SPO.Ingestion.DataAccess\SPO.Ingestion.DataAccess.csproj" />

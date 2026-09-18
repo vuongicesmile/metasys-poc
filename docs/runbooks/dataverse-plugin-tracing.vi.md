@@ -17,12 +17,12 @@ Form chặn required trước khi gửi request cũng không có trace của plu
 ## Build và đưa lên môi trường test
 
 ```powershell
-dotnet build .\plugins\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
+dotnet build .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.csproj -c Release
 ```
 
 Trong PRT, kết nối đúng Developer environment, chọn assembly
 `FMCentralBms.Plugins` → Update → chọn
-`plugins/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll`.
+`Dataverse.Plugin/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll`.
 Giữ hai steps hiện có. Bản export solution vẫn là receipt của lần deploy cũ;
 sau update cần export lại nếu muốn lưu artifact mới.
 

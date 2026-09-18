@@ -13,9 +13,9 @@ Refactor ngày 2026-09-12–13 tách phần khởi tạo ứng dụng, điều p
 | Ingestion | `BMS.Ingestion/BMS.Ingestion.Business/Services/CovIngestionWorker.cs` | Đọc catalog → lưu catalog nếu bật SQL → subscribe → nhận event → lưu reading |
 | Metasys transport | `BMS.Ingestion/BMS.Ingestion.DataAccess/Services/MetasysClient.cs` | HTTP, JSON, subscription, đọc SSE và giải phóng connection |
 | Lưu dữ liệu nguồn | `BMS.Ingestion/BMS.Ingestion.DataAccess/Services/BmsReadingRepository.cs` | Upsert catalog và append SQL readings |
-| Xử lý request sync | `DataverseSyncWorker/Services/CommandProcessor.cs` | Claim request, chốt cutoff, điều phối batch, progress, requeue và completion |
-| Đồng bộ một batch | `DataverseSyncWorker/Services/SyncEngine.cs` | Lock, đọc ledger, mapping, ghi Dataverse, Ack/quarantine |
-| Lệnh bảo trì | `DataverseSyncWorker/Hosting/WorkerCommandLine.cs`, `WorkerCommandDispatcher.cs` | Tách cờ CLI khỏi host và thực thi lệnh trước khi khởi động background worker |
+| Xử lý request sync | `Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/CommandProcessor.cs` | Claim request, chốt cutoff, điều phối batch, progress, requeue và completion |
+| Đồng bộ một batch | `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs` | Lock, đọc ledger, mapping, ghi Dataverse, Ack/quarantine |
+| Lệnh bảo trì | `Dataverse.SyncWorker/Dataverse.SyncWorker.App/Hosting/WorkerCommandLine.cs`, `WorkerCommandDispatcher.cs` | Tách cờ CLI khỏi host và thực thi lệnh trước khi khởi động background worker |
 | Trạng thái runtime | `Services/RuntimeState.cs`, `IngestionStatusTracker.cs` | Snapshot phục vụ API theo dõi |
 | Dashboard | `dataverse/app-source/fmc-bms-demo/src/` | Service, hook, component và styles riêng |
 
@@ -89,7 +89,7 @@ Chạy từ root repository:
 ```powershell
 dotnet build MetasysPoc.sln -c Release
 dotnet test tests/MetasysPoc.Tests/MetasysPoc.Tests.csproj -c Release
-dotnet DataverseSyncWorker/bin/Release/net10.0/DataverseSyncWorker.dll --self-test
+dotnet Dataverse.SyncWorker/Dataverse.SyncWorker.App/bin/Release/net10.0/Dataverse.SyncWorker.App.dll --self-test
 npm --prefix dataverse/app-source/fmc-bms-demo ci
 npm --prefix dataverse/app-source/fmc-bms-demo run build
 npm --prefix dataverse/app-source/fmc-bms-demo test
@@ -99,7 +99,7 @@ git diff --check
 
 23 unit test dùng fake service/HTTP, không gọi SQL hoặc Dataverse. Các ca kiểm tra gồm cutoff/baseline, progress từ ledger, requeue, failure, cancellation, singleton dùng chung, `--no-sql`, thứ tự ingestion, lỗi HTTP/SSE và giải phóng stream. `--self-test` tạo database SQL có tên duy nhất rồi xóa sau khi chạy; sink Dataverse là giả lập. Browser regression chạy trên cả source module và artifact sinh ra, dùng dữ liệu tổng hợp, Microsoft Edge headless và xuất screenshot vào `.artifacts/language-tests`.
 
-Checkout này thiếu `plugins/FMCentralBms.Plugins/FMCentralBms.Plugins.snk`. Build solution với signing mặc định sẽ lỗi; đã kiểm tra compilation bằng `-p:SignAssembly=false`. Cách này chỉ dùng để kiểm tra code, DLL không ký không phải artifact để deploy plugin. Cần khóa ký hiện có để build plugin dùng cho deployment; không tạo khóa thay thế làm đổi assembly identity.
+Checkout này thiếu `Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.snk`. Build solution với signing mặc định sẽ lỗi; đã kiểm tra compilation bằng `-p:SignAssembly=false`. Cách này chỉ dùng để kiểm tra code, DLL không ký không phải artifact để deploy plugin. Cần khóa ký hiện có để build plugin dùng cho deployment; không tạo khóa thay thế làm đổi assembly identity.
 
 NuGet restore của test project hiện báo `NU1903` cho dependency gián tiếp `System.Security.Cryptography.Xml 8.0.2` từ SDK hiện có. Refactor này không nâng phiên bản SDK; cần xử lý dependency trong một thay đổi có kiểm thử tương thích riêng.
 
