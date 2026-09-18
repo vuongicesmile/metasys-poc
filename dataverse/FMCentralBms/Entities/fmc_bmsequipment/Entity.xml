@@ -326,6 +326,11 @@
                   <label description="Test Rig" languagecode="1033" />
                 </labels>
               </option>
+              <option value="789100003" IsHidden="0">
+                <labels>
+                  <label description="Electric Meter" languagecode="1033" />
+                </labels>
+              </option>
             </options>
           </optionset>
           <displaynames>

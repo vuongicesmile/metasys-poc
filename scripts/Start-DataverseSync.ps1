@@ -27,7 +27,7 @@ if ($CertificateThumbprint -and $ClientId -eq [Guid]::Empty) {
 if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     throw 'The .NET SDK is not available. Install the SDK required by DataverseSyncWorker and reopen the terminal.'
 }
-$project = Join-Path (Split-Path $PSScriptRoot -Parent) 'DataverseSyncWorker'
+$project = Join-Path (Split-Path $PSScriptRoot -Parent) 'Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj'
 $oldId = $env:Dataverse__ClientId
 $oldSecret = $env:Dataverse__ClientSecret
 $oldCertificate = $env:Dataverse__CertificateThumbprint

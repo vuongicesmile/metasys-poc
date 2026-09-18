@@ -119,7 +119,7 @@ def main():
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
 
     appsettings = json.loads(
-        (ROOT / "DataverseSyncWorker/appsettings.json").read_text(encoding="utf-8-sig")
+        (ROOT / "Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json").read_text(encoding="utf-8-sig")
     )
     token = subprocess.check_output(
         [

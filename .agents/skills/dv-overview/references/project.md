@@ -96,13 +96,13 @@ Run from the repository root. Do not start a write mode merely to inspect status
 | Command or mode | Effect |
 | --- | --- |
 | dotnet build .\MetasysPoc.sln | Local build |
-| dotnet run --project .\DataverseSyncWorker -- --verify | Live SQL/Dataverse reads; up to 25 retained history samples |
-| dotnet run --project .\DataverseSyncWorker -c Release --no-launch-profile -- --self-test | Creates/removes isolated SQL test database; simulated cloud sink |
-| dotnet run --project .\DataverseSyncWorker -- --provision | Cloud metadata, views, solution and role writes |
-| dotnet run --project .\DataverseSyncWorker -- --run-once | One synchronization batch and SQL delivery-state writes |
-| dotnet run --project .\DataverseSyncWorker | Starts API and waits for queued requests in the checked-in CommandDriven mode |
-| dotnet run --project .\DataverseSyncWorker -- --enqueue | Creates/coalesces a live sync request; cloud/SQL mutation follows when processed |
-| dotnet run --project .\DataverseSyncWorker -- --process-command-once | Claims and processes one request through potentially multiple SQL batches |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --verify | Live SQL/Dataverse reads; up to 25 retained history samples |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -c Release --no-launch-profile -- --self-test | Creates/removes isolated SQL test database; simulated cloud sink |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --provision | Cloud metadata, views, solution and role writes |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --run-once | One synchronization batch and SQL delivery-state writes |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App | Starts API and waits for queued requests in the checked-in CommandDriven mode |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --enqueue | Creates/coalesces a live sync request; cloud/SQL mutation follows when processed |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --process-command-once | Claims and processes one request through potentially multiple SQL batches |
 | Start-DataverseSync.ps1 -Mode Verify | Read-only reconciliation, after its authentication setup |
 | Development run-once/replay POST endpoints | Mutations, not status checks |
 

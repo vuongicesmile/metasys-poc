@@ -12,7 +12,9 @@
     "TemperatureSensor": 789100001,
     "Temperature Sensor": 789100001,
     "TestRig": 789100002,
-    "Test Rig": 789100002
+    "Test Rig": 789100002,
+    "ElectricMeter": 789100003,
+    "Electric Meter": 789100003
   },
   "sources": [
     {
@@ -20,8 +22,8 @@
       "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/Building/",
       "mapping": "building-v1",
       "targetTable": "fmc_bmsbuilding",
-      "extensions": [ "csv", "json", "xlsx" ],
-      "localSample": "building.csv",
+      "extensions": [ "xlsx" ],
+      "localSample": "building.xlsx",
       "ownedKeyPrefix": "BLD",
       "maxRows": 10000
     },
@@ -30,8 +32,8 @@
       "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/Equipment/",
       "mapping": "equipment-v1",
       "targetTable": "fmc_bmsequipment",
-      "extensions": [ "csv", "json", "xlsx" ],
-      "localSample": "equipment.csv",
+      "extensions": [ "xlsx" ],
+      "localSample": "equipment.xlsx",
       "ownedKeyPrefix": "EQ",
       "maxRows": 100000
     },
@@ -39,10 +41,10 @@
       "key": "spo-electric-meter",
       "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/ElectricMeter/",
       "mapping": "electric-meter-v1",
-      "targetTable": "",
-      "extensions": [ "csv", "json", "xlsx" ],
-      "enabled": false,
-      "localSample": "electric_meter.csv",
+      "targetTable": "fmc_bmsequipment",
+      "extensions": [ "xlsx" ],
+      "localSample": "electric_meter.xlsx",
+      "ownedKeyPrefix": "EM",
       "maxRows": 100000
     },
     {
@@ -50,8 +52,8 @@
       "pathPrefix": "/Shared Documents/FMC-Inbox/01-Master/WaterMeter/",
       "mapping": "water-meter-v1",
       "targetTable": "fmc_bmsequipment",
-      "extensions": [ "csv", "json", "xlsx" ],
-      "localSample": "water_meter.csv",
+      "extensions": [ "xlsx" ],
+      "localSample": "water_meter.xlsx",
       "ownedKeyPrefix": "WM",
       "maxRows": 100000
     },
@@ -60,8 +62,8 @@
       "pathPrefix": "/Shared Documents/FMC-Inbox/02-Telemetry/Electricity/",
       "mapping": "electricity-reading-v1",
       "targetTable": "fmc_bmspoint,fmc_bmsreading",
-      "extensions": [ "csv", "json", "xlsx" ],
-      "localSample": "electricity_reading_hourly.csv",
+      "extensions": [ "xlsx" ],
+      "localSample": "electricity_reading_hourly.xlsx",
       "ownedKeyPrefix": "EM",
       "timestampUtcOffset": "+07:00",
       "maxRows": 250000
@@ -71,8 +73,8 @@
       "pathPrefix": "/Shared Documents/FMC-Inbox/02-Telemetry/Water/",
       "mapping": "water-reading-v1",
       "targetTable": "fmc_bmspoint,fmc_bmsreading",
-      "extensions": [ "csv", "json", "xlsx" ],
-      "localSample": "water_reading_hourly.csv",
+      "extensions": [ "xlsx" ],
+      "localSample": "water_reading_hourly.xlsx",
       "ownedKeyPrefix": "WM",
       "timestampUtcOffset": "+07:00",
       "maxRows": 250000

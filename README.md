@@ -56,7 +56,7 @@ the command worker, then run `FMC - Request SQL to Dataverse Sync` in Power
 Automate. The worker claims queued requests and drains their SQL cutoff; keep
 its window open and use Ctrl+C to stop until a production service identity is installed.
 See the [repeatable setup and operating steps (Vietnamese)](docs/runbooks/sql-to-dataverse-runbook.vi.md).
-Running `dotnet run --project .\DataverseSyncWorker` also starts the command worker.
+Running `dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App` also starts the command worker.
 For this Developer environment it reuses the authenticated Azure CLI bundled by
 `rmit-fm-data`; no secret is copied into this repository. The Dataverse schema
 has been provisioned, the initial SQL backlog has been delivered, and live rows
@@ -102,7 +102,7 @@ production identity guidance, and tests.
 
    ```powershell
    Invoke-RestMethod http://localhost:5300/api/dataverse-sync/status
-   dotnet run --project .\DataverseSyncWorker -- --verify
+   dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --verify
    ```
 
    A completed run has `pendingRows = 0` and `deadLetterRows = 0`. A successful

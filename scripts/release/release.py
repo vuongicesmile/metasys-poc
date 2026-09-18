@@ -59,10 +59,10 @@ def classify(files):
     paths = set(files)
     infrastructure = any(p.startswith(("scripts/release/", "config/release.", ".github/workflows/")) for p in paths)
     solution = any(p.startswith("dataverse/FMCentralBms/") for p in paths)
-    plugin = any(p.startswith("plugins/") for p in paths)
+    plugin = any(p.startswith(("Dataverse.Plugin/", "plugins/")) for p in paths)
     web = [p for p in CONFIG["webResources"] if p in paths]
     dashboard = solution or plugin or infrastructure or any(p.startswith(CONFIG["pageDirectory"] + "/") for p in paths)
-    backend = infrastructure or any(p.startswith(("BMS.Ingestion/", "DataverseSyncWorker/", "BMS.Fake/", "tests/", "sql/"))
+    backend = infrastructure or any(p.startswith(("BMS.Ingestion/", "BMS.Fake/", "Dataverse.SyncWorker/", "DataverseSyncWorker/", "SPO.Ingestion.", "tests/", "sql/"))
                                    or p.endswith((".sln", "Directory.Build.props", "Directory.Packages.props")) for p in paths)
     if CONFIG["pageDirectory"] + "/app-spec.json" in paths and not solution:
         raise ValueError("app-spec changed: build/export the model-driven solution into dataverse/FMCentralBms before tagging")
@@ -123,7 +123,7 @@ def validate(plan, out):
         for project, project_file in (
             ("BMS.Fake.App", "BMS.Fake/BMS.Fake.App/BMS.Fake.App.csproj"),
             ("BMS.Ingestion.App", "BMS.Ingestion/BMS.Ingestion.App/BMS.Ingestion.App.csproj"),
-            ("DataverseSyncWorker", "DataverseSyncWorker/DataverseSyncWorker.csproj"),
+            ("DataverseSyncWorker", "Dataverse.SyncWorker/Dataverse.SyncWorker.App/Dataverse.SyncWorker.App.csproj"),
         ):
             dest = out / "workers" / project
             command("dotnet", "publish", project_file, "-c", "Release", "-o", dest)
@@ -139,9 +139,9 @@ def validate(plan, out):
         key = os.environ.get("FMC_PLUGIN_SIGNING_KEY")
         if not key or not Path(key).is_file():
             raise ValueError("Plugin changed: set FMC_PLUGIN_SIGNING_KEY to the existing .snk; no cloud writes made")
-        command("dotnet", "build", "plugins/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj", "-c", "Release",
+        command("dotnet", "build", "Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj", "-c", "Release",
                 f"-p:AssemblyOriginatorKeyFile={key}")
-        dll = ROOT / "plugins/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll"
+        dll = ROOT / "Dataverse.Plugin/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll"
         manifests = list((ROOT / "dataverse/FMCentralBms/PluginAssemblies").glob("*/FMCentralBmsPlugins.dll.data.xml"))
         if len(manifests) != 1:
             raise ValueError("Expected one plugin manifest")
@@ -204,7 +204,7 @@ def deploy(plan, out, receipt):
         doc.find(".//SolutionManifest/Version").text = plan["solutionVersion"]
         doc.write(metadata, encoding="utf-8", xml_declaration=True)
         if plan["plugin"]:
-            dll = ROOT / "plugins/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll"
+            dll = ROOT / "Dataverse.Plugin/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll"
             matches = list(staged.glob("PluginAssemblies/*/FMCentralBmsPlugins.dll"))
             if len(matches) != 1:
                 raise ValueError("Expected one plugin assembly in solution source")

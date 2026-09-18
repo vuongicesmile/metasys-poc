@@ -97,9 +97,7 @@ def build(entity_set, catalog_id, category_id):
     normalized_item_path = "concat('/', " + item_path + ")"
     supported = (
         "@and(equals(coalesce(" + is_folder + ", false), false),"
-        "or(endsWith(toLower(" + item_name + "), '.csv'),"
-        "endsWith(toLower(" + item_name + "), '.json'),"
-        "endsWith(toLower(" + item_name + "), '.xlsx')),"
+        "endsWith(toLower(" + item_name + "), '.xlsx'),"
         + "or(startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/01-Master/Building/'))),"
         "startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/01-Master/Equipment/'))),"
         "startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/01-Master/WaterMeter/'))),"
@@ -408,7 +406,7 @@ def main():
     parser.add_argument("mode", choices=["render", "deploy", "enable", "disable", "verify", "test"])
     args = parser.parse_args()
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
-    appsettings = json.loads((ROOT / "DataverseSyncWorker/appsettings.json").read_text(encoding="utf-8-sig"))
+    appsettings = json.loads((ROOT / "Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json").read_text(encoding="utf-8-sig"))
     token_python = appsettings["Dataverse"]["DeveloperTokenPython"]
     token = subprocess.check_output(
         [token_python, str(ROOT / "scripts/get-dataverse-token.py")], text=True
@@ -695,7 +693,7 @@ def verify(api, rows, flow_id):
         raise RuntimeError("SPO sync flow is inactive or has the wrong business-event trigger")
     callbacks = rows(
         "callbackregistrations",
-        f"sdkmessagename eq '{API_NAME}'",
+        f"sdkmessagename eq '{API_NAME}' and softdeletestatus eq 0",
         "callbackregistrationid,sdkmessagename,entityname,softdeletestatus",
     )
     if len(callbacks) != 1 or callbacks[0]["entityname"] != "none" or callbacks[0]["softdeletestatus"] != 0:

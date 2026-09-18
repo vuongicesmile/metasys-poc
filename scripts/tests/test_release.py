@@ -38,12 +38,12 @@ class ReleaseTests(unittest.TestCase):
         self.assertTrue(release.classify(["dataverse/FMCentralBms/Other/Solution.xml"])["dashboard"])
 
     def test_plugin_requires_signed_build_and_page_validation(self):
-        plan = release.classify(["plugins/FMCentralBms.Plugins/RequestBmsSync.cs"])
+        plan = release.classify(["Dataverse.Plugin/FMCentralBms.Plugins/RequestBmsSync.cs"])
         self.assertTrue(plan["plugin"])
         self.assertTrue(plan["dashboard"])
 
     def test_backend_change_is_packaged_separately(self):
-        plan = release.classify(["DataverseSyncWorker/Services/SyncEngine.cs"])
+        plan = release.classify(["Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/SyncEngine.cs"])
         self.assertTrue(plan["backend"])
         self.assertFalse(plan["solution"])
 
