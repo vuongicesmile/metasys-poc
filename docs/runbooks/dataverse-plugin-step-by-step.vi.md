@@ -106,7 +106,7 @@ Lệnh sinh project, code mẫu và signing key. Template của PAC 2.11.2 sinh
 
 Trong editor, xóa file mẫu `Plugin1.cs` của project vừa tạo, thêm file
 `RequireEquipmentBuilding.cs` ở cùng thư mục với `.csproj`, rồi paste code ở
-bước 4. `PluginBase.cs` có thể giữ lại; rule này trực tiếp triển khai `IPlugin`
+bước 4. Rule này trực tiếp triển khai `IPlugin` (helpers nằm trong `Infrastructure/` / `Shared/`)
 nên không cần kế thừa base class đó.
 
 Cấu trúc cần hiểu:
@@ -115,10 +115,12 @@ Cấu trúc cần hiểu:
 Dataverse.Plugin/FMCentralBms.Plugins/
   FMCentralBms.Plugins.csproj    cấu hình build/dependencies/version
   FMCentralBms.Plugins.snk       key ký assembly, giữ ổn định khi cập nhật
-  RequireEquipmentBuilding.cs   logic nghiệp vụ
-  PluginBase.cs                 helper do template sinh; mẫu này không dùng
-  bin/Release/net48/            kết quả build
-  obj/                         file trung gian do build sinh
+  Plugins/RequireEquipmentBuilding.cs   IPlugin entry (type name không đổi)
+  Infrastructure/                PluginServices, BusinessEventPluginBase
+  Shared/                        constants, ClientRequestId
+  Services/                      SyncRequestStore, NotificationOutbox
+  bin/Release/net48/             kết quả build
+  obj/                           file trung gian do build sinh
 ```
 
 Các dòng quan trọng trong [project thật](../../Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj):

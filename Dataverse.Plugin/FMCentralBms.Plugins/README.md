@@ -1,6 +1,20 @@
 # FMCentralBms.Plugins
 
-Dataverse plug-in source for the Equipment → Building validation rule.
+Dataverse plug-in source for FMCentralBms (single signed net48 assembly).
+
+## Layout
+
+```text
+Infrastructure/   PluginServices, BusinessEventPluginBase
+Shared/           Entity names, choice constants, ClientRequestId, EmailAddress
+Services/         SyncRequestStore, NotificationOutbox, NotificationMessageBuilder
+Plugins/          IPlugin entry points registered in Dataverse
+```
+
+Public type names stay under `FMCentralBms.Plugins.*` so existing step
+registrations keep working after rebuild.
+
+## Signing
 
 The local signing key `FMCentralBms.Plugins.snk` is intentionally excluded from
 Git. Before building on another machine, obtain the existing key from the project

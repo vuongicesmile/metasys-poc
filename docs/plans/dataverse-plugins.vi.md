@@ -129,8 +129,8 @@ lần cập nhật; signing key này không phải credential đăng nhập Data
 Bài này chỉ dùng SDK có sẵn trong sandbox nên đăng ký DLL là đủ.
 [Microsoft: build and package](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/build-and-package).
 
-Xóa file mẫu `Plugin1.cs`, tạo `RequireEquipmentBuilding.cs` với toàn bộ nội dung sau.
-`PluginBase.cs` do template sinh có thể giữ lại; class dưới đây dùng trực tiếp `IPlugin`.
+Xóa file mẫu `Plugin1.cs`, tạo `Plugins/RequireEquipmentBuilding.cs` với toàn bộ nội dung sau.
+Class dùng trực tiếp `IPlugin`; helpers dùng chung nằm trong `Infrastructure/` / `Shared/` / `Services/`.
 
 ```csharp
 using System;
