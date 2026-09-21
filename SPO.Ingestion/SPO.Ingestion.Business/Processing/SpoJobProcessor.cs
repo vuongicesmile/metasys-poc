@@ -7,6 +7,7 @@ namespace SPO.Ingestion.Business;
 public sealed class SpoJobProcessor(
     SpoIngestionOptions options,
     ISpoJobStore store,
+    ISpoJobUnitOfWorkFactory sessions,
     TabularParser parser,
     SpoBronzeMapper mapper,
     SpoRecordValidator validator,
@@ -15,12 +16,12 @@ public sealed class SpoJobProcessor(
     public async Task<SpoJobManifest> Process(string jobId, CancellationToken ct)
     {
         await store.Initialize(ct);
-        await using var lease = await store.TryLease(jobId, ct);
-        if (lease is null) return await store.Read(jobId, ct);
+        await using var session = await sessions.TryCreate(jobId, ct);
+        if (session is null) return await store.Read(jobId, ct);
         var job = await store.Read(jobId, ct);
         if (job.Status == "Completed") return job;
         job = job with { Status = "Processing", Attempt = job.Attempt + 1, Error = null };
-        await store.Save(job, lease, ct);
+        await session.Save(job, ct);
         try
         {
             var source = SpoConfiguration.Resolve(options, job.SourcePath);
@@ -45,7 +46,7 @@ public sealed class SpoJobProcessor(
                         point.EventTimeUtc == current.EventTimeUtc && point.SourceOrdinal > current.SourceOrdinal)
                         latest[point.Identity] = point;
                 var pointResult = await writer.Write(latest.Values.ToArray(), ct);
-                await store.SaveReceiptSegment(jobId, "points", pointResult.Receipts, ct);
+                await session.SaveReceiptSegment("points", pointResult.Receipts, ct);
                 delivered += pointResult.Delivered; skipped += pointResult.Skipped;
                 var segment = 0;
                 var deliveredEvents = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -61,7 +62,7 @@ public sealed class SpoJobProcessor(
                         }).ToArray();
                     if (history.Length == 0 && duplicateReceipts.Count == 0) continue;
                     var result = await writer.Write(history, ct);
-                    await store.SaveReceiptSegment(jobId, $"history-{segment++:D6}",
+                    await session.SaveReceiptSegment($"history-{segment++:D6}",
                         result.Receipts.Concat(duplicateReceipts).ToArray(), ct);
                     delivered += result.Delivered; skipped += result.Skipped + duplicateReceipts.Count;
                 }
@@ -70,30 +71,30 @@ public sealed class SpoJobProcessor(
             {
                 var mapped = mapper.Map(source, rows, now);
                 var result = await writer.Write(mapped.Records, ct);
-                await store.SaveReceipts(jobId, result.Receipts, ct);
+                await session.SaveReceipts(result.Receipts, ct);
                 delivered = result.Delivered; skipped += result.Skipped;
             }
             job = job with { Status = "Completed", InputRows = rows.Count, Delivered = delivered,
                 Skipped = skipped, Error = null };
-            await store.Save(job, lease, ct);
+            await session.Save(job, ct);
             return job;
         }
         catch (InvalidDataException ex)
         {
             job = job with { Status = "Failed", Error = ex.Message };
-            await store.Save(job, lease, ct);
+            await session.Save(job, ct);
             return job;
         }
         catch (SpoDependencyException ex)
         {
             job = job with { Status = job.Attempt < 12 ? "WaitingDependency" : "Failed", Error = ex.Message };
-            await store.Save(job, lease, ct);
+            await session.Save(job, ct);
             return job;
         }
         catch (Exception ex)
         {
             job = job with { Status = job.Attempt < 5 ? "Retrying" : "Failed", Error = ex.Message };
-            await store.Save(job, lease, ct);
+            await session.Save(job, ct);
             throw;
         }
     }

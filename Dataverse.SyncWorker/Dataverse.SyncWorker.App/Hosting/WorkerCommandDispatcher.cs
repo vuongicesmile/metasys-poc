@@ -32,7 +32,7 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             else
             {
                 await provisioner.ReadBmsRelationMetadata(true);
-                var seeder = new BmsRelationshipSeeder(new DataverseBmsRelationStore(connection.Get()), options);
+                var seeder = services.GetRequiredService<BmsRelationshipSeeder>();
                 if (relationCommand.Mode == "--verify-bms-relations")
                 {
                     await provisioner.VerifyBmsRelationUi();

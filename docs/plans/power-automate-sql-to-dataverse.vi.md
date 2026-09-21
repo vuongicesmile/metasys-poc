@@ -44,7 +44,7 @@ không tạo flow cho từng reading, không đưa toàn bộ lịch sử SQL l�
 Nguồn baseline: [hợp đồng implementation](../reference/dataverse-deployment.md),
 [Program.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.App/Program.cs),
 [SyncOptions.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Common/Configuration/SyncOptions.cs),
-[SyncEngine.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs) và
+[SyncEngine.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/SyncEngine.cs) và
 [SqlStore.cs](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SqlStore.cs).
 [Plan 3.0](plan-3.0-sql-to-dataverse.md) chỉ là thiết kế lịch sử.
 

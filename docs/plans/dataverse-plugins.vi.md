@@ -45,7 +45,7 @@ Các điểm quyết định thiết kế:
 - [Provisioner](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseProvisioner.BmsRelations.cs) đặt `fmc_buildingid` là `ApplicationRequired`; Point → Equipment vẫn optional để hỗ trợ dữ liệu cũ.
 - [ReadingMapper](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/ReadingMapper.cs) tạo GUID từ SourceId và source key; payload Equipment luôn có Building lookup.
 - [DataverseWriter](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseWriter.cs) dùng `UpsertRequest` cho standard tables; elastic history dùng `UpsertMultiple`.
-- [SyncEngine](../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs) ghi Building, Equipment rồi Point/history; SQL acknowledgement sau khi các write cần thiết thành công.
+- [SyncEngine](../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/SyncEngine.cs) ghi Building, Equipment rồi Point/history; SQL acknowledgement sau khi các write cần thiết thành công.
 
 ## 2. Nên làm những plug-in nào?
 

@@ -1,4 +1,7 @@
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
+using SPO.Ingestion.App.Hosting;
+using SPO.Ingestion.Business.Abstractions;
 using DataverseSyncWorker.Models;
 using DataverseSyncWorker.Services;
 using SPO.Ingestion.Business;
@@ -32,18 +35,14 @@ var options = SpoConfiguration.Load(configPath);
 // ingest-dataverse-once chạy một vòng; watch-dataverse tiếp tục polling đến khi Ctrl+C.
 if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
 {
-    var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "DataverseSyncWorker", "appsettings.json")));
+    var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "Dataverse.SyncWorker", "Dataverse.SyncWorker.App", "appsettings.json")));
     var maxFiles = int.Parse(Arg("--max", "20"), System.Globalization.CultureInfo.InvariantCulture);
     var pollSeconds = int.Parse(Arg("--poll-seconds", "10"), System.Globalization.CultureInfo.InvariantCulture);
     if (pollSeconds is < 2 or > 3600) throw new ArgumentOutOfRangeException("--poll-seconds", "poll-seconds must be 2..3600.");
     var dataverse = LoadDataverseOptions(appsettingsPath);
     // CLI là composition root: tại đây mới tạo implementation DataAccess thật.
-    using var connection = new DataverseConnection(dataverse);
-    var client = connection.Get();
-    var writer = new DataverseBronzeWriter(client, options);
-    var mapper = new SpoBronzeMapper(options);
-    var local = new SpoLocalProcessor(new TabularParser(), mapper, new SpoRecordValidator(mapper), writer, options);
-    var inbox = new SpoDataverseInboxProcessor(client, local, options);
+    await using var services = BuildServices(options, dataverse);
+    var inbox = services.GetRequiredService<SpoDataverseInboxProcessor>();
     using var stop = new CancellationTokenSource();
     Console.CancelKeyPress += (_, eventArgs) => { eventArgs.Cancel = true; stop.Cancel(); };
 
@@ -76,14 +75,12 @@ if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
 // ingest-local đọc sample trên máy nhưng vẫn dùng cùng mapper/validator/writer với cloud path.
 if (args[0] == "ingest-local")
 {
-    var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "DataverseSyncWorker", "appsettings.json")));
+    var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "Dataverse.SyncWorker", "Dataverse.SyncWorker.App", "appsettings.json")));
     var sourceKey = Arg("--source", "");
     var currentOnly = args.Contains("--current-only", StringComparer.Ordinal);
     var dataverse = LoadDataverseOptions(appsettingsPath);
-    using var connection = new DataverseConnection(dataverse);
-    var writer = new DataverseBronzeWriter(connection.Get(), options);
-    var mapper = new SpoBronzeMapper(options);
-    var runner = new SpoLocalProcessor(new TabularParser(), mapper, new SpoRecordValidator(mapper), writer, options);
+    await using var services = BuildServices(options, dataverse);
+    var runner = services.GetRequiredService<SpoLocalProcessor>();
     // Chọn source được bật và sắp catalog cha trước reading.
     var selected = options.Sources
         .Where(x => x.Enabled && x.LocalSample is not null)
@@ -130,7 +127,8 @@ if (args[0] == "ingest-local")
 }
 // Command còn lại duy nhất là preview-all: chỉ parse/map để kiểm tra, không ghi Dataverse.
 if (args[0] != "preview-all") throw new InvalidOperationException("Unknown command. Use --help.");
-var previewer = new SpoPreviewer(new TabularParser(), new SpoBronzeMapper(options));
+await using var previewServices = BuildServices(options);
+var previewer = previewServices.GetRequiredService<SpoPreviewer>();
 var results = new List<object>();
 var exit = 0;
 foreach (var source in options.Sources.Where(x => x.LocalSample is not null))
@@ -171,4 +169,22 @@ static SyncOptions LoadDataverseOptions(string path)
         ?? throw new InvalidOperationException($"Dataverse section is invalid in '{path}'.");
     options.Validate();
     return options;
+}
+
+static ServiceProvider BuildServices(SpoIngestionOptions options, SyncOptions? dataverse = null)
+{
+    var services = new ServiceCollection();
+    services.AddSpoProcessing(options);
+    if (dataverse is not null)
+    {
+        services.AddSingleton(dataverse);
+        services.AddSingleton<DataverseConnection>();
+        // Connection sở hữu SDK client; các adapter chỉ mượn client.
+        services.AddSingleton<ISpoBronzeWriter>(sp => new DataverseBronzeWriter(
+            sp.GetRequiredService<DataverseConnection>().Get(), options));
+        services.AddTransient(sp => new SpoDataverseInboxProcessor(
+            sp.GetRequiredService<DataverseConnection>().Get(),
+            sp.GetRequiredService<SpoLocalProcessor>(), options));
+    }
+    return services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 }

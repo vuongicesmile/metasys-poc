@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(sp => new BlobJobStore(storageConnectionString,
             sp.GetRequiredService<SpoIngestionOptions>()));
         services.AddSingleton<ISpoJobStore>(sp => sp.GetRequiredService<BlobJobStore>());
+        services.AddSingleton<ISpoJobUnitOfWorkFactory, SpoJobUnitOfWorkFactory>();
         // DI sở hữu và dispose SDK client khi host dừng.
         services.AddSingleton(_ => new ServiceClient(dataverseConnectionString));
         services.AddSingleton<ISpoBronzeWriter, DataverseBronzeWriter>();

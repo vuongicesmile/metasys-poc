@@ -24,12 +24,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DataverseConnection>();
         services.AddSingleton<IIntegrationFailureClassifier, DataverseFailureClassifier>();
         services.AddSingleton<IDataverseWriter, DataverseWriter>();
-        services.AddSingleton<SyncEngine>();
-        services.AddSingleton<ISyncEngine>(sp => sp.GetRequiredService<SyncEngine>());
+        services.AddSingleton<ISyncBatchUnitOfWorkFactory, SqlSyncBatchUnitOfWorkFactory>();
         services.AddSingleton<SyncRequestStore>();
         services.AddSingleton<ISyncRequestStore>(services => services.GetRequiredService<SyncRequestStore>());
         services.AddTransient<DataverseProvisioner>();
         services.AddTransient<DataversePluginProvisioner>();
+        services.AddTransient<IBmsRelationStore>(sp => new DataverseBmsRelationStore(sp.GetRequiredService<DataverseConnection>().Get()));
+        services.AddTransient<BmsRelationshipSeeder>();
         return services;
     }
 }

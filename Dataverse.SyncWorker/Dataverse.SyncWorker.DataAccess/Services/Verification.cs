@@ -82,7 +82,7 @@ public static class Verification
                 .UseSqlServer(cs.ConnectionString)
                 .Options;
             var catalogReader = new SqlCatalogReader(new TestDbContextFactory(dbOptions));
-            var engine = new SyncEngine(sql, catalogReader, mapper, sink, options, logs.CreateLogger<SyncEngine>());
+            var engine = new SyncEngine(new SqlSyncBatchUnitOfWorkFactory(sql), catalogReader, mapper, sink, options, logs.CreateLogger<SyncEngine>());
             async Task Exec(string command)
             {
                 await using var c = await sql.Open(CancellationToken.None);

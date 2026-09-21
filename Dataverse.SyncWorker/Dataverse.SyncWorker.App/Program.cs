@@ -17,7 +17,7 @@ builder.Host.UseWindowsService(options => options.ServiceName = "FMCentralDatave
 
 // Đăng ký toàn bộ adapter SQL, Dataverse, command processor và hosted worker.
 builder.Services.AddDataverseSync(builder.Configuration);
-var app = builder.Build();
+await using var app = builder.Build();
 
 // Maintenance commands chạy xong rồi thoát trước app.RunAsync();
 // đây là ranh giới an toàn để verify/provision không vô tình chạy sync nền.

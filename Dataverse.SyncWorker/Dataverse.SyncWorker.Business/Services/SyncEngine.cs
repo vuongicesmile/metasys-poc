@@ -1,8 +1,6 @@
 using DataverseSyncWorker.Abstractions;
 using DataverseSyncWorker.Contracts;
-using DataverseSyncWorker.DataAccess.Abstractions;
 using DataverseSyncWorker.Models;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace DataverseSyncWorker.Services;
@@ -11,7 +9,7 @@ namespace DataverseSyncWorker.Services;
 /// Điều phối một batch SQL → Dataverse theo thứ tự catalog, current point, history rồi Ack.
 /// Thứ tự này bảo đảm lookup cha tồn tại và SQL chỉ đánh dấu thành công sau khi ghi đủ dữ liệu.
 /// </summary>
-public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader, ReadingMapper mapper, IDataverseWriter writer,
+public sealed class SyncEngine(ISyncBatchUnitOfWorkFactory sessions, ISqlCatalogReader catalogReader, ReadingMapper mapper, IDataverseWriter writer,
     SyncOptions options, ILogger<SyncEngine> logger) : ISyncEngine
 {
     // Semaphore chống hai batch chạy đồng thời trong cùng process.
@@ -25,15 +23,14 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
         try
         {
             // App lock có phạm vi SQL session nên connection phải sống suốt batch.
-            await using var c = await store.Open(ct);
-            if (!await store.Lock(c, ct)) return new(0, 0, 0, true);
-            try { return await RunLocked(c, ct, cutoffId); }
-            finally { await store.Unlock(c); }
+            await using var session = await sessions.TryCreate(ct);
+            if (session is null) return new(0, 0, 0, true);
+            return await RunLocked(session, ct, cutoffId);
         }
         finally { _gate.Release(); }
     }
 
-    private async Task<BatchResult> RunLocked(SqlConnection c, CancellationToken ct, long? cutoffId)
+    private async Task<BatchResult> RunLocked(ISyncBatchUnitOfWork session, CancellationToken ct, long? cutoffId)
     {
         // Mỗi command đều đồng bộ catalog trước. Building là bản ghi cha nên phải
         // tồn tại trước equipment; equipment phải tồn tại trước lookup của point.
@@ -43,14 +40,14 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
         await writer.WriteEquipment(catalog.Equipment.Select(mapper.Equipment).ToArray(), ct);
         logger.LogInformation("Catalog synchronized: {Buildings} buildings, {Equipment} equipment",
             catalog.Buildings.Count, catalog.Equipment.Count);
-        var batch = await store.ReadBatch(c, ct, cutoffId);
+        var batch = await session.ReadBatch( ct, cutoffId);
         // Catalog vẫn được đồng bộ dù không có reading pending để đảm bảo lookup cha tồn tại.
         if (batch.Count == 0) return new(0, 0, 0);
         var valid = new List<BmsReading>();
         foreach (var row in batch)
         {
             // Validation lỗi từng row được quarantine; row hợp lệ tiếp tục cùng batch.
-            if (mapper.Validate(row) is { } error) await store.Quarantine(c, row, error, ct);
+            if (mapper.Validate(row) is { } error) await session.Quarantine( row, error, ct);
             else valid.Add(row);
         }
         var points = new List<DataverseRecord>();
@@ -59,7 +56,7 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
         {
             // Current state được chọn theo thời gian event mới nhất, không theo id
             // lớn nhất. Nhờ vậy replay/backfill một event cũ không làm tụt giá trị hiện tại.
-            var latest = await store.Latest(c, group.Key, ct);
+            var latest = await session.Latest( group.Key, ct);
             if (mapper.Validate(latest) is { } error)
                 throw new InvalidOperationException($"Latest reading {latest.Id} requires correction: {error}");
             points.Add(mapper.Point(latest));
@@ -74,7 +71,7 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
         }
         // Chỉ acknowledge sau khi point và history (nếu bật) cùng ghi thành công.
         // Nếu Dataverse lỗi giữa chừng, lần chạy sau sẽ replay an toàn nhờ identity cố định.
-        foreach (var row in valid) await store.Ack(c, row, ct);
+        foreach (var row in valid) await session.Ack( row, ct);
         logger.LogInformation("Batch {FirstId}..{LastId}: delivered {Delivered}, quarantined {Quarantined}",
             batch[0].Id, batch[^1].Id, valid.Count, batch.Count - valid.Count);
         return new(batch.Count, valid.Count, batch.Count - valid.Count);

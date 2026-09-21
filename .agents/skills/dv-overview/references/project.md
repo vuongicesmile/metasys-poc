@@ -33,7 +33,7 @@ to this baseline. Public identifiers above do not supply credentials.
 | Schema, solution, role and view provisioning | [DataverseProvisioner.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseProvisioner.cs) |
 | Deterministic identity, UTC, values and TTL | [ReadingMapper.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/ReadingMapper.cs) |
 | Source reads, delivery ledger and locks | [SqlStore.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SqlStore.cs) |
-| Batch orchestration and acknowledgement | [SyncEngine.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs) |
+| Batch orchestration and acknowledgement | [SyncEngine.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/SyncEngine.cs) |
 | Remote writes and retry handling | [DataverseWriter.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/DataverseWriter.cs) |
 | Self-test and live sample checks | [Verification.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/Verification.cs) |
 | Command modes and endpoints | [Program.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.App/Program.cs) |

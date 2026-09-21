@@ -13,12 +13,20 @@ public static class ServiceCollectionExtensions
         string storageConnectionString,
         string dataverseConnectionString)
     {
-        services.AddSingleton(options);
+        services.AddSpoProcessing(options);
         services.AddSpoDataAccess(storageConnectionString, dataverseConnectionString);
+        services.AddSingleton<SpoJobProcessor>();
+        return services;
+    }
+
+    public static IServiceCollection AddSpoProcessing(this IServiceCollection services, SpoIngestionOptions options)
+    {
+        services.AddSingleton(options);
         services.AddSingleton<TabularParser>();
         services.AddSingleton<SpoBronzeMapper>();
         services.AddSingleton<SpoRecordValidator>();
-        services.AddSingleton<SpoJobProcessor>();
+        services.AddSingleton<SpoPreviewer>();
+        services.AddTransient<SpoLocalProcessor>();
         return services;
     }
 }

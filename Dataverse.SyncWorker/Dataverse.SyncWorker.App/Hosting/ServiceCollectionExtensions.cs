@@ -15,6 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(options);
         services.AddSingleton<ReadingMapper>();
         services.AddSyncDataAccess(configuration);
+        services.AddSingleton<SyncEngine>();
+        services.AddSingleton<ISyncEngine>(sp => sp.GetRequiredService<SyncEngine>());
         services.AddSingleton<CommandProcessor>();
         services.AddSingleton<ICommandProcessor>(sp => sp.GetRequiredService<CommandProcessor>());
         services.AddSingleton<RuntimeState>();
