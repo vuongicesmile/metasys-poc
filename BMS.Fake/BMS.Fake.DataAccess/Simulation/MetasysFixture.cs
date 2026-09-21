@@ -1,18 +1,20 @@
-using BMS.Ingestion.Domain.Models;
+using BMS.Fake.Business.Contracts;
 
 namespace BMS.Fake.DataAccess.Simulation;
 
-/// <summary>Deterministic source fixture owned by the simulator adapter.</summary>
+/// <summary>Fixture deterministic được adapter simulator sở hữu.</summary>
 internal static class MetasysFixture
 {
-    public static IReadOnlyList<BmsBuilding> Buildings { get; } =
+    // Catalog building cố định để mọi lần chạy có cùng dữ liệu đầu vào.
+    public static IReadOnlyList<BmsBuildingDto> Buildings { get; } =
     [
         new("BLDG-A", "Building A", "Building A", "Building in the Fake Metasys BMS fixture."),
         new("BLDG-B", "Building B", "Building B", "Building in the Fake Metasys BMS fixture."),
         new("BLDG-TEST", "Test Building", "Test Building", "Building for POC relationship test points.")
     ];
 
-    public static IReadOnlyList<BmsEquipment> Equipment { get; } =
+    // Catalog equipment cố định; BuildingCode tạo quan hệ tới Buildings.
+    public static IReadOnlyList<BmsEquipmentDto> Equipment { get; } =
     [
         new("EQ-A-WM-001", "Main Water Meter A", "WaterMeter", "BLDG-A", "Fake water meter equipment."),
         new("EQ-B-WM-002", "Secondary Water Meter B", "WaterMeter", "BLDG-B", "Fake water meter equipment."),
@@ -20,7 +22,8 @@ internal static class MetasysFixture
         new("EQ-TEST-RIG-001", "BMS Relationship Test Rig", "TestRig", "BLDG-TEST", "Fake test rig with two points for a 1:N demo.")
     ];
 
-    public static Dictionary<string, MetasysPoint> CreatePoints() =>
+    // Tạo dictionary state mới cho mỗi MetasysPointStore.
+    public static Dictionary<string, MetasysPointDto> CreatePoints() =>
         new(StringComparer.OrdinalIgnoreCase)
         {
             ["WATER-001"] = NewPoint("WATER-001", "Main Water Meter", "WaterConsumption", "Building A", "EQ-A-WM-001", 350.00m, "m3"),
@@ -30,7 +33,8 @@ internal static class MetasysFixture
             ["TEST-POWER-AUTOMATE-002"] = NewPoint("TEST-POWER-AUTOMATE-002", "Power Automate Test Point 2", "Temperature", "Test Building", "EQ-TEST-RIG-001", 26.2345m, "C")
         };
 
-    private static MetasysPoint NewPoint(
+    // Helper tạo một point DTO với metadata và giá trị ban đầu.
+    private static MetasysPointDto NewPoint(
         string id,
         string name,
         string type,

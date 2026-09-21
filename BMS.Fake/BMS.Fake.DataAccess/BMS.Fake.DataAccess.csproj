@@ -11,6 +11,8 @@
     <ProjectReference Include="..\BMS.Fake.Business\BMS.Fake.Business.csproj" />
     <ProjectReference Include="..\BMS.Fake.Common\BMS.Fake.Common.csproj" />
     <ProjectReference Include="..\BMS.Fake.Domain\BMS.Fake.Domain.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
   </ItemGroup>
 
 </Project>

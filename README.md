@@ -150,6 +150,10 @@ different from the local Windows-authenticated default.
 dotnet run --project .\BMS.Fake\BMS.Fake.App\BMS.Fake.App.csproj
 ```
 
+`BMS.Fake` dùng database riêng `BMS_Fake`. Connection string nằm trong
+`BMS.Fake/BMS.Fake.App/appsettings.json`; lần chạy đầu, EF Core tự tạo schema và
+seed dữ liệu mẫu vào các bảng thuộc schema `fake`.
+
 The API listens on `http://localhost:5100` and exposes:
 
 - Swagger UI: `http://localhost:5100/swagger`

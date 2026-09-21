@@ -1,12 +1,18 @@
-using BMS.Ingestion.Domain.Models;
+using BMS.Fake.Business.Contracts;
 using BMS.Fake.Business.Models;
+using BMS.Ingestion.Domain.Models;
 
 namespace BMS.Fake.Business.Abstractions;
 
-/// <summary>Business-facing port for publishing COV events to subscribers.</summary>
+/// <summary>Cổng business để tạo subscription và phát COV event tới subscribers.</summary>
 public interface ISubscriptionManager
 {
-    SubscriptionResponse Create(IEnumerable<string> objectIds);
+    /// <summary>Tạo subscription cho danh sách ObjectId.</summary>
+    SubscriptionResponseDto Create(IEnumerable<string> objectIds);
+
+    /// <summary>Tìm runtime subscription theo ID.</summary>
     MetasysSubscription? Get(string id);
+
+    /// <summary>Phát event tới các subscription đang theo dõi ObjectId đó.</summary>
     void Publish(CovEvent covEvent);
 }

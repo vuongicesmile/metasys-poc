@@ -1,6 +1,9 @@
 using BMS.Ingestion.Domain.Models;
+using BMS.Fake.DataAccess.Persistence;
 using BMS.Fake.DataAccess.Services;
 using BMS.Fake.Domain.Rules;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace MetasysPoc.Tests;
 
@@ -15,16 +18,21 @@ public sealed class BmsFakeApiTests
     }
 
     [Fact]
-    public void Point_store_keeps_fixture_state_private_and_emits_cov_event()
+    public async Task Point_store_keeps_fixture_state_private_and_emits_cov_event()
     {
-        var store = new MetasysPointStore();
-        var original = store.Get("WATER-001");
+        var options = new DbContextOptionsBuilder<FakeBmsDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        var factory = new PooledDbContextFactory<FakeBmsDbContext>(options);
+        await new FakeBmsDatabaseInitializer(factory).InitializeAsync();
+        var store = new MetasysPointStore(factory);
+        var original = await store.GetAsync("WATER-001");
 
         Assert.NotNull(original);
 
         var timestamp = DateTime.UtcNow;
-        var covEvent = store.ChangeValue("WATER-001", 351.25m, timestamp);
-        var current = store.Get("WATER-001");
+        var covEvent = await store.ChangeValueAsync("WATER-001", 351.25m, timestamp);
+        var current = await store.GetAsync("WATER-001");
 
         Assert.NotNull(current);
         Assert.Equal(350.00m, original!.Value);
