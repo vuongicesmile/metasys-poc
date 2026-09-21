@@ -119,8 +119,12 @@ public sealed class MetasysPointStore(
     {
         // Context này được dùng cho cả đọc, update và commit.
         await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
-        // Transaction giữ previous value và update nhất quán.
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        // SQL Server cần transaction để giữ previous value và update nhất quán.
+        // Provider InMemory dùng trong unit test không hỗ trợ transaction; trong
+        // trường hợp đó một DbContext vẫn giữ toàn bộ thao tác trong cùng test scope.
+        await using var transaction = db.Database.IsRelational()
+            ? await db.Database.BeginTransactionAsync(cancellationToken)
+            : null;
 
         // Không dùng AsNoTracking vì cần EF theo dõi entity để tạo UPDATE.
         var point = await db.Points
@@ -137,7 +141,8 @@ public sealed class MetasysPointStore(
         // EF tạo UPDATE SQL cho point.
         await db.SaveChangesAsync(cancellationToken);
         // Xác nhận update thành công.
-        await transaction.CommitAsync(cancellationToken);
+        if (transaction is not null)
+            await transaction.CommitAsync(cancellationToken);
 
         // CovEvent là shared contract mà BMS.Ingestion đọc qua SSE.
         return new CovEvent
