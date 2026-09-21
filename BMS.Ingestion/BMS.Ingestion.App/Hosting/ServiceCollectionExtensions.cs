@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(new IngestionRuntimeOptions(settings.Sql.Enabled && sqlEnabled));
         // Status tracker dùng chung cho worker và các endpoint status.
         services.AddSingleton<IngestionStatusTracker>();
-        // Đăng ký DbContext factory cùng hai repository EF Core.
+        // Đăng ký Unit of Work factory và các repository EF Core scoped.
         services.AddBmsIngestionDataAccess(settings.Sql.ConnectionString);
         // Tạo HttpClient có base URL trỏ tới Fake Metasys.
         services.AddHttpClient(MetasysClient.ClientName, client =>

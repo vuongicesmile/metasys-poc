@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
 
         // Initializer được gọi một lần trước khi app nhận request.
         services.AddSingleton<FakeBmsDatabaseInitializer>();
+        services.AddSingleton<IFakeUnitOfWorkFactory, FakeUnitOfWorkFactory>();
 
         // Point store là singleton về mặt service nhưng tạo DbContext theo từng method.
         services.AddSingleton<IMetasysPointStore, MetasysPointStore>();

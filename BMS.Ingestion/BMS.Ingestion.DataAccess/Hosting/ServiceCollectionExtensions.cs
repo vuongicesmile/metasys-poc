@@ -10,20 +10,21 @@ namespace BMS.Ingestion.DataAccess.Hosting;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Đăng ký pooled DbContext factory và hai repository có trách nhiệm riêng.
-    /// Connection string chỉ được dùng khi repository thực hiện thao tác database.
+    /// Đăng ký pooled DbContext, repositories, Unit of Work và factory dùng bởi worker.
     /// </summary>
     public static IServiceCollection AddBmsIngestionDataAccess(
         this IServiceCollection services,
         string connectionString)
     {
-        // Đăng ký factory để mỗi thao tác có một DbContext ngắn hạn.
-        services.AddPooledDbContextFactory<BmsIngestionDbContext>(options =>
+        // Mỗi DI scope có một DbContext; dispose scope sẽ trả context về pool.
+        services.AddDbContextPool<BmsIngestionDbContext>(options =>
             options.UseSqlServer(connectionString));
-        // Repository catalog chỉ xử lý building và equipment.
-        services.AddSingleton<IBmsCatalogRepository, BmsCatalogRepository>();
-        // Repository reading chỉ xử lý append reading history.
-        services.AddSingleton<IBmsReadingRepository, BmsReadingRepository>();
+        // Các repository scoped dùng chung DbContext của Unit of Work.
+        services.AddScoped<IBmsCatalogRepository, BmsCatalogRepository>();
+        services.AddScoped<IBmsReadingRepository, BmsReadingRepository>();
+        services.AddScoped<IBmsIngestionUnitOfWork, BmsIngestionUnitOfWork>();
+        // BackgroundService là singleton nên chỉ nhận factory an toàn về lifetime.
+        services.AddSingleton<IBmsIngestionUnitOfWorkFactory, BmsIngestionUnitOfWorkFactory>();
         // Trả lại IServiceCollection để có thể nối tiếp các đăng ký khác.
         return services;
     }

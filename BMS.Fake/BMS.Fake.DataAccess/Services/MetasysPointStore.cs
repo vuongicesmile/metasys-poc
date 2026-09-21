@@ -8,7 +8,8 @@ namespace BMS.Fake.DataAccess.Services;
 
 /// <summary>Repository đọc/ghi current state của Fake Metasys bằng EF Core.</summary>
 public sealed class MetasysPointStore(
-    IDbContextFactory<FakeBmsDbContext> contextFactory) : IMetasysPointStore
+    IDbContextFactory<FakeBmsDbContext> contextFactory,
+    IFakeUnitOfWorkFactory unitOfWorkFactory) : IMetasysPointStore
 {
     /// <summary>Đọc catalog building từ database, không tracking entity.</summary>
     public async Task<IReadOnlyList<BmsBuildingDto>> GetBuildingsAsync(
@@ -118,13 +119,8 @@ public sealed class MetasysPointStore(
         CancellationToken cancellationToken = default)
     {
         // Context này được dùng cho cả đọc, update và commit.
-        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
-        // SQL Server cần transaction để giữ previous value và update nhất quán.
-        // Provider InMemory dùng trong unit test không hỗ trợ transaction; trong
-        // trường hợp đó một DbContext vẫn giữ toàn bộ thao tác trong cùng test scope.
-        await using var transaction = db.Database.IsRelational()
-            ? await db.Database.BeginTransactionAsync(cancellationToken)
-            : null;
+        await using var unitOfWork = await unitOfWorkFactory.CreateAsync(cancellationToken);
+        var db = unitOfWork.Context;
 
         // Không dùng AsNoTracking vì cần EF theo dõi entity để tạo UPDATE.
         var point = await db.Points
@@ -139,10 +135,7 @@ public sealed class MetasysPointStore(
         point.Timestamp = timestamp;
 
         // EF tạo UPDATE SQL cho point.
-        await db.SaveChangesAsync(cancellationToken);
-        // Xác nhận update thành công.
-        if (transaction is not null)
-            await transaction.CommitAsync(cancellationToken);
+        await unitOfWork.CommitAsync(cancellationToken);
 
         // CovEvent là shared contract mà BMS.Ingestion đọc qua SSE.
         return new CovEvent

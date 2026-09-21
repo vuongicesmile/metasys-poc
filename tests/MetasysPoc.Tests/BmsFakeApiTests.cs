@@ -25,7 +25,7 @@ public sealed class BmsFakeApiTests
             .Options;
         var factory = new PooledDbContextFactory<FakeBmsDbContext>(options);
         await new FakeBmsDatabaseInitializer(factory).InitializeAsync();
-        var store = new MetasysPointStore(factory);
+        var store = new MetasysPointStore(factory, new FakeUnitOfWorkFactory(factory));
         var original = await store.GetAsync("WATER-001");
 
         Assert.NotNull(original);

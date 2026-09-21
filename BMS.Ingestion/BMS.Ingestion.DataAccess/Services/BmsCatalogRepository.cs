@@ -7,39 +7,26 @@ namespace BMS.Ingestion.DataAccess.Services;
 
 /// <summary>Upsert catalog nguồn vào raw.bms_building và raw.bms_equipment.</summary>
 public sealed class BmsCatalogRepository(
-    // Factory tạo DbContext theo từng lần xử lý catalog.
-    IDbContextFactory<BmsIngestionDbContext> contextFactory) : IBmsCatalogRepository
+    // Scoped DbContext được chia sẻ bởi các repository trong cùng Unit of Work.
+    BmsIngestionDbContext db) : IBmsCatalogRepository
 {
     /// <summary>
-    /// Validate và upsert trọn một catalog snapshot trong một SQL transaction.
-    /// Tòa nhà được save trước thiết bị để thỏa mãn foreign key.
+    /// Validate và stage trọn một catalog snapshot; Unit of Work chịu trách nhiệm commit.
     /// </summary>
-    public async Task PersistCatalogAsync(
+    public async Task StageAsync(
         BmsCatalogDto catalog,
         CancellationToken cancellationToken = default)
     {
-        // Kiểm tra duplicate key và quan hệ thiết bị - tòa nhà trước khi mở transaction.
+        // Kiểm tra duplicate key và quan hệ thiết bị - tòa nhà trước khi query database.
         ValidateCatalog(catalog);
 
-        // Tạo context mới cho lần đồng bộ catalog này.
-        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
-        // Mọi thay đổi building/equipment phải commit hoặc rollback cùng nhau.
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         // Dùng cùng một timestamp cho toàn bộ snapshot để dữ liệu nhất quán.
         var now = DateTime.UtcNow;
 
-        // Upsert tòa nhà trước.
+        // Stage building trước; EF sẽ sắp xếp INSERT theo foreign key khi commit.
         await UpsertBuildingsAsync(db, catalog.Buildings, now, cancellationToken);
-        // Flush INSERT/UPDATE tòa nhà xuống SQL trước khi xử lý FK thiết bị.
-        await db.SaveChangesAsync(cancellationToken);
-
-        // Upsert thiết bị sau khi tòa nhà đã tồn tại.
+        // Stage equipment trong cùng change tracker và transaction commit.
         await UpsertEquipmentAsync(db, catalog.Equipment, now, cancellationToken);
-        // Flush INSERT/UPDATE thiết bị xuống SQL.
-        await db.SaveChangesAsync(cancellationToken);
-
-        // Xác nhận toàn bộ transaction thành công.
-        await transaction.CommitAsync(cancellationToken);
     }
 
     /// <summary>Đọc các tòa nhà đã có một lần, sau đó update hoặc add từng DTO.</summary>

@@ -19,10 +19,8 @@ public sealed class CovIngestionWorker(
     IngestionStatusTracker status,
     // Client gọi API Metasys/Fake Metasys.
     IMetasysClient metasys,
-    // Repository lưu catalog building/equipment.
-    IBmsCatalogRepository catalogRepository,
-    // Repository append reading history.
-    IBmsReadingRepository repository,
+    // Factory tạo persistence boundary ngắn hạn cho từng lần ghi nguyên tử.
+    IBmsIngestionUnitOfWorkFactory unitOfWorkFactory,
     // Logger của worker.
     ILogger<CovIngestionWorker> logger) : BackgroundService
 {
@@ -40,8 +38,10 @@ public sealed class CovIngestionWorker(
             var catalog = await metasys.ReadCatalogAsync(stoppingToken);
             if (runtimeOptions.SqlEnabled)
             {
-                // Chuyển source model thành DTO tại ranh giới Business/DataAccess.
-                await catalogRepository.PersistCatalogAsync(catalog.ToPersistenceDto(), stoppingToken);
+                await using var unitOfWork = await unitOfWorkFactory.CreateAsync(stoppingToken);
+                // Stage toàn bộ catalog rồi commit bằng cùng một EF Core Unit of Work.
+                await unitOfWork.Catalog.StageAsync(catalog.ToPersistenceDto(), stoppingToken);
+                await unitOfWork.CommitAsync(stoppingToken);
                 // Cập nhật status sau khi catalog đã ghi thành công.
                 status.CatalogPersisted(catalog.Buildings.Length, catalog.Equipment.Length);
             }
@@ -70,9 +70,11 @@ public sealed class CovIngestionWorker(
 
                 if (runtimeOptions.SqlEnabled)
                 {
-                    // Chuyển event thành DTO rồi append vào reading repository.
-                    await repository.InsertAsync(covEvent.ToPersistenceDto(), stoppingToken);
-                    // Chỉ tăng RowsInserted sau khi SaveChanges thành công.
+                    await using var unitOfWork = await unitOfWorkFactory.CreateAsync(stoppingToken);
+                    // Mỗi COV được commit độc lập để event lỗi không bị ghi nhận thành công.
+                    unitOfWork.Readings.Add(covEvent.ToPersistenceDto());
+                    await unitOfWork.CommitAsync(stoppingToken);
+                    // Chỉ tăng RowsInserted sau khi commit thành công.
                     status.RowInserted();
                 }
             }

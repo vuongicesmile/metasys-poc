@@ -247,11 +247,16 @@ CovEvent       -> BmsReadingDto
 - `MetasysClient` gọi source API và biến SSE JSON thành `CovEvent`.
 - `BmsIngestionDbContext` khai báo mapping tới schema `raw`.
 - `BmsEntities` chứa class chỉ dành cho EF; không dùng ở Business layer.
-- `BmsCatalogRepository` upsert catalog trong transaction.
-- `BmsReadingRepository` append reading và để SQL Server sinh `id`.
+- `BmsCatalogRepository.StageAsync` chuẩn bị upsert catalog trong change tracker.
+- `BmsReadingRepository.Add` chuẩn bị append reading và để SQL Server sinh `id`.
 
-`BmsIngestionDbContext` dùng `IDbContextFactory`. Mỗi repository operation tạo
-một context ngắn hạn rồi dispose sau khi hoàn tất.
+`IBmsIngestionUnitOfWorkFactory` là singleton được inject vào worker. Mỗi catalog
+snapshot hoặc COV event tạo một DI scope ngắn hạn, trong đó Unit of Work và hai
+repository dùng chung một pooled `BmsIngestionDbContext`. `CommitAsync` gọi
+`SaveChangesAsync` một lần; SQL Server transaction bao phủ toàn bộ thay đổi,
+EF sắp xếp building/equipment theo foreign key. Dispose scope giải phóng context;
+thay đổi chưa commit bị bỏ. Chỉ cập nhật status thành công sau commit.
+Không giữ Unit of Work qua vòng đời SSE stream; không dùng đồng thời trên nhiều thread.
 
 ### 6.5 EF Core mapping
 
@@ -288,7 +293,8 @@ MetasysClient.ReadCatalogAsync
   -> GET objects
   -> MetasysCatalog
   -> BmsPersistenceDtoMapper.ToPersistenceDto
-  -> BmsCatalogRepository.PersistCatalogAsync
+  -> BmsCatalogRepository.StageAsync
+  -> UnitOfWork.CommitAsync
 ```
 
 Catalog validation kiểm tra:
@@ -305,7 +311,8 @@ MetasysClient.ReadEventsAsync
   -> deserialize thành CovEvent
   -> worker cập nhật status
   -> mapper tạo BmsReadingDto
-  -> BmsReadingRepository.InsertAsync
+  -> BmsReadingRepository.Add
+  -> UnitOfWork.CommitAsync
   -> EF Core SaveChangesAsync
   -> SQL INSERT raw.bms_reading
 ```
