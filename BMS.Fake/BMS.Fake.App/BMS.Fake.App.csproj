@@ -11,7 +11,6 @@
     <ProjectReference Include="..\BMS.Fake.Common\BMS.Fake.Common.csproj" />
     <ProjectReference Include="..\BMS.Fake.DataAccess\BMS.Fake.DataAccess.csproj" />
     <ProjectReference Include="..\BMS.Fake.Domain\BMS.Fake.Domain.csproj" />
-    <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.Domain\BMS.Ingestion.Domain.csproj" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
 

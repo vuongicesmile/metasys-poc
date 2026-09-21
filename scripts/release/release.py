@@ -62,7 +62,7 @@ def classify(files):
     plugin = any(p.startswith(("Dataverse.Plugin/", "plugins/")) for p in paths)
     web = [p for p in CONFIG["webResources"] if p in paths]
     dashboard = solution or plugin or infrastructure or any(p.startswith(CONFIG["pageDirectory"] + "/") for p in paths)
-    backend = infrastructure or any(p.startswith(("BMS.Ingestion/", "BMS.Fake/", "Dataverse.SyncWorker/", "DataverseSyncWorker/", "SPO.Ingestion.", "tests/", "sql/"))
+    backend = infrastructure or any(p.startswith(("BMS.Ingestion/", "BMS.Fake/", "Dataverse.SyncWorker/", "DataverseSyncWorker/", "SPO.Ingestion/", "tests/", "sql/"))
                                    or p.endswith((".sln", "Directory.Build.props", "Directory.Packages.props")) for p in paths)
     if CONFIG["pageDirectory"] + "/app-spec.json" in paths and not solution:
         raise ValueError("app-spec changed: build/export the model-driven solution into dataverse/FMCentralBms before tagging")

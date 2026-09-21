@@ -24,9 +24,8 @@ Start at the [documentation index](docs/README.md):
 
 ## SharePoint cloud ingestion
 
-`SPO.Ingestion.Domain`, `SPO.Ingestion.Common`, `SPO.Ingestion.Business`,
-`SPO.Ingestion.DataAccess`, `SPO.Ingestion.App`, `SPO.Ingestion.Cli` and
-`SPO.Ingestion.Functions` implement the
+The projects under `SPO.Ingestion/` (`Domain`, `Common`, `Business`,
+`DataAccess`, `App`, `Cli` and `Functions`) implement the
 cloud-ready SharePoint file path: CSV/JSON/XLSX raw snapshots in Azure Blob Storage,
 durable queue/lease processing and typed writes into the existing BMS Bronze tables.
 No new Dataverse table or column is provisioned. Azure deployment is currently

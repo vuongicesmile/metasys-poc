@@ -38,7 +38,7 @@ Write-Host 'Waiting for archived file versions in fmc_spofile. Press Ctrl+C to s
 $logStart = "[$(Get-Date -Format o)] Starting SharePoint watcher`r`n"
 Add-Content -LiteralPath $logPath -Value $logStart -Encoding UTF8
 Write-Host "Log file: $logPath"
-& dotnet run --project (Join-Path $repo 'SPO.Ingestion.Cli') `
+& dotnet run --project (Join-Path $repo 'SPO.Ingestion\SPO.Ingestion.Cli') `
     --configuration Release --no-launch-profile -- `
     watch-dataverse `
     --config (Join-Path $repo 'config/spo-ingestion.json') `

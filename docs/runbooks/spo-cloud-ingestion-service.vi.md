@@ -43,12 +43,12 @@ Các file chính:
 | File/project | Ý nghĩa |
 | --- | --- |
 | `config/spo-ingestion.json` | Route folder → mapper, allowlist extension, row/file limits, UTC offset |
-| `SPO.Ingestion.Business/TabularParser.cs` | CSV quoted newline, JSON array, XLSX sheet; reject formula và zip expansion quá lớn |
-| `SPO.Ingestion.Business/SpoBronzeMapper.cs` | Typed Dataverse `Entity`, decimal 4 số, UTC, stable GUID/partition, TTL |
-| `SPO.Ingestion.DataAccess/DataverseBronzeWriter.cs` | Resolve alternate key/lookup, ownership, current-state concurrency và batch history |
-| `SPO.Ingestion.DataAccess/BlobJobStore.cs` | Raw hash, JobKey, manifest, queue, lease, receipt |
-| `SPO.Ingestion.Business/SpoJobProcessor.cs` | Validate-first, chunk file lớn, dependency retry và terminal status |
-| `SPO.Ingestion.Functions/Functions.cs` | HTTP finalizer, queue consumer và 5-minute reconciler |
+| `SPO.Ingestion/SPO.Ingestion.Business/Parsing/TabularParser.cs` | CSV quoted newline, JSON array, XLSX sheet; reject formula và zip expansion quá lớn |
+| `SPO.Ingestion/SPO.Ingestion.Business/Mapping/SpoBronzeMapper.cs` | Typed Dataverse `Entity`, decimal 4 số, UTC, stable GUID/partition, TTL |
+| `SPO.Ingestion/SPO.Ingestion.DataAccess/Dataverse/DataverseBronzeWriter.cs` | Resolve alternate key/lookup, ownership, current-state concurrency và batch history |
+| `SPO.Ingestion/SPO.Ingestion.DataAccess/Storage/BlobJobStore.cs` | Raw hash, JobKey, manifest, queue, lease, receipt |
+| `SPO.Ingestion/SPO.Ingestion.Business/Processing/SpoJobProcessor.cs` | Validate-first, chunk file lớn, dependency retry và terminal status |
+| `SPO.Ingestion/SPO.Ingestion.Functions/Functions.cs` | HTTP finalizer, queue consumer và 5-minute reconciler |
 | `infra/spo-ingestion/main.bicep` | Storage, containers, queue, Windows Consumption Function App và Application Insights |
 | `scripts/deploy-spo-ingestion.ps1` | Deploy hạ tầng, publish ZIP và deploy Function code |
 
@@ -74,7 +74,7 @@ Chạy từ root repository:
 dotnet restore .\MetasysPoc.sln
 dotnet build .\MetasysPoc.sln -c Release --no-restore
 dotnet test .\tests\MetasysPoc.Tests\MetasysPoc.Tests.csproj -c Release --no-restore
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-restore -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-restore -- `
   preview-all --root .\data --config .\config\spo-ingestion.json `
   --utc-now 2026-09-14T00:00:00Z
 ```

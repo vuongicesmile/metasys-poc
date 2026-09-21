@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj" />
     <ProjectReference Include="..\SPO.Ingestion.App\SPO.Ingestion.App.csproj" />
     <ProjectReference Include="..\SPO.Ingestion.Business\SPO.Ingestion.Business.csproj" />
     <ProjectReference Include="..\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />
@@ -14,6 +14,6 @@
     <ProjectReference Include="..\SPO.Ingestion.Domain\SPO.Ingestion.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\config\spo-ingestion.json" Link="config\spo-ingestion.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\config\spo-ingestion.json" Link="config\spo-ingestion.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

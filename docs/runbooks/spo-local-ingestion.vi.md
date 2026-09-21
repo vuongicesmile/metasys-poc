@@ -30,7 +30,7 @@ Từ repository root:
 ```powershell
 dotnet build .\MetasysPoc.sln -c Release
 
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json `
   --source spo-building --utc-now 2026-09-14T00:00:00Z
 ```
@@ -42,20 +42,20 @@ trước. Receipt đầy đủ được lưu dưới `.artifacts/spo-local/`.
 Ví dụ chạy từng bước:
 
 ```powershell
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-building
 
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-water-meter
 
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-electric-meter
 
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json `
   --source spo-electricity-reading --current-only
 
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-local --root .\data --config .\config\spo-ingestion.json --source spo-water-reading
 ```
 
@@ -153,7 +153,7 @@ chưa hoàn tất cho đến khi worker tương ứng chạy lại.
 Chạy liên tục trước khi bấm nút trong app:
 
 ```powershell
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   watch-dataverse --config .\config\spo-ingestion.json `
   --appsettings .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json `
   --max 20 --poll-seconds 10
@@ -169,7 +169,7 @@ dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
 Muốn test một vòng rồi thoát:
 
 ```powershell
-dotnet run --project .\SPO.Ingestion.Cli -c Release --no-build -- `
+dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- `
   ingest-dataverse-once --config .\config\spo-ingestion.json `
   --appsettings .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json --max 20
 ```

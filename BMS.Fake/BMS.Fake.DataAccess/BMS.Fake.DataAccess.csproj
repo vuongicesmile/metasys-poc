@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BMS.Ingestion\BMS.Ingestion.Domain\BMS.Ingestion.Domain.csproj" />
     <ProjectReference Include="..\BMS.Fake.Business\BMS.Fake.Business.csproj" />
     <ProjectReference Include="..\BMS.Fake.Common\BMS.Fake.Common.csproj" />
     <ProjectReference Include="..\BMS.Fake.Domain\BMS.Fake.Domain.csproj" />

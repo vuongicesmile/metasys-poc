@@ -33,10 +33,9 @@
     <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.Common\Dataverse.SyncWorker.Common.csproj" />
     <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.DataAccess\Dataverse.SyncWorker.DataAccess.csproj" />
     <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.Domain\Dataverse.SyncWorker.Domain.csproj" />
-    <ProjectReference Include="..\..\SPO.Ingestion.Business\SPO.Ingestion.Business.csproj" />
-    <ProjectReference Include="..\..\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />
-    <ProjectReference Include="..\..\SPO.Ingestion.DataAccess\SPO.Ingestion.DataAccess.csproj" />
-    <ProjectReference Include="..\..\SPO.Ingestion.Domain\SPO.Ingestion.Domain.csproj" />
+    <ProjectReference Include="..\..\SPO.Ingestion\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />
+    <ProjectReference Include="..\..\SPO.Ingestion\SPO.Ingestion.DataAccess\SPO.Ingestion.DataAccess.csproj" />
+    <ProjectReference Include="..\..\SPO.Ingestion\SPO.Ingestion.Domain\SPO.Ingestion.Domain.csproj" />
   </ItemGroup>
 
 </Project>
