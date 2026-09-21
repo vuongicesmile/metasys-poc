@@ -6,7 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.App\Dataverse.SyncWorker.App.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.Common\Dataverse.SyncWorker.Common.csproj" />
+    <ProjectReference Include="..\..\Dataverse.SyncWorker\Dataverse.SyncWorker.DataAccess\Dataverse.SyncWorker.DataAccess.csproj" />
     <ProjectReference Include="..\SPO.Ingestion.App\SPO.Ingestion.App.csproj" />
     <ProjectReference Include="..\SPO.Ingestion.Business\SPO.Ingestion.Business.csproj" />
     <ProjectReference Include="..\SPO.Ingestion.Common\SPO.Ingestion.Common.csproj" />

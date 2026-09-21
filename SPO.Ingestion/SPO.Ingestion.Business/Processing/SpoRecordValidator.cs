@@ -1,4 +1,3 @@
-using Microsoft.Xrm.Sdk;
 using SPO.Ingestion.Domain;
 
 namespace SPO.Ingestion.Business;
@@ -35,7 +34,7 @@ public sealed class SpoRecordValidator(SpoBronzeMapper mapper)
             {
                 pointIdentities.Add(point.Identity);
                 var eventKey = $"{point.Identity}|{point.EventTimeUtc:O}";
-                var value = point.Entity.GetAttributeValue<decimal>("fmc_currentvalue");
+                var value = point.Record.Get<decimal>("fmc_currentvalue");
                 if (eventValues.TryGetValue(eventKey, out var previous) && previous != value)
                 {
                     issues.Add(new(point.SourceOrdinal, "SPO-DUPLICATE-EVENT",

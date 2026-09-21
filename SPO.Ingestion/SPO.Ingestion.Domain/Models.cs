@@ -1,5 +1,3 @@
-using Microsoft.Xrm.Sdk;
-
 namespace SPO.Ingestion.Domain;
 
 public sealed record SpoSourceDefinition(
@@ -33,11 +31,36 @@ public sealed record ParsedRow(int Ordinal, IReadOnlyDictionary<string, string?>
 
 public enum BronzeRecordKind { Building, Equipment, Point, History }
 
+/// <summary>
+/// Bản ghi đích thuần .NET. DataAccess chịu trách nhiệm chuyển nó sang Dataverse Entity.
+/// </summary>
+public sealed class TargetRecord(string logicalName, Guid id)
+{
+    public string LogicalName { get; } = logicalName;
+    public Guid Id { get; } = id;
+    public IDictionary<string, object?> Attributes { get; } = new Dictionary<string, object?>();
+
+    public object? this[string name]
+    {
+        get => Attributes[name];
+        set => Attributes[name] = value;
+    }
+
+    public T? Get<T>(string name) =>
+        Attributes.TryGetValue(name, out var value) && value is T typed ? typed : default;
+}
+
+/// <summary>Lookup thuần .NET; DataAccess sẽ đổi thành EntityReference.</summary>
+public sealed record TargetReference(string LogicalName, Guid Id);
+
+/// <summary>Choice thuần .NET; DataAccess sẽ đổi thành OptionSetValue.</summary>
+public sealed record TargetChoice(int Value);
+
 public sealed record BronzeRecord(
     int SourceOrdinal,
     string Identity,
     BronzeRecordKind Kind,
-    Entity Entity,
+    TargetRecord Record,
     DateTime? EventTimeUtc = null,
     string? PartitionId = null,
     string? ParentIdentity = null);

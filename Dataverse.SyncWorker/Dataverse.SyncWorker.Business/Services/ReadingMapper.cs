@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using DataverseSyncWorker.Contracts;
 using DataverseSyncWorker.Models;
-using Microsoft.Xrm.Sdk;
 
 namespace DataverseSyncWorker.Services;
 
@@ -39,9 +39,9 @@ public sealed class ReadingMapper(SyncOptions options)
         return null;
     }
 
-    public Entity Point(BmsReading r)
+    public DataverseRecord Point(BmsReading r)
     {
-        var e = new Entity("fmc_bmspoint", PointId(r.ObjectId));
+        var e = new DataverseRecord("fmc_bmspoint", PointId(r.ObjectId));
         e["fmc_name"] = r.ObjectName ?? r.ObjectId;
         e["fmc_objectid"] = r.ObjectId;
         e["fmc_objecttype"] = r.ObjectType;
@@ -52,11 +52,11 @@ public sealed class ReadingMapper(SyncOptions options)
         e["fmc_sourcesystem"] = r.SourceSystem;
         e["fmc_lastsqlid"] = r.Id.ToString(CultureInfo.InvariantCulture);
         if (!string.IsNullOrWhiteSpace(r.EquipmentCode))
-            e["fmc_equipmentid"] = new EntityReference("fmc_bmsequipment", EquipmentId(r.EquipmentCode));
+            e["fmc_equipmentid"] = new DataverseReference("fmc_bmsequipment", EquipmentId(r.EquipmentCode));
         return e;
     }
 
-    public Entity Building(BmsBuilding row) => new("fmc_bmsbuilding", BuildingId(row.BuildingCode))
+    public DataverseRecord Building(BmsBuilding row) => new("fmc_bmsbuilding", BuildingId(row.BuildingCode))
     {
         ["fmc_name"] = row.Name,
         ["fmc_buildingcode"] = row.BuildingCode,
@@ -64,22 +64,22 @@ public sealed class ReadingMapper(SyncOptions options)
         ["fmc_description"] = row.Description
     };
 
-    public Entity Equipment(BmsEquipment row) => new("fmc_bmsequipment", EquipmentId(row.EquipmentCode))
+    public DataverseRecord Equipment(BmsEquipment row) => new("fmc_bmsequipment", EquipmentId(row.EquipmentCode))
     {
         ["fmc_name"] = row.Name,
         ["fmc_equipmentcode"] = row.EquipmentCode,
-        ["fmc_equipmenttype"] = new OptionSetValue(BmsRelationManifest.TypeValue(row.EquipmentType)),
-        ["fmc_buildingid"] = new EntityReference("fmc_bmsbuilding", BuildingId(row.BuildingCode)),
+        ["fmc_equipmenttype"] = new DataverseChoice(BmsRelationManifest.TypeValue(row.EquipmentType)),
+        ["fmc_buildingid"] = new DataverseReference("fmc_bmsbuilding", BuildingId(row.BuildingCode)),
         ["fmc_description"] = row.Description
     };
 
-    public Entity? History(BmsReading r, DateTime utcNow)
+    public DataverseRecord? History(BmsReading r, DateTime utcNow)
     {
         var time = ReadingUtc(r);
         // Age-based retention: retrying/backfilling must not grant an old row another 30 days.
         var remaining = (int)Math.Ceiling((time.AddSeconds(options.HistoryTtlSeconds) - utcNow).TotalSeconds);
         if (remaining <= 0) return null;
-        var e = new Entity("fmc_bmsreading", ReadingId(r.Id));
+        var e = new DataverseRecord("fmc_bmsreading", ReadingId(r.Id));
         e["partitionid"] = Partition(r.ObjectId);
         e["fmc_name"] = $"{r.ObjectId} {time:O}";
         e["fmc_externalkey"] = $"{options.SourceId}-{r.Id}";

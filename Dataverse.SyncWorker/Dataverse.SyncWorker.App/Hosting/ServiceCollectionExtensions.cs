@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISqlStore>(sp => sp.GetRequiredService<SqlStore>());
         services.AddSingleton<ISqlCatalogReader, SqlCatalogReader>();
         services.AddSingleton<DataverseConnection>();
+        services.AddSingleton<IIntegrationFailureClassifier, DataverseFailureClassifier>();
         services.AddSingleton<IDataverseWriter, DataverseWriter>();
         services.AddSingleton<SyncEngine>();
         services.AddSingleton<ISyncEngine>(sp => sp.GetRequiredService<SyncEngine>());

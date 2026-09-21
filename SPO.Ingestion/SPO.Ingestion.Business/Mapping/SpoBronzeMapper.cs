@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Xrm.Sdk;
 using SPO.Ingestion.Domain;
 
 namespace SPO.Ingestion.Business;
@@ -67,14 +66,14 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         var code = Required(row, "building_id", 50);
         RequireOwnedKey(source, row, code);
         var name = Required(row, "building_name", 200);
-        var entity = new Entity("fmc_bmsbuilding", StableGuid($"metasys-building|{options.SourceId}|{code}"))
+        var record = new TargetRecord("fmc_bmsbuilding", StableGuid($"metasys-building|{options.SourceId}|{code}"))
         {
             ["fmc_name"] = name,
             ["fmc_buildingcode"] = code,
             ["fmc_sourcebuilding"] = code,
             ["fmc_description"] = Describe(row, "city", "building_type", "ownership", "year_built", "gross_floor_area_m2", "total_floors")
         };
-        return new(row.Ordinal, code, BronzeRecordKind.Building, entity);
+        return new(row.Ordinal, code, BronzeRecordKind.Building, record);
     }
 
     private BronzeRecord Equipment(SpoSourceDefinition source, ParsedRow row, string codeField,
@@ -87,15 +86,15 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         if (!options.EquipmentTypeChoices.TryGetValue(type, out var typeValue))
             throw new SpoContractException("SPO-CHOICE", row.Ordinal,
                 $"Equipment type '{type}' is not present in fmc_equipmenttype configuration.");
-        var entity = new Entity("fmc_bmsequipment", StableGuid($"metasys-equipment|{options.SourceId}|{code}"))
+        var record = new TargetRecord("fmc_bmsequipment", StableGuid($"metasys-equipment|{options.SourceId}|{code}"))
         {
             ["fmc_name"] = code,
             ["fmc_equipmentcode"] = code,
-            ["fmc_equipmenttype"] = new OptionSetValue(typeValue),
-            ["fmc_buildingid"] = new EntityReference("fmc_bmsbuilding", StableGuid($"metasys-building|{options.SourceId}|{building}")),
+            ["fmc_equipmenttype"] = new TargetChoice(typeValue),
+            ["fmc_buildingid"] = new TargetReference("fmc_bmsbuilding", StableGuid($"metasys-building|{options.SourceId}|{building}")),
             ["fmc_description"] = Describe(row, descriptionFields)
         };
-        return new(row.Ordinal, code, BronzeRecordKind.Equipment, entity, ParentIdentity: building);
+        return new(row.Ordinal, code, BronzeRecordKind.Equipment, record, ParentIdentity: building);
     }
 
     private IReadOnlyList<BronzeRecord> Reading(ParsedRow row, string meterField,
@@ -112,7 +111,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
             var value = Decimal(row, metric.Field);
             var objectId = $"{meter}/{metric.Field}";
             var eventIdentity = $"{options.SourceNamespace}|{meter}|{time:O}|{metric.Field}";
-            var point = new Entity("fmc_bmspoint", StableGuid($"metasys-point|{options.SourceId}|{objectId}"))
+            var point = new TargetRecord("fmc_bmspoint", StableGuid($"metasys-point|{options.SourceId}|{objectId}"))
             {
                 ["fmc_name"] = $"{meter} {metric.Label}",
                 ["fmc_objectid"] = objectId,
@@ -124,7 +123,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
                 ["fmc_sourcesystem"] = "SharePoint"
             };
             if (attachEquipment)
-                point["fmc_equipmentid"] = new EntityReference("fmc_bmsequipment",
+                point["fmc_equipmentid"] = new TargetReference("fmc_bmsequipment",
                     StableGuid($"metasys-equipment|{options.SourceId}|{meter}"));
             output.Add(new(row.Ordinal, objectId, BronzeRecordKind.Point, point, time,
                 ParentIdentity: attachEquipment ? meter : null));
@@ -132,7 +131,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
             var remaining = (int)Math.Ceiling((time.AddSeconds(options.HistoryTtlSeconds) - utcNow).TotalSeconds);
             if (remaining <= 0) { expired(); continue; }
             var partition = Partition(objectId);
-            var history = new Entity("fmc_bmsreading", StableGuid("spo-reading|" + eventIdentity))
+            var history = new TargetRecord("fmc_bmsreading", StableGuid("spo-reading|" + eventIdentity))
             {
                 ["partitionid"] = partition,
                 ["fmc_name"] = $"{objectId} {time:O}",

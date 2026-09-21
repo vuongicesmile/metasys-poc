@@ -1,4 +1,4 @@
-using Microsoft.Xrm.Sdk;
+using DataverseSyncWorker.Contracts;
 
 namespace DataverseSyncWorker.Abstractions;
 
@@ -8,8 +8,8 @@ namespace DataverseSyncWorker.Abstractions;
 /// </summary>
 public interface IDataverseWriter
 {
-    Task WriteBuildings(IReadOnlyList<Entity> buildings, CancellationToken ct);
-    Task WriteEquipment(IReadOnlyList<Entity> equipment, CancellationToken ct);
-    Task WritePoints(IReadOnlyList<Entity> points, CancellationToken ct);
-    Task WriteHistory(IReadOnlyList<Entity> readings, CancellationToken ct);
+    Task WriteBuildings(IReadOnlyList<DataverseRecord> buildings, CancellationToken ct);
+    Task WriteEquipment(IReadOnlyList<DataverseRecord> equipment, CancellationToken ct);
+    Task WritePoints(IReadOnlyList<DataverseRecord> points, CancellationToken ct);
+    Task WriteHistory(IReadOnlyList<DataverseRecord> readings, CancellationToken ct);
 }

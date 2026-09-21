@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Xml.Linq;
+using DataverseSyncWorker.Contracts;
 using DataverseSyncWorker.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -147,7 +148,7 @@ public static class BmsRelationshipVerification
         Check(XElement.Parse(form).Descendants("RelationshipName").Single().Value == DataverseProvisioner.EquipmentRelationship,
             "equipment subgrid targets the actual proposed point relationship");
         var mappedPoint = new ReadingMapper(options).Point(new BmsReading(1, "WATER-001", "Water", "WaterConsumption", "Building A", "EQ-A-WM-001", DateTime.UtcNow, 1.1234m, "m3", "Fake Metasys COV", null));
-        Check(mappedPoint.GetAttributeValue<EntityReference>("fmc_equipmentid")?.Id == new ReadingMapper(options).EquipmentId("EQ-A-WM-001"),
+        Check(mappedPoint.Get<DataverseReference>("fmc_equipmentid")?.Id == new ReadingMapper(options).EquipmentId("EQ-A-WM-001"),
             "ordinary sync payload carries the deterministic equipment lookup");
         Console.WriteLine($"BMS relationship self-test completed. Receipts: {testRoot}. No SQL or Dataverse connection was made.");
     }

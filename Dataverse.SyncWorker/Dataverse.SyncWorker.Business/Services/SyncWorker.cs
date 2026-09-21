@@ -1,14 +1,12 @@
 using DataverseSyncWorker.Abstractions;
 using DataverseSyncWorker.Models;
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace DataverseSyncWorker.Services;
 
 public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, SyncOptions options, RuntimeState status,
-    ILogger<SyncWorker> logger) : BackgroundService
+    IIntegrationFailureClassifier failures, ILogger<SyncWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
@@ -37,8 +35,7 @@ public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, S
                 if (result.Read == options.BatchSize) continue;
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { return; }
-            catch (Exception ex) when (ex is InvalidOperationException ||
-                ex is FaultException<OrganizationServiceFault> && !DataverseRetryPolicy.IsTransient(ex))
+            catch (Exception ex) when (ex is InvalidOperationException || failures.IsPermanent(ex))
             {
                 // Lỗi schema, quyền hoặc authentication permanent phải dừng để người vận hành sửa.
                 status.Set(new("Blocked", DateTime.UtcNow, Error: "Configuration, authentication, schema or permanent Dataverse error. Correct the cause and restart; SQL delivery remains pending."));

@@ -1,4 +1,5 @@
 using DataverseSyncWorker.Abstractions;
+using DataverseSyncWorker.Contracts;
 using DataverseSyncWorker.DataAccess.Persistence;
 using DataverseSyncWorker.Models;
 using Microsoft.EntityFrameworkCore;
@@ -38,10 +39,10 @@ public static class Verification
             350.1234m, "m3", "Fake Metasys COV", new DateTime(2026, 9, 7, 14, 0, 0));
         var mapped = mapper.History(row, row.ReadingTime)!;
         Assert(mapper.ReadingId(1) == mapper.ReadingId(1) && mapper.ReadingId(1) != mapper.ReadingId(2), "deterministic distinct IDs");
-        Assert((decimal)mapped["fmc_readingvalue"] == 350.1234m, "decimal precision preserved");
-        Assert((DateTime)mapped["fmc_sqlingestedat"] == new DateTime(2026,9,7,7,0,0,DateTimeKind.Utc), "SQL local time converted to UTC");
+        Assert(mapped.Get<decimal>("fmc_readingvalue") == 350.1234m, "decimal precision preserved");
+        Assert(mapped.Get<DateTime>("fmc_sqlingestedat") == new DateTime(2026,9,7,7,0,0,DateTimeKind.Utc), "SQL local time converted to UTC");
         Assert(mapper.History(row with { ReadingTime = DateTime.UtcNow.AddDays(-31) }, DateTime.UtcNow) is null, "expired history is not reintroduced");
-        Assert((int)mapper.History(row, row.ReadingTime.AddSeconds(100))!["ttlinseconds"] == options.HistoryTtlSeconds - 100, "replay does not extend retention");
+        Assert(mapper.History(row, row.ReadingTime.AddSeconds(100))!.Get<int>("ttlinseconds") == options.HistoryTtlSeconds - 100, "replay does not extend retention");
         Assert(mapper.Validate(row with { ReadingValue = 100000000001m }) is not null, "Dataverse decimal overflow quarantined");
 
         // Isolated disposable database; no test writes to FM_Central.raw.bms_reading.
@@ -93,9 +94,9 @@ public static class Verification
             catch (TimeoutException) { }
             Assert(sink.Buildings.Count == 1 && sink.Equipment.Count == 1,
                 "one sync run upserts SQL building and equipment catalogs before readings");
-            Assert(((EntityReference)sink.Equipment.Values.Single()["fmc_buildingid"]).Id == sink.Buildings.Keys.Single(),
+            Assert(((DataverseReference)sink.Equipment.Values.Single()["fmc_buildingid"]!).Id == sink.Buildings.Keys.Single(),
                 "equipment lookup targets the deterministic building ID");
-            Assert(((EntityReference)sink.Points.Values.Single()["fmc_equipmentid"]).Id == sink.Equipment.Keys.Single(),
+            Assert(((DataverseReference)sink.Points.Values.Single()["fmc_equipmentid"]!).Id == sink.Equipment.Keys.Single(),
                 "point lookup targets the deterministic equipment ID");
             Assert((await sql.Summary(CancellationToken.None)).DeliveredRows == 0, "partial Dataverse failure does not advance SQL delivery");
             sink.FailAfterHistory = false;
@@ -105,7 +106,7 @@ public static class Verification
             await Exec("INSERT raw.bms_reading VALUES(10,'WATER-001','Water','WaterConsumption','A','EQ-A-WM-001',DATEADD(minute,-1,SYSUTCDATETIME()),340,'m3','Fake Metasys COV',GETDATE());");
             await engine.Run(CancellationToken.None);
             Assert(sink.History.Count == 2, "late commit below the high watermark is delivered");
-            Assert((decimal)sink.Points.Values.Single()["fmc_currentvalue"] == 350m, "old replay cannot regress current value");
+            Assert(sink.Points.Values.Single().Get<decimal>("fmc_currentvalue") == 350m, "old replay cannot regress current value");
             await Exec("INSERT raw.bms_reading VALUES(21,'WATER-002','Water','WaterConsumption','B',NULL,SYSUTCDATETIME(),100000000001,'m3','Fake Metasys COV',GETDATE());");
             var bad = await engine.Run(CancellationToken.None);
             Assert(bad.Quarantined == 1 && (await sql.Summary(CancellationToken.None)).DeadLetterRows == 1, "invalid row recorded in dead-letter");
@@ -245,20 +246,20 @@ public static class Verification
 
     private sealed class TestWriter : IDataverseWriter
     {
-        public Dictionary<Guid,Entity> Buildings { get; } = [];
-        public Dictionary<Guid,Entity> Equipment { get; } = [];
-        public Dictionary<Guid,Entity> Points { get; } = [];
-        public Dictionary<(Guid,string),Entity> History { get; } = [];
+        public Dictionary<Guid,DataverseRecord> Buildings { get; } = [];
+        public Dictionary<Guid,DataverseRecord> Equipment { get; } = [];
+        public Dictionary<Guid,DataverseRecord> Points { get; } = [];
+        public Dictionary<(Guid,string),DataverseRecord> History { get; } = [];
         public bool FailAfterHistory { get; set; }
-        public Task WriteBuildings(IReadOnlyList<Entity> buildings,CancellationToken ct)
+        public Task WriteBuildings(IReadOnlyList<DataverseRecord> buildings,CancellationToken ct)
         { foreach(var b in buildings) Buildings[b.Id]=b; return Task.CompletedTask; }
-        public Task WriteEquipment(IReadOnlyList<Entity> equipment,CancellationToken ct)
+        public Task WriteEquipment(IReadOnlyList<DataverseRecord> equipment,CancellationToken ct)
         { foreach(var e in equipment) Equipment[e.Id]=e; return Task.CompletedTask; }
-        public Task WritePoints(IReadOnlyList<Entity> points,CancellationToken ct)
+        public Task WritePoints(IReadOnlyList<DataverseRecord> points,CancellationToken ct)
         { foreach(var p in points) Points[p.Id]=p; return Task.CompletedTask; }
-        public Task WriteHistory(IReadOnlyList<Entity> rows,CancellationToken ct)
+        public Task WriteHistory(IReadOnlyList<DataverseRecord> rows,CancellationToken ct)
         {
-            foreach(var r in rows) History[(r.Id,(string)r["partitionid"])]=r;
+            foreach(var r in rows) History[(r.Id,r.Get<string>("partitionid")!)]=r;
             if(FailAfterHistory) throw new TimeoutException("Simulated lost response after remote commit");
             return Task.CompletedTask;
         }

@@ -21,7 +21,7 @@ public sealed class SpoPreviewer(TabularParser parser, SpoBronzeMapper mapper)
                 pointIdentities.Add(point.Identity);
             foreach (var history in mapped.Records.Where(x => x.Kind == BronzeRecordKind.History))
                 historyIdentities.Add(history.Identity);
-            foreach (var group in mapped.Records.Where(x => x.Kind is not (BronzeRecordKind.Point or BronzeRecordKind.History)).GroupBy(x => x.Entity.LogicalName))
+            foreach (var group in mapped.Records.Where(x => x.Kind is not (BronzeRecordKind.Point or BronzeRecordKind.History)).GroupBy(x => x.Record.LogicalName))
                 counts[group.Key] = counts.GetValueOrDefault(group.Key) + group.Count();
             issues.AddRange(mapped.Issues);
             expired += mapped.ExpiredHistory;

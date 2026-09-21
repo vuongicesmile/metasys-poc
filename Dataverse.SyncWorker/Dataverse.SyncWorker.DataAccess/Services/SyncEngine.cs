@@ -1,9 +1,9 @@
 using DataverseSyncWorker.Abstractions;
+using DataverseSyncWorker.Contracts;
 using DataverseSyncWorker.DataAccess.Abstractions;
 using DataverseSyncWorker.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using Microsoft.Xrm.Sdk;
 
 namespace DataverseSyncWorker.Services;
 
@@ -47,7 +47,7 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
             if (mapper.Validate(row) is { } error) await store.Quarantine(c, row, error, ct);
             else valid.Add(row);
         }
-        var points = new List<Entity>();
+        var points = new List<DataverseRecord>();
         foreach (var group in valid.GroupBy(r => r.ObjectId, StringComparer.Ordinal))
         {
             // Current state được chọn theo thời gian event mới nhất, không theo id
@@ -62,7 +62,7 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
         {
             // History có TTL theo reading time; mapper sẽ bỏ qua event đã hết hạn.
             var now = DateTime.UtcNow;
-            var readings = valid.Select(r => mapper.History(r, now)).OfType<Entity>().ToArray();
+            var readings = valid.Select(r => mapper.History(r, now)).OfType<DataverseRecord>().ToArray();
             await writer.WriteHistory(readings, ct);
         }
         // Chỉ acknowledge sau khi point và history (nếu bật) cùng ghi thành công.

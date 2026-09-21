@@ -4,25 +4,15 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using SPO.Ingestion.Business;
 using SPO.Ingestion.Common;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.Business;
-
-public sealed record SpoInboxFileResult(
-    Guid FileId,
-    string FileName,
-    string SourcePath,
-    string ETag,
-    string Status,
-    int InputRows = 0,
-    int Delivered = 0,
-    int Skipped = 0,
-    string? Error = null);
+namespace SPO.Ingestion.DataAccess;
 
 /// <summary>
-/// Consumes SharePoint file versions already archived in fmc_spofile by Power Automate.
-/// The archived ETag is the durable checkpoint: a version is imported at most once.
+/// Đọc file đã archive trong Dataverse và giao nội dung cho Application xử lý.
+/// Class nằm ở DataAccess vì trực tiếp dùng ServiceClient và Microsoft.Xrm.Sdk.
 /// </summary>
 public sealed class SpoDataverseInboxProcessor(
     ServiceClient client,
@@ -51,9 +41,14 @@ public sealed class SpoDataverseInboxProcessor(
 
         var candidates = await ReadCandidates(utcNow, cancellationToken);
         var selected = candidates
-            .Select(row => new { Row = row, Source = TryResolve(row.GetAttributeValue<string>("fmc_sharepointpath")) })
+            .Select(row => new
+            {
+                Row = row,
+                Source = TryResolve(row.GetAttributeValue<string>("fmc_sharepointpath"))
+            })
             .OrderBy(x => SourceOrder(x.Source))
-            .ThenBy(x => x.Row.GetAttributeValue<DateTime?>("fmc_receivedat") ?? x.Row.GetAttributeValue<DateTime>("createdon"))
+            .ThenBy(x => x.Row.GetAttributeValue<DateTime?>("fmc_receivedat") ??
+                         x.Row.GetAttributeValue<DateTime>("createdon"))
             .Take(maxFiles)
             .ToArray();
 
@@ -66,7 +61,9 @@ public sealed class SpoDataverseInboxProcessor(
         return results;
     }
 
-    private async Task<IReadOnlyList<Entity>> ReadCandidates(DateTime utcNow, CancellationToken cancellationToken)
+    private async Task<IReadOnlyList<Entity>> ReadCandidates(
+        DateTime utcNow,
+        CancellationToken cancellationToken)
     {
         var query = new QueryExpression(FileTable)
         {
@@ -83,11 +80,13 @@ public sealed class SpoDataverseInboxProcessor(
         return rows.Where(row =>
         {
             var state = row.GetAttributeValue<OptionSetValue>("fmc_importstatus")?.Value ?? NotRequested;
-            if (state == Processing && row.GetAttributeValue<DateTime>("modifiedon").ToUniversalTime() > staleBefore)
+            if (state == Processing &&
+                row.GetAttributeValue<DateTime>("modifiedon").ToUniversalTime() > staleBefore)
                 return false;
             var etag = row.GetAttributeValue<string>("fmc_etag");
             var imported = row.GetAttributeValue<string>("fmc_importedetag");
-            return !string.IsNullOrWhiteSpace(etag) && !string.Equals(etag, imported, StringComparison.Ordinal);
+            return !string.IsNullOrWhiteSpace(etag) &&
+                   !string.Equals(etag, imported, StringComparison.Ordinal);
         }).ToArray();
     }
 
@@ -102,8 +101,13 @@ public sealed class SpoDataverseInboxProcessor(
         var etag = row.GetAttributeValue<string>("fmc_etag") ?? "";
 
         if (source is null)
-            return await Fail(row, fileName, sourcePath, etag,
-                $"No enabled SPO mapping matches '{sourcePath}'.", cancellationToken);
+            return await Fail(
+                row,
+                fileName,
+                sourcePath,
+                etag,
+                $"No enabled SPO mapping matches '{sourcePath}'.",
+                cancellationToken);
 
         if (!await TryClaim(row, cancellationToken))
             return new(row.Id, fileName, sourcePath, etag, "SkippedConcurrency");
@@ -112,18 +116,28 @@ public sealed class SpoDataverseInboxProcessor(
         {
             var declaredSize = row.GetAttributeValue<int?>("fmc_filesize") ?? 0;
             if (declaredSize <= 0 || declaredSize > options.MaxFileBytes)
-                throw new InvalidDataException($"Archived file size must be 1..{options.MaxFileBytes} bytes; actual={declaredSize}.");
+                throw new InvalidDataException(
+                    $"Archived file size must be 1..{options.MaxFileBytes} bytes; actual={declaredSize}.");
 
             await using var content = await Download(row.Id, cancellationToken);
             if (content.Length != declaredSize)
-                throw new InvalidDataException($"Archived file size mismatch; metadata={declaredSize}, downloaded={content.Length}.");
+                throw new InvalidDataException(
+                    $"Archived file size mismatch; metadata={declaredSize}, downloaded={content.Length}.");
 
             var result = await processor.Process(content, sourcePath, utcNow, cancellationToken);
             if (!string.Equals(result.Status, "Completed", StringComparison.Ordinal))
             {
-                var detail = string.Join(" | ", result.Issues.Take(10).Select(x => $"row {x.Ordinal} {x.Code}: {x.Message}"));
-                return await FailClaimed(row.Id, fileName, sourcePath, etag,
-                    string.IsNullOrWhiteSpace(detail) ? $"Import ended with status {result.Status}." : detail,
+                var detail = string.Join(
+                    " | ",
+                    result.Issues.Take(10).Select(x => $"row {x.Ordinal} {x.Code}: {x.Message}"));
+                return await FailClaimed(
+                    row.Id,
+                    fileName,
+                    sourcePath,
+                    etag,
+                    string.IsNullOrWhiteSpace(detail)
+                        ? $"Import ended with status {result.Status}."
+                        : detail,
                     cancellationToken);
             }
 
@@ -135,8 +149,15 @@ public sealed class SpoDataverseInboxProcessor(
                 ["fmc_processedat"] = utcNow,
                 ["fmc_errormessage"] = null
             }, cancellationToken);
-            return new(row.Id, fileName, sourcePath, etag, "Imported",
-                result.InputRows, result.Delivered, result.Skipped);
+            return new(
+                row.Id,
+                fileName,
+                sourcePath,
+                etag,
+                "Imported",
+                result.InputRows,
+                result.Delivered,
+                result.Skipped);
         }
         catch (SpoDependencyException ex)
         {
@@ -149,7 +170,13 @@ public sealed class SpoDataverseInboxProcessor(
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            return await FailClaimed(row.Id, fileName, sourcePath, etag, ex.Message, cancellationToken);
+            return await FailClaimed(
+                row.Id,
+                fileName,
+                sourcePath,
+                etag,
+                ex.Message,
+                cancellationToken);
         }
     }
 
@@ -183,7 +210,8 @@ public sealed class SpoDataverseInboxProcessor(
                 FileAttributeName = FileColumn
             }, cancellationToken);
         if (initialize.FileSizeInBytes <= 0 || initialize.FileSizeInBytes > options.MaxFileBytes)
-            throw new InvalidDataException($"Dataverse file size must be 1..{options.MaxFileBytes} bytes; actual={initialize.FileSizeInBytes}.");
+            throw new InvalidDataException(
+                $"Dataverse file size must be 1..{options.MaxFileBytes} bytes; actual={initialize.FileSizeInBytes}.");
 
         var stream = new MemoryStream((int)initialize.FileSizeInBytes);
         for (long offset = 0; offset < initialize.FileSizeInBytes; offset += BlockSize)
@@ -202,15 +230,31 @@ public sealed class SpoDataverseInboxProcessor(
     }
 
     private async Task<SpoInboxFileResult> Fail(
-        Entity row, string fileName, string sourcePath, string etag, string error, CancellationToken cancellationToken)
+        Entity row,
+        string fileName,
+        string sourcePath,
+        string etag,
+        string error,
+        CancellationToken cancellationToken)
     {
         if (!await TryClaim(row, cancellationToken))
             return new(row.Id, fileName, sourcePath, etag, "SkippedConcurrency");
-        return await FailClaimed(row.Id, fileName, sourcePath, etag, error, cancellationToken);
+        return await FailClaimed(
+            row.Id,
+            fileName,
+            sourcePath,
+            etag,
+            error,
+            cancellationToken);
     }
 
     private async Task<SpoInboxFileResult> FailClaimed(
-        Guid fileId, string fileName, string sourcePath, string etag, string error, CancellationToken cancellationToken)
+        Guid fileId,
+        string fileName,
+        string sourcePath,
+        string etag,
+        string error,
+        CancellationToken cancellationToken)
     {
         await client.UpdateAsync(new Entity(FileTable, fileId)
         {
@@ -225,8 +269,14 @@ public sealed class SpoDataverseInboxProcessor(
     private SpoSourceDefinition? TryResolve(string? sourcePath)
     {
         if (string.IsNullOrWhiteSpace(sourcePath)) return null;
-        try { return SpoConfiguration.Resolve(options, sourcePath); }
-        catch (InvalidOperationException) { return null; }
+        try
+        {
+            return SpoConfiguration.Resolve(options, sourcePath);
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
     }
 
     private static int SourceOrder(SpoSourceDefinition? source) => source?.Mapping switch

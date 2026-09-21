@@ -2,7 +2,6 @@ using System.Text;
 using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using ClosedXML.Excel;
-using Microsoft.Xrm.Sdk;
 using SPO.Ingestion.Business;
 using SPO.Ingestion.Common;
 using SPO.Ingestion.DataAccess;
@@ -111,10 +110,10 @@ public sealed class SpoIngestionTests
         var first = new SpoBronzeMapper(Options).Map(Source("building-v1"), [row], DateTime.UtcNow);
         var second = new SpoBronzeMapper(Options).Map(Source("building-v1"), [row], DateTime.UtcNow);
 
-        var entity = Assert.Single(first.Records).Entity;
-        Assert.Equal("fmc_bmsbuilding", entity.LogicalName);
-        Assert.Equal("BLD001", entity["fmc_buildingcode"]);
-        Assert.Equal(entity.Id, Assert.Single(second.Records).Entity.Id);
+        var record = Assert.Single(first.Records).Record;
+        Assert.Equal("fmc_bmsbuilding", record.LogicalName);
+        Assert.Equal("BLD001", record["fmc_buildingcode"]);
+        Assert.Equal(record.Id, Assert.Single(second.Records).Record.Id);
     }
 
     [Fact]
@@ -130,13 +129,13 @@ public sealed class SpoIngestionTests
         Assert.Empty(result.Issues);
         Assert.Equal(4, result.Records.Count);
         Assert.Equal(2, result.Records.Count(x => x.Kind == BronzeRecordKind.Point));
-        Assert.DoesNotContain(result.Records, x => x.Entity.GetAttributeValue<string>("fmc_objecttype") is "Voltage" or "Power Factor");
-        var point = result.Records.First(x => x.Kind == BronzeRecordKind.Point).Entity;
-        var history = result.Records.First(x => x.Kind == BronzeRecordKind.History).Entity;
+        Assert.DoesNotContain(result.Records, x => x.Record.Get<string>("fmc_objecttype") is "Voltage" or "Power Factor");
+        var point = result.Records.First(x => x.Kind == BronzeRecordKind.Point).Record;
+        var history = result.Records.First(x => x.Kind == BronzeRecordKind.History).Record;
         Assert.Equal(new DateTime(2026, 9, 14, 1, 0, 0, DateTimeKind.Utc), point["fmc_lastreadingtime"]);
         Assert.Equal(1.2346m, point["fmc_currentvalue"]);
         Assert.False(point.Attributes.ContainsKey("fmc_lastsqlid"));
-        Assert.Equal("fmc_bmsequipment", point.GetAttributeValue<EntityReference>("fmc_equipmentid").LogicalName);
+        Assert.Equal("fmc_bmsequipment", point.Get<TargetReference>("fmc_equipmentid")!.LogicalName);
         Assert.False(history.Attributes.ContainsKey("fmc_sqlreadingid"));
         Assert.False(history.Attributes.ContainsKey("fmc_sqlingestedat"));
     }
@@ -154,7 +153,7 @@ public sealed class SpoIngestionTests
         Assert.Equal(BronzeRecordKind.Equipment, record.Kind);
         Assert.Equal("EM001", record.Identity);
         Assert.Equal("BLD001", record.ParentIdentity);
-        Assert.Equal(789100003, record.Entity.GetAttributeValue<OptionSetValue>("fmc_equipmenttype").Value);
+        Assert.Equal(789100003, record.Record.Get<TargetChoice>("fmc_equipmenttype")!.Value);
     }
 
     [Fact]

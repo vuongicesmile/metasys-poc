@@ -1,4 +1,3 @@
-using Microsoft.Xrm.Sdk;
 using SPO.Ingestion.Common;
 using SPO.Ingestion.Business.Abstractions;
 using SPO.Ingestion.Domain;
