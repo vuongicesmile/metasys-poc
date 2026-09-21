@@ -1,5 +1,7 @@
 using DataverseSyncWorker.Abstractions;
+using DataverseSyncWorker.DataAccess.Persistence;
 using DataverseSyncWorker.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
@@ -12,6 +14,15 @@ namespace DataverseSyncWorker.Services;
 
 public static class Verification
 {
+    private sealed class TestDbContextFactory(DbContextOptions<SqlSyncDbContext> options)
+        : IDbContextFactory<SqlSyncDbContext>
+    {
+        public SqlSyncDbContext CreateDbContext() => new(options);
+
+        public Task<SqlSyncDbContext> CreateDbContextAsync(CancellationToken ct = default) =>
+            Task.FromResult(new SqlSyncDbContext(options));
+    }
+
     private static void Assert(bool condition, string name)
     {
         if (!condition) throw new InvalidOperationException("TEST FAILED: " + name);
@@ -66,7 +77,11 @@ public static class Verification
             }
             var sink = new TestWriter();
             using var logs = LoggerFactory.Create(_ => { });
-            var engine = new SyncEngine(sql, mapper, sink, options, logs.CreateLogger<SyncEngine>());
+            var dbOptions = new DbContextOptionsBuilder<SqlSyncDbContext>()
+                .UseSqlServer(cs.ConnectionString)
+                .Options;
+            var catalogReader = new SqlCatalogReader(new TestDbContextFactory(dbOptions));
+            var engine = new SyncEngine(sql, catalogReader, mapper, sink, options, logs.CreateLogger<SyncEngine>());
             async Task Exec(string command)
             {
                 await using var c = await sql.Open(CancellationToken.None);
@@ -160,7 +175,7 @@ public static class Verification
             WHERE d.history_done=1 ORDER BY r.id DESC;
             """);
         var samples = await SqlStore.Read(cmd,CancellationToken.None);
-        var catalog = await sql.ReadCatalog(c, CancellationToken.None);
+        var catalog = await services.GetRequiredService<ISqlCatalogReader>().Read(CancellationToken.None);
         foreach (var building in catalog.Buildings)
         {
             var actual = await client.RetrieveAsync("fmc_bmsbuilding", mapper.BuildingId(building.BuildingCode),

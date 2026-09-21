@@ -1,6 +1,9 @@
 using DataverseSyncWorker.Models;
 using DataverseSyncWorker.Services;
 using DataverseSyncWorker.Abstractions;
+using DataverseSyncWorker.DataAccess.Abstractions;
+using DataverseSyncWorker.DataAccess.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataverseSyncWorker.Hosting;
 
@@ -11,9 +14,14 @@ public static class ServiceCollectionExtensions
         var options = configuration.GetSection("Dataverse").Get<SyncOptions>() ?? new();
         options.Validate();
         services.AddSingleton(options);
+        services.AddDbContextFactory<SqlSyncDbContext>(builder =>
+            builder.UseSqlServer(configuration.GetConnectionString("Sql")
+                ?? throw new InvalidOperationException("Missing ConnectionStrings:Sql.")));
         services.AddSingleton<ReadingMapper>();
         services.AddSingleton<SqlStore>();
         services.AddSingleton<ISyncLedger>(sp => sp.GetRequiredService<SqlStore>());
+        services.AddSingleton<ISqlStore>(sp => sp.GetRequiredService<SqlStore>());
+        services.AddSingleton<ISqlCatalogReader, SqlCatalogReader>();
         services.AddSingleton<DataverseConnection>();
         services.AddSingleton<IDataverseWriter, DataverseWriter>();
         services.AddSingleton<SyncEngine>();

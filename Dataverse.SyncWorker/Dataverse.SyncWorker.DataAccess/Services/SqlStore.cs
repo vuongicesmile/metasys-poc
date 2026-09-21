@@ -1,4 +1,5 @@
 using DataverseSyncWorker.Abstractions;
+using DataverseSyncWorker.DataAccess.Abstractions;
 using System.Data;
 using System.Text.Json;
 using DataverseSyncWorker.Models;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace DataverseSyncWorker.Services;
 
-public sealed class SqlStore(IConfiguration configuration, SyncOptions options) : ISyncLedger
+public sealed class SqlStore(IConfiguration configuration, SyncOptions options) : ISyncLedger, ISqlStore
 {
     private string ConnectionString => configuration.GetConnectionString("Sql")
         ?? throw new InvalidOperationException("Missing ConnectionStrings:Sql.");
@@ -28,6 +29,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
 
     public async Task<bool> Lock(SqlConnection c, CancellationToken ct)
     {
+        // App lock gắn với SQL session. Vì vậy SyncEngine phải giữ nguyên connection
+        // này trong toàn bộ batch và chỉ release sau khi batch hoàn tất.
         using var cmd = Command(c, "DECLARE @r int; EXEC @r=sp_getapplock @Resource=@pipeline, @LockMode='Exclusive', @LockOwner='Session', @LockTimeout=0; SELECT @r;");
         return Convert.ToInt32(await cmd.ExecuteScalarAsync(ct)) >= 0;
     }
@@ -41,7 +44,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
     private const string Pending = "(d.current_done IS NULL OR d.current_done=0 OR (@history=1 AND d.history_done=0))";
     public async Task<List<BmsReading>> ReadBatch(SqlConnection c, CancellationToken ct, long? cutoffId = null)
     {
-        // Anti-join catches late commits with lower identity values. Never use NOLOCK/READPAST here.
+        // Anti-join đọc delivery ledger thay vì chỉ nhìn watermark. Cách này bắt được
+        // transaction commit muộn có id thấp hơn MAX(id); tuyệt đối không dùng NOLOCK/READPAST.
         using var cmd = Command(c, $"SELECT TOP (@size) {Columns} FROM raw.bms_reading r LEFT JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id WHERE (@cutoff IS NULL OR r.id<=@cutoff) AND {Pending} AND NOT EXISTS (SELECT 1 FROM integration.dataverse_dead_letter x WHERE x.pipeline=@pipeline AND x.bms_reading_id=r.id AND x.resolved_at IS NULL) ORDER BY r.id;");
         cmd.Parameters.Add("@size", SqlDbType.Int).Value = options.BatchSize;
         cmd.Parameters.Add("@cutoff", SqlDbType.BigInt).Value = cutoffId is null ? DBNull.Value : cutoffId.Value;
@@ -81,25 +85,6 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
         using var cmd = Command(c, $"SELECT TOP(1) {Columns} FROM raw.bms_reading r WHERE r.object_id=@object ORDER BY r.reading_time DESC,r.id DESC;");
         cmd.Parameters.Add("@object", SqlDbType.VarChar, 100).Value = objectId;
         return (await Read(cmd, ct)).Single();
-    }
-
-    public async Task<(List<BmsBuilding> Buildings, List<BmsEquipment> Equipment)> ReadCatalog(SqlConnection c, CancellationToken ct)
-    {
-        var buildings = new List<BmsBuilding>();
-        using (var cmd = new SqlCommand("SELECT building_code,name,source_building,description,source_updated_at FROM raw.bms_building ORDER BY building_code;", c))
-        await using (var reader = await cmd.ExecuteReaderAsync(ct))
-            while (await reader.ReadAsync(ct))
-                buildings.Add(new(reader.GetString(0), reader.GetString(1), reader.GetString(2),
-                    reader.IsDBNull(3) ? null : reader.GetString(3), reader.GetDateTime(4)));
-        var equipment = new List<BmsEquipment>();
-        using (var cmd = new SqlCommand("SELECT equipment_code,name,equipment_type,building_code,description,source_updated_at FROM raw.bms_equipment ORDER BY equipment_code;", c))
-        await using (var reader = await cmd.ExecuteReaderAsync(ct))
-            while (await reader.ReadAsync(ct))
-                equipment.Add(new(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3),
-                    reader.IsDBNull(4) ? null : reader.GetString(4), reader.GetDateTime(5)));
-        if (equipment.Any(e => !buildings.Any(b => b.BuildingCode == e.BuildingCode)))
-            throw new InvalidOperationException("SQL equipment catalog refers to a missing building.");
-        return (buildings, equipment);
     }
 
     internal static async Task<List<BmsReading>> Read(SqlCommand cmd, CancellationToken ct)
