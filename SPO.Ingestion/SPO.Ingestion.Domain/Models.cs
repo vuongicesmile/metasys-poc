@@ -36,16 +36,23 @@ public enum BronzeRecordKind { Building, Equipment, Point, History }
 /// </summary>
 public sealed class TargetRecord(string logicalName, Guid id)
 {
+    /// <summary>Tên logical của bảng đích trong Dataverse.</summary>
     public string LogicalName { get; } = logicalName;
+
+    /// <summary>GUID xác định trước để import lại cùng file không tạo dữ liệu trùng.</summary>
     public Guid Id { get; } = id;
+
+    /// <summary>Các cột đã được mapper chuẩn hóa, chưa phụ thuộc Dataverse SDK.</summary>
     public IDictionary<string, object?> Attributes { get; } = new Dictionary<string, object?>();
 
+    /// <summary>Cho phép gán cột bằng cú pháp record["tên_cột"].</summary>
     public object? this[string name]
     {
         get => Attributes[name];
         set => Attributes[name] = value;
     }
 
+    /// <summary>Đọc giá trị theo kiểu mong muốn để validator/test không cần Dataverse SDK.</summary>
     public T? Get<T>(string name) =>
         Attributes.TryGetValue(name, out var value) && value is T typed ? typed : default;
 }

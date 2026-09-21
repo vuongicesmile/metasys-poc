@@ -19,13 +19,16 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
         IReadOnlyList<BronzeRecord> records,
         CancellationToken cancellationToken)
     {
+        // Dừng sớm nếu authentication/connection chưa sẵn sàng.
         if (!client.IsReady)
             throw new InvalidOperationException("Dataverse client is not ready: " + client.LastError);
 
         var receipts = new List<RowReceipt>();
+        // Building phải được ghi trước để equipment có thể resolve lookup cha.
         foreach (var item in records.Where(x => x.Kind == BronzeRecordKind.Building))
             receipts.Add(await UpsertStandard(item, ToEntity(item.Record), "fmc_buildingcode", cancellationToken));
 
+        // Không tin GUID lookup từ file; resolve lại building bằng alternate key đang tồn tại.
         foreach (var item in records.Where(x => x.Kind == BronzeRecordKind.Equipment))
         {
             var entity = ToEntity(item.Record);
@@ -58,6 +61,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
             var entity = ToEntity(point.Record);
             if (point.ParentIdentity is not null)
             {
+                // Cache lookup equipment trong một lần ghi để tránh query lặp cho nhiều metric cùng meter.
                 if (!equipmentIds.TryGetValue(point.ParentIdentity, out var equipmentId))
                 {
                     equipmentId = await ResolveRequired(
@@ -72,6 +76,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
             receipts.Add(await WritePoint(point, entity, cancellationToken));
         }
 
+        // History là elastic table nên gửi theo batch bằng UpsertMultiple.
         var history = records.Where(x => x.Kind == BronzeRecordKind.History).ToArray();
         foreach (var batch in history.Chunk(options.BatchSize))
         {
@@ -103,6 +108,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
         string keyColumn,
         CancellationToken ct)
     {
+        // Tìm bằng alternate key để dùng ID thật nếu bản ghi đã tồn tại từ nguồn khác.
         var keyValue = entity[keyColumn];
         var query = new QueryExpression(entity.LogicalName)
         {
@@ -126,6 +132,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
         string keyValue,
         CancellationToken ct)
     {
+        // Lookup cha thiếu được xem là dependency chưa sẵn sàng, không phải dữ liệu đã giao thành công.
         var query = new QueryExpression(table) { ColumnSet = new ColumnSet(false), TopCount = 2 };
         query.Criteria.AddCondition(keyColumn, ConditionOperator.Equal, keyValue);
         var matches = (await client.RetrieveMultipleAsync(query, ct)).Entities;
@@ -139,6 +146,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
 
     private async Task<RowReceipt> WritePoint(BronzeRecord record, Entity entity, CancellationToken ct)
     {
+        // Optimistic concurrency bảo vệ current state khi nhiều worker cùng cập nhật point.
         for (var attempt = 0; attempt < 5; attempt++)
         {
             var query = new QueryExpression("fmc_bmspoint")
@@ -153,11 +161,13 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
 
             if (matches.Count == 1)
             {
+                // Không cho SPO ghi đè point đang thuộc quyền sở hữu của nguồn SQL/Metasys khác.
                 var currentSource = matches[0].GetAttributeValue<string>("fmc_sourcesystem");
                 if (!string.Equals(currentSource, "SharePoint", StringComparison.OrdinalIgnoreCase))
                     throw new InvalidOperationException(
                         $"SourceOwnershipConflict: point '{record.Identity}' is owned by '{currentSource ?? "unknown"}'.");
 
+                // Event cũ chỉ được lưu history; nó không được làm lùi current state.
                 var current = matches[0].GetAttributeValue<DateTime?>("fmc_lastreadingtime");
                 if (current is not null && current.Value.ToUniversalTime() > record.EventTimeUtc!.Value)
                     return new(record.SourceOrdinal, record.Identity, "fmc_bmspoint", "SkippedOlderCurrent");
@@ -199,6 +209,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
 
     private static Entity ToEntity(TargetRecord record)
     {
+        // Việc phụ thuộc SDK chỉ xuất hiện tại DataAccess boundary này.
         var entity = new Entity(record.LogicalName, record.Id);
         foreach (var (name, value) in record.Attributes)
         {
@@ -214,6 +225,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
 
     private async Task Execute(OrganizationRequest request, CancellationToken ct)
     {
+        // Retry tối đa bốn lần cho timeout, lỗi mạng hoặc throttling.
         for (var attempt = 0; ; attempt++)
         {
             try
@@ -223,6 +235,7 @@ public sealed class DataverseBronzeWriter(ServiceClient client, SpoIngestionOpti
             }
             catch (Exception ex) when (attempt < 4 && IsTransient(ex))
             {
+                // Tôn trọng Retry-After của Dataverse; nếu thiếu thì dùng exponential backoff.
                 var delay = ex is FaultException<OrganizationServiceFault> fault &&
                     fault.Detail.ErrorDetails.TryGetValue("Retry-After", out var retry) &&
                     retry is TimeSpan serverDelay

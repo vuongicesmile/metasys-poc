@@ -44,7 +44,7 @@ public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, S
             }
             catch (Exception ex)
             {
-                // No exception text in public APIs: upstream faults can include request/credential details.
+                // Không đưa nội dung exception vào API public vì lỗi upstream có thể chứa thông tin request/credential.
                 status.Set(new("Failed", DateTime.UtcNow, Error: "Synchronization failed; delivery remains pending. Check schema, SQL and application permissions."));
                 logger.LogWarning("Sync failed ({ErrorType}); delivery remains pending", ex.GetType().Name);
             }

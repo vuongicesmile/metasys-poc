@@ -34,11 +34,13 @@ public sealed class SpoDataverseInboxProcessor(
         DateTime utcNow,
         CancellationToken cancellationToken)
     {
+        // Giới hạn số file giúp một vòng xử lý không giữ worker quá lâu.
         if (maxFiles is < 1 or > 100)
             throw new ArgumentOutOfRangeException(nameof(maxFiles), "maxFiles must be 1..100.");
         if (!client.IsReady)
             throw new InvalidOperationException("Dataverse client is not ready: " + client.LastError);
 
+        // Đọc file có thể xử lý, xác định mapping rồi ưu tiên catalog trước reading.
         var candidates = await ReadCandidates(utcNow, cancellationToken);
         var selected = candidates
             .Select(row => new
@@ -55,6 +57,7 @@ public sealed class SpoDataverseInboxProcessor(
         var results = new List<SpoInboxFileResult>();
         foreach (var candidate in selected)
         {
+            // Tôn trọng yêu cầu dừng trước khi bắt đầu file tiếp theo.
             cancellationToken.ThrowIfCancellationRequested();
             results.Add(await ProcessFile(candidate.Row, candidate.Source, utcNow, cancellationToken));
         }
@@ -65,6 +68,7 @@ public sealed class SpoDataverseInboxProcessor(
         DateTime utcNow,
         CancellationToken cancellationToken)
     {
+        // Chỉ lấy metadata cần thiết; nội dung file được tải riêng sau khi claim thành công.
         var query = new QueryExpression(FileTable)
         {
             ColumnSet = new ColumnSet(
@@ -76,6 +80,7 @@ public sealed class SpoDataverseInboxProcessor(
         query.Criteria.AddCondition("fmc_importstatus", ConditionOperator.In, NotRequested, Processing);
         query.Orders.Add(new OrderExpression("fmc_receivedat", OrderType.Ascending));
         var rows = (await client.RetrieveMultipleAsync(query, cancellationToken)).Entities;
+        // Processing quá 15 phút được xem là lease cũ để worker khác có thể recovery.
         var staleBefore = utcNow.AddMinutes(-15);
         return rows.Where(row =>
         {
@@ -96,6 +101,7 @@ public sealed class SpoDataverseInboxProcessor(
         DateTime utcNow,
         CancellationToken cancellationToken)
     {
+        // Lấy thông tin nhận diện trước để mọi nhánh kết quả đều có đủ receipt.
         var fileName = row.GetAttributeValue<string>("fmc_filename") ?? "(unnamed)";
         var sourcePath = row.GetAttributeValue<string>("fmc_sharepointpath") ?? "";
         var etag = row.GetAttributeValue<string>("fmc_etag") ?? "";
@@ -109,11 +115,13 @@ public sealed class SpoDataverseInboxProcessor(
                 $"No enabled SPO mapping matches '{sourcePath}'.",
                 cancellationToken);
 
+        // Claim bằng RowVersion; chỉ một worker được quyền xử lý phiên bản file này.
         if (!await TryClaim(row, cancellationToken))
             return new(row.Id, fileName, sourcePath, etag, "SkippedConcurrency");
 
         try
         {
+            // So sánh kích thước metadata và file thật để phát hiện archive thiếu/hỏng.
             var declaredSize = row.GetAttributeValue<int?>("fmc_filesize") ?? 0;
             if (declaredSize <= 0 || declaredSize > options.MaxFileBytes)
                 throw new InvalidDataException(
@@ -124,6 +132,7 @@ public sealed class SpoDataverseInboxProcessor(
                 throw new InvalidDataException(
                     $"Archived file size mismatch; metadata={declaredSize}, downloaded={content.Length}.");
 
+            // Application xử lý parse, validate, map và ghi typed records.
             var result = await processor.Process(content, sourcePath, utcNow, cancellationToken);
             if (!string.Equals(result.Status, "Completed", StringComparison.Ordinal))
             {
@@ -141,6 +150,7 @@ public sealed class SpoDataverseInboxProcessor(
                     cancellationToken);
             }
 
+            // Chỉ đánh dấu Imported sau khi toàn bộ pipeline hoàn tất.
             await client.UpdateAsync(new Entity(FileTable, row.Id)
             {
                 ["fmc_importstatus"] = new OptionSetValue(Imported),
@@ -161,6 +171,7 @@ public sealed class SpoDataverseInboxProcessor(
         }
         catch (SpoDependencyException ex)
         {
+            // Thiếu building/equipment cha là lỗi có thể thử lại sau, nên trả về NotRequested.
             await client.UpdateAsync(new Entity(FileTable, row.Id)
             {
                 ["fmc_importstatus"] = new OptionSetValue(NotRequested),
@@ -170,6 +181,7 @@ public sealed class SpoDataverseInboxProcessor(
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
+            // Lỗi dữ liệu hoặc lỗi cố định được lưu vào trạng thái Failed để vận hành kiểm tra.
             return await FailClaimed(
                 row.Id,
                 fileName,
@@ -182,6 +194,7 @@ public sealed class SpoDataverseInboxProcessor(
 
     private async Task<bool> TryClaim(Entity row, CancellationToken cancellationToken)
     {
+        // Gửi RowVersion hiện tại để Dataverse từ chối nếu worker khác đã sửa bản ghi trước.
         var claim = new Entity(FileTable, row.Id) { RowVersion = row.RowVersion };
         claim["fmc_importstatus"] = new OptionSetValue(Processing);
         claim["fmc_errormessage"] = null;
@@ -203,6 +216,7 @@ public sealed class SpoDataverseInboxProcessor(
 
     private async Task<MemoryStream> Download(Guid fileId, CancellationToken cancellationToken)
     {
+        // Dataverse file column cần khởi tạo download session trước khi đọc từng block.
         var initialize = (InitializeFileBlocksDownloadResponse)await client.ExecuteAsync(
             new InitializeFileBlocksDownloadRequest
             {
@@ -216,6 +230,7 @@ public sealed class SpoDataverseInboxProcessor(
         var stream = new MemoryStream((int)initialize.FileSizeInBytes);
         for (long offset = 0; offset < initialize.FileSizeInBytes; offset += BlockSize)
         {
+            // Đọc theo block 4 MB để không yêu cầu một response quá lớn từ Dataverse.
             var length = (int)Math.Min(BlockSize, initialize.FileSizeInBytes - offset);
             var block = (DownloadBlockResponse)await client.ExecuteAsync(new DownloadBlockRequest
             {
@@ -256,6 +271,7 @@ public sealed class SpoDataverseInboxProcessor(
         string error,
         CancellationToken cancellationToken)
     {
+        // Giới hạn error text để không vượt độ dài cột fmc_errormessage.
         await client.UpdateAsync(new Entity(FileTable, fileId)
         {
             ["fmc_importstatus"] = new OptionSetValue(Failed),
@@ -268,6 +284,7 @@ public sealed class SpoDataverseInboxProcessor(
 
     private SpoSourceDefinition? TryResolve(string? sourcePath)
     {
+        // Path không khớp mapping được trả về null để caller ghi trạng thái Failed có kiểm soát.
         if (string.IsNullOrWhiteSpace(sourcePath)) return null;
         try
         {
@@ -281,6 +298,7 @@ public sealed class SpoDataverseInboxProcessor(
 
     private static int SourceOrder(SpoSourceDefinition? source) => source?.Mapping switch
     {
+        // Catalog cha phải chạy trước catalog con và reading để lookup luôn sẵn sàng.
         "building-v1" => 0,
         "equipment-v1" or "water-meter-v1" or "electric-meter-v1" => 1,
         _ => 2

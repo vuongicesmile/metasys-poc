@@ -6,9 +6,13 @@ using DataverseSyncWorker.Models;
 
 namespace DataverseSyncWorker.Services;
 
+/// <summary>
+/// Chuyển model đọc từ SQL thành contract thuần .NET để DataAccess ghi sang Dataverse.
+/// Mapper chỉ chứa quy tắc dữ liệu; không gọi Dataverse SDK và không thực hiện I/O.
+/// </summary>
 public sealed class ReadingMapper(SyncOptions options)
 {
-    // Stable primary GUID + partition, not an unsupported elastic custom alternate key.
+    // Băm identity thành GUID cố định để cùng một dữ liệu luôn có cùng khóa khi retry.
     public static Guid StableGuid(string identity)
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(identity))[..16];
@@ -17,12 +21,14 @@ public sealed class ReadingMapper(SyncOptions options)
         return new Guid(bytes);
     }
 
+    // Thêm loại bản ghi và SourceId vào chuỗi băm để các nhóm ID không va chạm nhau.
     public Guid ReadingId(long id) => StableGuid($"metasys-reading|{options.SourceId}|{id}");
     public Guid PointId(string objectId) => StableGuid($"metasys-point|{options.SourceId}|{objectId}");
     public Guid BuildingId(string code) => StableGuid($"metasys-building|{options.SourceId}|{code}");
     public Guid EquipmentId(string code) => StableGuid($"metasys-equipment|{options.SourceId}|{code}");
     public static string Partition(string objectId) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(objectId)));
 
+    // Simulator phát UTC; nguồn legacy được đổi từ múi giờ cấu hình sang UTC.
     public DateTime ReadingUtc(BmsReading r) => r.SourceSystem == "Fake Metasys COV"
         ? DateTime.SpecifyKind(r.ReadingTime, DateTimeKind.Utc)
         : ToUtc(r.ReadingTime, options.LegacyReadingTimeZoneId);
@@ -31,6 +37,7 @@ public sealed class ReadingMapper(SyncOptions options)
         TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(value, DateTimeKind.Unspecified),
             TimeZoneInfo.FindSystemTimeZoneById(zone));
 
+    /// <summary>Kiểm tra giới hạn Dataverse trước khi một dòng được phép đi tiếp.</summary>
     public string? Validate(BmsReading r)
     {
         if (string.IsNullOrWhiteSpace(r.ObjectId) || r.ObjectId.Length > 100) return "Invalid object_id.";
@@ -39,6 +46,7 @@ public sealed class ReadingMapper(SyncOptions options)
         return null;
     }
 
+    /// <summary>Tạo trạng thái hiện tại của một point từ reading mới nhất.</summary>
     public DataverseRecord Point(BmsReading r)
     {
         var e = new DataverseRecord("fmc_bmspoint", PointId(r.ObjectId));
@@ -56,6 +64,7 @@ public sealed class ReadingMapper(SyncOptions options)
         return e;
     }
 
+    /// <summary>Chuyển một building trong SQL catalog thành bản ghi đích.</summary>
     public DataverseRecord Building(BmsBuilding row) => new("fmc_bmsbuilding", BuildingId(row.BuildingCode))
     {
         ["fmc_name"] = row.Name,
@@ -64,6 +73,7 @@ public sealed class ReadingMapper(SyncOptions options)
         ["fmc_description"] = row.Description
     };
 
+    /// <summary>Chuyển equipment và lookup building thành bản ghi đích.</summary>
     public DataverseRecord Equipment(BmsEquipment row) => new("fmc_bmsequipment", EquipmentId(row.EquipmentCode))
     {
         ["fmc_name"] = row.Name,
@@ -73,10 +83,13 @@ public sealed class ReadingMapper(SyncOptions options)
         ["fmc_description"] = row.Description
     };
 
+    /// <summary>
+    /// Tạo history có TTL tính từ thời gian event; trả null khi dữ liệu đã hết hạn.
+    /// </summary>
     public DataverseRecord? History(BmsReading r, DateTime utcNow)
     {
         var time = ReadingUtc(r);
-        // Age-based retention: retrying/backfilling must not grant an old row another 30 days.
+        // TTL dựa trên thời gian event; retry/backfill không được cấp lại đủ 30 ngày cho dữ liệu cũ.
         var remaining = (int)Math.Ceiling((time.AddSeconds(options.HistoryTtlSeconds) - utcNow).TotalSeconds);
         if (remaining <= 0) return null;
         var e = new DataverseRecord("fmc_bmsreading", ReadingId(r.Id));

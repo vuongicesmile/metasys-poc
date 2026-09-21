@@ -7,11 +7,17 @@ using Microsoft.Extensions.Logging;
 
 namespace DataverseSyncWorker.Services;
 
+/// <summary>
+/// Điều phối một batch SQL → Dataverse theo thứ tự catalog, current point, history rồi Ack.
+/// Thứ tự này bảo đảm lookup cha tồn tại và SQL chỉ đánh dấu thành công sau khi ghi đủ dữ liệu.
+/// </summary>
 public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader, ReadingMapper mapper, IDataverseWriter writer,
     SyncOptions options, ILogger<SyncEngine> logger) : ISyncEngine
 {
     // Semaphore chống hai batch chạy đồng thời trong cùng process.
     private readonly SemaphoreSlim _gate = new(1, 1);
+
+    /// <summary>Chạy tối đa một batch; cutoffId giới hạn các dòng thuộc một sync request.</summary>
     public async Task<BatchResult> Run(CancellationToken ct, long? cutoffId = null)
     {
         // Busy không phải lỗi; caller có thể requeue command hoặc đợi vòng sau.
@@ -48,6 +54,7 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
             else valid.Add(row);
         }
         var points = new List<DataverseRecord>();
+        // Gom theo ObjectId vì nhiều history row chỉ tạo ra một current point mới nhất.
         foreach (var group in valid.GroupBy(r => r.ObjectId, StringComparer.Ordinal))
         {
             // Current state được chọn theo thời gian event mới nhất, không theo id

@@ -5,8 +5,13 @@ using SPO.Ingestion.Domain;
 
 namespace SPO.Ingestion.Business;
 
+/// <summary>
+/// Chuyển từng dòng CSV/JSON/XLSX đã parse thành các bản ghi đích thuần .NET.
+/// Mapper chỉ xử lý quy tắc dữ liệu, không kết nối Dataverse và không ghi file.
+/// </summary>
 public sealed class SpoBronzeMapper(SpoIngestionOptions options)
 {
+    /// <summary>Tạo GUID ổn định từ business identity để retry vẫn dùng đúng bản ghi cũ.</summary>
     public static Guid StableGuid(string identity)
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(identity))[..16];
@@ -17,6 +22,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
 
     public static string Partition(string objectId) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(objectId)));
 
+    /// <summary>Map một nhóm dòng và gom lỗi theo từng dòng thay vì dừng cả file ngay lỗi đầu tiên.</summary>
     public MappingResult Map(SpoSourceDefinition source, IReadOnlyList<ParsedRow> rows, DateTime utcNow)
     {
         var records = new List<BronzeRecord>();
@@ -26,6 +32,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         {
             try
             {
+                // Một dòng reading có thể sinh nhiều point/history vì mỗi metric là một ObjectId.
                 foreach (var record in MapRow(source, row, utcNow, () => expired++)) records.Add(record);
             }
             catch (SpoContractException ex)
@@ -42,6 +49,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
 
     private IEnumerable<BronzeRecord> MapRow(SpoSourceDefinition source, ParsedRow row, DateTime utcNow, Action expired)
     {
+        // Mapping version trong config quyết định bộ cột và loại record cần tạo.
         return source.Mapping switch
         {
             "building-v1" => [Building(source, row)],
@@ -63,6 +71,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
 
     private BronzeRecord Building(SpoSourceDefinition source, ParsedRow row)
     {
+        // Business key phải thuộc prefix mà source được phép sở hữu.
         var code = Required(row, "building_id", 50);
         RequireOwnedKey(source, row, code);
         var name = Required(row, "building_name", 200);
@@ -83,6 +92,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         RequireOwnedKey(source, row, code);
         var building = Required(row, "building_id", 50);
         var type = fixedType ?? Required(row, "equipment_type", 100);
+        // Text loại thiết bị được đổi sang choice number đã cấu hình trong Dataverse.
         if (!options.EquipmentTypeChoices.TryGetValue(type, out var typeValue))
             throw new SpoContractException("SPO-CHOICE", row.Ordinal,
                 $"Equipment type '{type}' is not present in fmc_equipmenttype configuration.");
@@ -108,6 +118,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         var output = new List<BronzeRecord>();
         foreach (var metric in metrics)
         {
+            // Mỗi metric của meter trở thành một point riêng, ví dụ Energy và Demand.
             var value = Decimal(row, metric.Field);
             var objectId = $"{meter}/{metric.Field}";
             var eventIdentity = $"{options.SourceNamespace}|{meter}|{time:O}|{metric.Field}";
@@ -128,6 +139,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
             output.Add(new(row.Ordinal, objectId, BronzeRecordKind.Point, point, time,
                 ParentIdentity: attachEquipment ? meter : null));
 
+            // History hết TTL vẫn bỏ qua, nhưng current point phía trên vẫn được giữ.
             var remaining = (int)Math.Ceiling((time.AddSeconds(options.HistoryTtlSeconds) - utcNow).TotalSeconds);
             if (remaining <= 0) { expired(); continue; }
             var partition = Partition(objectId);
@@ -153,6 +165,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
 
     private static string Required(ParsedRow row, string field, int max)
     {
+        // Kiểm tra bắt buộc, khoảng trắng thừa và độ dài tại một chỗ dùng chung.
         if (!row.Values.TryGetValue(field, out var value) || string.IsNullOrWhiteSpace(value))
             throw new SpoContractException("SPO-REQUIRED", row.Ordinal, $"Required field '{field}' is missing.");
         if (value != value.Trim() || value.Length > max)
@@ -173,6 +186,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         var text = Required(row, field, 100);
         if (!decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
             throw new SpoContractException("SPO-DECIMAL", row.Ordinal, $"Field '{field}' is not a decimal.");
+        // Hợp đồng đích lưu tối đa bốn chữ số thập phân.
         value = decimal.Round(value, 4, MidpointRounding.ToEven);
         if (value is < -100000000000m or > 100000000000m)
             throw new SpoContractException("SPO-RANGE", row.Ordinal, $"Field '{field}' exceeds Dataverse decimal range.");
@@ -181,6 +195,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
 
     private static DateTime Utc(ParsedRow row, string field, string configuredOffset)
     {
+        // Nếu file không ghi timezone, dùng offset khai báo trong source configuration.
         var text = Required(row, field, 100);
         var sign = configuredOffset.StartsWith('-') ? -1 : 1;
         var offsetText = configuredOffset.TrimStart('+', '-');

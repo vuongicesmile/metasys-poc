@@ -14,6 +14,7 @@ public sealed class DataverseWriter(
     DataverseConnection connection,
     IIntegrationFailureClassifier failures) : IDataverseWriter
 {
+    // Building và equipment là standard table nên có thể dùng chung cách Upsert từng dòng.
     public Task WriteBuildings(IReadOnlyList<DataverseRecord> buildings, CancellationToken ct) =>
         WriteStandard(buildings, ct);
 
@@ -22,18 +23,21 @@ public sealed class DataverseWriter(
 
     private async Task WriteStandard(IReadOnlyList<DataverseRecord> rows, CancellationToken ct)
     {
+        // Chuyển từng contract sang Entity ngay trước khi gọi SDK.
         foreach (var row in rows)
             await Execute(new UpsertRequest { Target = ToEntity(row) }, ct);
     }
 
     public async Task WritePoints(IReadOnlyList<DataverseRecord> points, CancellationToken ct)
     {
+        // Point dùng GUID cố định nên Upsert an toàn khi batch phải replay.
         foreach (var point in points)
             await Execute(new UpsertRequest { Target = ToEntity(point) }, ct);
     }
 
     public async Task WriteHistory(IReadOnlyList<DataverseRecord> readings, CancellationToken ct)
     {
+        // Không gửi request rỗng lên Dataverse.
         if (readings.Count == 0) return;
 
         // Elastic history dùng deterministic GUID + partition nên replay vẫn idempotent.
@@ -52,6 +56,7 @@ public sealed class DataverseWriter(
         var entity = new Entity(record.LogicalName, record.Id);
         foreach (var (name, value) in record.Attributes)
         {
+            // Chỉ hai kiểu wrapper đặc biệt cần đổi sang kiểu của Dataverse SDK.
             entity[name] = value switch
             {
                 DataverseReference reference => new EntityReference(reference.LogicalName, reference.Id),
@@ -74,6 +79,7 @@ public sealed class DataverseWriter(
             }
             catch (Exception ex) when (attempt < 4 && failures.IsTransient(ex))
             {
+                // Ưu tiên Retry-After do server trả về; nếu không có thì dùng exponential backoff.
                 var delay = ex is FaultException<OrganizationServiceFault> fault &&
                     fault.Detail.ErrorDetails.TryGetValue("Retry-After", out var retry) &&
                     retry is TimeSpan serverDelay

@@ -6,6 +6,7 @@ using SPO.Ingestion.Common;
 using SPO.Ingestion.DataAccess;
 using SPO.Ingestion.Domain;
 
+// Không có command hoặc có --help thì chỉ in hướng dẫn, không mở kết nối Dataverse.
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
     Console.WriteLine("Usage:");
@@ -17,6 +18,7 @@ if (args.Length == 0 || args[0] is "-h" or "--help")
 }
 string Arg(string name, string fallback)
 {
+    // Tìm giá trị ngay sau tên option; dùng fallback khi option không xuất hiện.
     var index = Array.IndexOf(args, name);
     return index >= 0 && index + 1 < args.Length ? args[index + 1] : fallback;
 }
@@ -26,6 +28,8 @@ var utcNow = DateTime.Parse(Arg("--utc-now", DateTime.UtcNow.ToString("O")), nul
     System.Globalization.DateTimeStyles.AssumeUniversal | System.Globalization.DateTimeStyles.AdjustToUniversal);
 var options = SpoConfiguration.Load(configPath);
 
+// Hai command này đọc các file đã archive trong Dataverse inbox.
+// ingest-dataverse-once chạy một vòng; watch-dataverse tiếp tục polling đến khi Ctrl+C.
 if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
 {
     var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "DataverseSyncWorker", "appsettings.json")));
@@ -33,6 +37,7 @@ if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
     var pollSeconds = int.Parse(Arg("--poll-seconds", "10"), System.Globalization.CultureInfo.InvariantCulture);
     if (pollSeconds is < 2 or > 3600) throw new ArgumentOutOfRangeException("--poll-seconds", "poll-seconds must be 2..3600.");
     var dataverse = LoadDataverseOptions(appsettingsPath);
+    // CLI là composition root: tại đây mới tạo implementation DataAccess thật.
     using var connection = new DataverseConnection(dataverse);
     var client = connection.Get();
     var writer = new DataverseBronzeWriter(client, options);
@@ -44,6 +49,7 @@ if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
 
     do
     {
+        // Watch mode dùng thời gian thật mỗi vòng; one-shot giữ utcNow do caller truyền vào.
         var cycleUtc = args[0] == "watch-dataverse" ? DateTime.UtcNow : utcNow;
         var cycle = await inbox.ProcessOnce(maxFiles, cycleUtc, stop.Token);
         Console.WriteLine(JsonSerializer.Serialize(new
@@ -60,12 +66,14 @@ if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
             if (cycle.Any(x => x.Status == "Failed")) Environment.ExitCode = 1;
             return;
         }
+        // Delay có cancellation để Ctrl+C dừng nhanh mà không chờ hết poll interval.
         try { await Task.Delay(TimeSpan.FromSeconds(pollSeconds), stop.Token); }
         catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
     } while (!stop.IsCancellationRequested);
     return;
 }
 
+// ingest-local đọc sample trên máy nhưng vẫn dùng cùng mapper/validator/writer với cloud path.
 if (args[0] == "ingest-local")
 {
     var appsettingsPath = Path.GetFullPath(Arg("--appsettings", Path.Combine(Environment.CurrentDirectory, "DataverseSyncWorker", "appsettings.json")));
@@ -76,6 +84,7 @@ if (args[0] == "ingest-local")
     var writer = new DataverseBronzeWriter(connection.Get(), options);
     var mapper = new SpoBronzeMapper(options);
     var runner = new SpoLocalProcessor(new TabularParser(), mapper, new SpoRecordValidator(mapper), writer, options);
+    // Chọn source được bật và sắp catalog cha trước reading.
     var selected = options.Sources
         .Where(x => x.Enabled && x.LocalSample is not null)
         .Where(x => string.IsNullOrWhiteSpace(sourceKey) || x.Key.Equals(sourceKey, StringComparison.OrdinalIgnoreCase))
@@ -87,6 +96,7 @@ if (args[0] == "ingest-local")
     var ingestResults = new List<LocalIngestionResult>();
     foreach (var source in selected)
     {
+        // Mỗi file được mở theo stream và đóng ngay sau khi xử lý xong source đó.
         var file = Path.Combine(root, source.LocalSample!);
         if (!File.Exists(file)) throw new FileNotFoundException($"Local sample not found for {source.Key}.", file);
         await using var content = File.OpenRead(file);
@@ -110,6 +120,7 @@ if (args[0] == "ingest-local")
         if (result.Status != "Completed") Environment.ExitCode = 1;
     }
 
+    // Ghi receipt local để người vận hành biết file nào đã giao, bỏ qua hoặc lỗi.
     var receiptDirectory = Path.Combine(Environment.CurrentDirectory, ".artifacts", "spo-local");
     Directory.CreateDirectory(receiptDirectory);
     var receiptPath = Path.Combine(receiptDirectory, $"receipt-{DateTime.UtcNow:yyyyMMddTHHmmssfffZ}.json");
@@ -117,6 +128,7 @@ if (args[0] == "ingest-local")
     Console.WriteLine($"Receipt: {receiptPath}");
     return;
 }
+// Command còn lại duy nhất là preview-all: chỉ parse/map để kiểm tra, không ghi Dataverse.
 if (args[0] != "preview-all") throw new InvalidOperationException("Unknown command. Use --help.");
 var previewer = new SpoPreviewer(new TabularParser(), new SpoBronzeMapper(options));
 var results = new List<object>();
@@ -151,6 +163,7 @@ Environment.ExitCode = exit;
 
 static SyncOptions LoadDataverseOptions(string path)
 {
+    // Chỉ đọc section Dataverse từ appsettings của SyncWorker và validate trước khi kết nối.
     using var document = JsonDocument.Parse(File.ReadAllText(path));
     if (!document.RootElement.TryGetProperty("Dataverse", out var section))
         throw new InvalidOperationException($"Dataverse section is missing in '{path}'.");
