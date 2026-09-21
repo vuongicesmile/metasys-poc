@@ -1,129 +1,42 @@
-using System.Data;
 using BMS.Ingestion.Business.Abstractions;
-using BMS.Ingestion.Domain.Models;
-using Microsoft.Data.SqlClient;
+using BMS.Ingestion.Business.Contracts;
+using BMS.Ingestion.DataAccess.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace BMS.Ingestion.DataAccess.Services;
 
-/// <summary>SQL adapter for the raw BMS catalog and append-only reading history.</summary>
-public sealed class BmsReadingRepository(string connectionString) : IBmsReadingRepository
+/// <summary>Repository append COV reading vào raw.bms_reading bằng EF Core.</summary>
+public sealed class BmsReadingRepository(
+    // Factory tạo DbContext mới cho mỗi thao tác, tránh dùng chung context lâu dài.
+    IDbContextFactory<BmsIngestionDbContext> contextFactory) : IBmsReadingRepository
 {
-    private const string InsertSql = """
-        INSERT INTO raw.bms_reading
-        (
-            object_id,
-            object_name,
-            object_type,
-            building,
-            equipment_code,
-            reading_time,
-            reading_value,
-            unit,
-            source_system
-        )
-        VALUES
-        (
-            @object_id,
-            @object_name,
-            @object_type,
-            @building,
-            @equipment_code,
-            @reading_time,
-            @reading_value,
-            @unit,
-            'Fake Metasys COV'
-        );
-        """;
+    // Giá trị cố định ghi vào source_system để phân biệt nguồn Fake Metasys.
+    private const string SourceSystem = "Fake Metasys COV";
 
-    public async Task InsertAsync(CovEvent covEvent, CancellationToken cancellationToken = default)
-    {
-        RequireConnectionString();
-        await using var connection = new SqlConnection(connectionString);
-        await connection.OpenAsync(cancellationToken);
-
-        await using var command = new SqlCommand(InsertSql, connection);
-        command.Parameters.Add("@object_id", SqlDbType.VarChar, 100).Value = covEvent.ObjectId;
-        command.Parameters.Add("@object_name", SqlDbType.VarChar, 200).Value = covEvent.ObjectName;
-        command.Parameters.Add("@object_type", SqlDbType.VarChar, 100).Value = covEvent.ObjectType;
-        command.Parameters.Add("@building", SqlDbType.VarChar, 100).Value = covEvent.Building;
-        command.Parameters.Add("@equipment_code", SqlDbType.VarChar, 100).Value = covEvent.EquipmentCode;
-        command.Parameters.Add("@reading_time", SqlDbType.DateTime2).Value = covEvent.Timestamp;
-
-        var valueParameter = command.Parameters.Add("@reading_value", SqlDbType.Decimal);
-        valueParameter.Precision = 18;
-        valueParameter.Scale = 4;
-        valueParameter.Value = covEvent.CurrentValue;
-
-        command.Parameters.Add("@unit", SqlDbType.VarChar, 50).Value = covEvent.Unit;
-        await command.ExecuteNonQueryAsync(cancellationToken);
-    }
-
-    public async Task PersistCatalogAsync(
-        IReadOnlyList<BmsBuilding> buildings,
-        IReadOnlyList<BmsEquipment> equipment,
+    /// <summary>Tạo một row lịch sử chỉ-append và để SQL Server sinh identity.</summary>
+    public async Task InsertAsync(
+        BmsReadingDto reading,
         CancellationToken cancellationToken = default)
     {
-        RequireConnectionString();
-        var buildingCodes = buildings.Select(building => building.BuildingCode)
-            .ToHashSet(StringComparer.Ordinal);
-        if (buildingCodes.Count != buildings.Count ||
-            equipment.Select(item => item.EquipmentCode).Distinct(StringComparer.Ordinal).Count() != equipment.Count)
-            throw new InvalidOperationException("Fake Metasys catalog contains duplicate codes.");
-        if (equipment.Any(item => !buildingCodes.Contains(item.BuildingCode)))
-            throw new InvalidOperationException("Fake Metasys equipment refers to a missing building.");
+        // Tạo DbContext cho đúng một thao tác insert.
+        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
 
-        await using var connection = new SqlConnection(connectionString);
-        await connection.OpenAsync(cancellationToken);
-        await using var transaction = (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken);
-        try
+        // Chuyển DTO thành EF entity; business layer không biết entity này.
+        db.Readings.Add(new BmsReadingEntity
         {
-            foreach (var building in buildings)
-            {
-                const string sql = """
-                    UPDATE raw.bms_building SET name=@name,source_building=@source,description=@description,
-                        source_updated_at=@updated,ingested_at=SYSUTCDATETIME() WHERE building_code=@code;
-                    IF @@ROWCOUNT=0 INSERT raw.bms_building(building_code,name,source_building,description,source_updated_at)
-                        VALUES(@code,@name,@source,@description,@updated);
-                    """;
-                await using var command = new SqlCommand(sql, connection, transaction);
-                command.Parameters.Add("@code", SqlDbType.VarChar, 50).Value = building.BuildingCode;
-                command.Parameters.Add("@name", SqlDbType.NVarChar, 200).Value = building.Name;
-                command.Parameters.Add("@source", SqlDbType.VarChar, 100).Value = building.SourceBuilding;
-                command.Parameters.Add("@description", SqlDbType.NVarChar, 2000).Value = building.Description;
-                command.Parameters.Add("@updated", SqlDbType.DateTime2).Value = DateTime.UtcNow;
-                await command.ExecuteNonQueryAsync(cancellationToken);
-            }
+            // Sao chép từng trường DTO sang cột tương ứng.
+            ObjectId = reading.ObjectId,
+            ObjectName = reading.ObjectName,
+            ObjectType = reading.ObjectType,
+            Building = reading.Building,
+            EquipmentCode = reading.EquipmentCode,
+            ReadingTime = reading.ReadingTime,
+            ReadingValue = reading.ReadingValue,
+            Unit = reading.Unit,
+            SourceSystem = SourceSystem
+        });
 
-            foreach (var item in equipment)
-            {
-                const string sql = """
-                    UPDATE raw.bms_equipment SET name=@name,equipment_type=@type,building_code=@building,
-                        description=@description,source_updated_at=@updated,ingested_at=SYSUTCDATETIME() WHERE equipment_code=@code;
-                    IF @@ROWCOUNT=0 INSERT raw.bms_equipment(equipment_code,name,equipment_type,building_code,description,source_updated_at)
-                        VALUES(@code,@name,@type,@building,@description,@updated);
-                    """;
-                await using var command = new SqlCommand(sql, connection, transaction);
-                command.Parameters.Add("@code", SqlDbType.VarChar, 100).Value = item.EquipmentCode;
-                command.Parameters.Add("@name", SqlDbType.NVarChar, 200).Value = item.Name;
-                command.Parameters.Add("@type", SqlDbType.VarChar, 50).Value = item.EquipmentType;
-                command.Parameters.Add("@building", SqlDbType.VarChar, 50).Value = item.BuildingCode;
-                command.Parameters.Add("@description", SqlDbType.NVarChar, 2000).Value = item.Description;
-                command.Parameters.Add("@updated", SqlDbType.DateTime2).Value = DateTime.UtcNow;
-                await command.ExecuteNonQueryAsync(cancellationToken);
-            }
-
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
-    }
-
-    private void RequireConnectionString()
-    {
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException("Sql.ConnectionString must be configured when SQL is enabled.");
+        // EF tạo INSERT SQL và thực thi bất đồng bộ.
+        await db.SaveChangesAsync(cancellationToken);
     }
 }

@@ -12,14 +12,14 @@ Refactor ngày 2026-09-12–13 tách phần khởi tạo ứng dụng, điều p
 | Hợp đồng service | `Abstractions/` | Interface tại các ranh giới cần thay thế hoặc kiểm thử |
 | Ingestion | `BMS.Ingestion/BMS.Ingestion.Business/Services/CovIngestionWorker.cs` | Đọc catalog → lưu catalog nếu bật SQL → subscribe → nhận event → lưu reading |
 | Metasys transport | `BMS.Ingestion/BMS.Ingestion.DataAccess/Services/MetasysClient.cs` | HTTP, JSON, subscription, đọc SSE và giải phóng connection |
-| Lưu dữ liệu nguồn | `BMS.Ingestion/BMS.Ingestion.DataAccess/Services/BmsReadingRepository.cs` | Upsert catalog và append SQL readings |
+| Lưu dữ liệu nguồn | `BMS.Ingestion/BMS.Ingestion.DataAccess/Services/BmsCatalogRepository.cs`, `BmsReadingRepository.cs` | Upsert catalog và append SQL readings bằng EF Core |
 | Xử lý request sync | `Dataverse.SyncWorker/Dataverse.SyncWorker.Business/Services/CommandProcessor.cs` | Claim request, chốt cutoff, điều phối batch, progress, requeue và completion |
 | Đồng bộ một batch | `Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/SyncEngine.cs` | Lock, đọc ledger, mapping, ghi Dataverse, Ack/quarantine |
 | Lệnh bảo trì | `Dataverse.SyncWorker/Dataverse.SyncWorker.App/Hosting/WorkerCommandLine.cs`, `WorkerCommandDispatcher.cs` | Tách cờ CLI khỏi host và thực thi lệnh trước khi khởi động background worker |
 | Trạng thái runtime | `Services/RuntimeState.cs`, `IngestionStatusTracker.cs` | Snapshot phục vụ API theo dõi |
 | Dashboard | `dataverse/app-source/fmc-bms-demo/src/` | Service, hook, component và styles riêng |
 
-Các service nghiệp vụ không tự tạo implementation của dependency. Ví dụ `CovIngestionWorker` nhận `IMetasysClient` và `IBmsReadingRepository` qua constructor. Khi muốn thay nguồn simulator bằng adapter Metasys thật, tạo implementation mới của `IMetasysClient`, rồi đổi đăng ký trong `AddIngestionServices`.
+Các service nghiệp vụ không tự tạo implementation của dependency. Ví dụ `CovIngestionWorker` nhận `IMetasysClient`, `IBmsCatalogRepository` và `IBmsReadingRepository` qua constructor. Khi muốn thay nguồn simulator bằng adapter Metasys thật, tạo implementation mới của `IMetasysClient`, rồi đổi đăng ký trong `AddIngestionServices`.
 
 Không ép mọi class có interface. `ISyncLedger` chỉ cung cấp hai phép đọc mà `CommandProcessor` cần. `SyncEngine` vẫn dùng `SqlStore` để giữ SQL session lock và thứ tự ghi ledger hiện có. Các service provisioning, mapper và adapter Dataverse chuyên biệt vẫn được giữ riêng theo chức năng.
 

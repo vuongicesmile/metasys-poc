@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using BMS.Ingestion.Business.Abstractions;
+using BMS.Ingestion.Business.Contracts;
 using BMS.Ingestion.Business.Services;
 using BMS.Ingestion.Common.Configuration;
 using BMS.Ingestion.Domain.Models;
@@ -17,7 +18,7 @@ public sealed class CovIngestionWorkerTests
         var trace = new List<string>();
         var status = new IngestionStatusTracker();
         using var worker = new CovIngestionWorker(new(), new(sqlEnabled), status,
-            new Source(trace), new Repository(trace), NullLogger<CovIngestionWorker>.Instance);
+            new Source(trace), new Repository(trace), new Repository(trace), NullLogger<CovIngestionWorker>.Instance);
         await worker.StartAsync(default);
         await worker.ExecuteTask!.WaitAsync(TimeSpan.FromSeconds(5));
         var snapshot = status.GetSnapshot();
@@ -35,7 +36,7 @@ public sealed class CovIngestionWorkerTests
         var trace = new List<string>();
         var status = new IngestionStatusTracker();
         using var worker = new CovIngestionWorker(new(), new(false), status,
-            new Source(trace) { FailCatalog = true }, new Repository(trace), NullLogger<CovIngestionWorker>.Instance);
+            new Source(trace) { FailCatalog = true }, new Repository(trace), new Repository(trace), NullLogger<CovIngestionWorker>.Instance);
         await worker.StartAsync(default);
         await worker.ExecuteTask!.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.Equal("Failed", status.GetSnapshot().State);
@@ -62,11 +63,11 @@ public sealed class CovIngestionWorkerTests
             yield return new() { ObjectId = "P-1", CurrentValue = 12.3456m };
         }
     }
-    private sealed class Repository(List<string> trace) : IBmsReadingRepository
+    private sealed class Repository(List<string> trace) : IBmsReadingRepository, IBmsCatalogRepository
     {
-        public Task InsertAsync(CovEvent value, CancellationToken ct = default)
+        public Task InsertAsync(BmsReadingDto value, CancellationToken ct = default)
         { trace.Add("insert:" + value.ObjectId); return Task.CompletedTask; }
-        public Task PersistCatalogAsync(IReadOnlyList<BmsBuilding> buildings, IReadOnlyList<BmsEquipment> equipment, CancellationToken ct = default)
+        public Task PersistCatalogAsync(BmsCatalogDto catalog, CancellationToken ct = default)
         { trace.Add("persist-catalog"); return Task.CompletedTask; }
     }
 }

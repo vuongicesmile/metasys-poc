@@ -9,6 +9,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | Runbook | [Deploy và test user email notification](runbooks/user-email-notifications.vi.md) | Provision schema/plug-in, cấu hình Outlook connection reference, deploy flow và đọc delivery receipt |
 | Runbook | [Release Dataverse bằng Git tag](runbooks/tag-release-dataverse.vi.md) | Push tag, tự build/test/deploy qua runner local, receipt, retry và rollback |
 | Reference | [Kiến trúc service và hướng dẫn mở rộng](reference/service-architecture.vi.md) | Cấu trúc backend/dashboard, dependency injection, thêm adapter, build và test |
+| Reference | [BMS Ingestion — cách sử dụng và bố trí code](reference/bms-ingestion.vi.md) | Chạy BMS ingestion, endpoint, DTO/interface, EF Core mapping và cách mở rộng |
 | Plan + interactive lab | [Refactor BMS ingestion theo tầng](plans/bms-ingestion-layered-refactor.vi.md) / [mở lab](interactive/bms-ingestion-refactor-lab/index.html) | Tách Presentation, Business, Common, Metasys adapter và SQL adapter theo checkpoint |
 | Plan | [Refactor Fake BMS services](plans/fake-bms-services-refactor.vi.md) | Tách shared contracts, fixture, mutable point store, simulator, subscription và SSE endpoint |
 | Runbook | [FMC BMS Demo hoàn chỉnh](runbooks/model-driven-app-demo.vi.md) | Demo đăng nhập, nhập liệu, SQL sync, Bronze/Silver, SharePoint, phân trang, phân quyền và đăng xuất |

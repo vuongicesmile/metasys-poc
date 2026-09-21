@@ -1,13 +1,10 @@
-using BMS.Ingestion.Domain.Models;
+using BMS.Ingestion.Business.Contracts;
 
 namespace BMS.Ingestion.Business.Abstractions;
 
-/// <summary>Business-facing persistence port; SQL commands stay in DataAccess.</summary>
+/// <summary>Cổng persistence cho lịch sử reading BMS chỉ-append.</summary>
 public interface IBmsReadingRepository
 {
-    Task InsertAsync(CovEvent covEvent, CancellationToken cancellationToken = default);
-    Task PersistCatalogAsync(
-        IReadOnlyList<BmsBuilding> buildings,
-        IReadOnlyList<BmsEquipment> equipment,
-        CancellationToken cancellationToken = default);
+    /// <summary>Append một reading đã được chuẩn bị vào bảng lịch sử raw.</summary>
+    Task InsertAsync(BmsReadingDto reading, CancellationToken cancellationToken = default);
 }
