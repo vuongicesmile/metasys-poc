@@ -9,6 +9,7 @@ public sealed class SpoJobProcessor(
     ISpoJobStore store,
     TabularParser parser,
     SpoBronzeMapper mapper,
+    SpoRecordValidator validator,
     ISpoBronzeWriter writer)
 {
     public async Task<SpoJobManifest> Process(string jobId, CancellationToken ct)
@@ -26,33 +27,15 @@ public sealed class SpoJobProcessor(
             await using var content = await store.OpenRaw(job, ct);
             var rows = parser.Parse(content, Path.GetExtension(job.SourcePath), source);
             var now = DateTime.UtcNow;
-            var issues = new List<RowIssue>();
-            var eventValues = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-            var expired = 0;
-            foreach (var chunk in rows.Chunk(1000))
+            var validation = validator.Validate(source, rows, now);
+            if (validation.Issues.Count > 0)
             {
-                var validation = mapper.Map(source, chunk, now);
-                issues.AddRange(validation.Issues);
-                foreach (var point in validation.Records.Where(x => x.Kind == BronzeRecordKind.Point))
-                {
-                    var eventKey = $"{point.Identity}|{point.EventTimeUtc:O}";
-                    var value = point.Entity.GetAttributeValue<decimal>("fmc_currentvalue");
-                    if (eventValues.TryGetValue(eventKey, out var prior) && prior != value)
-                        issues.Add(new(point.SourceOrdinal, "SPO-DUPLICATE-EVENT",
-                            $"Event '{eventKey}' occurs with conflicting values {prior} and {value}."));
-                    else
-                        eventValues.TryAdd(eventKey, value);
-                }
-                expired += validation.ExpiredHistory;
-            }
-            if (issues.Count > 0)
-            {
-                var first = issues[0];
-                throw new InvalidDataException($"Validation failed for {issues.Count} row(s). First: row {first.Ordinal}, {first.Code}: {first.Message}");
+                var first = validation.Issues[0];
+                throw new InvalidDataException($"Validation failed for {validation.Issues.Count} row(s). First: row {first.Ordinal}, {first.Code}: {first.Message}");
             }
 
             var delivered = 0;
-            var skipped = expired;
+            var skipped = validation.ExpiredHistory;
             if (source.Mapping.EndsWith("reading-v1", StringComparison.Ordinal))
             {
                 var latest = new Dictionary<string, BronzeRecord>(StringComparer.OrdinalIgnoreCase);

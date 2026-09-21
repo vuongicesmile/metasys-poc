@@ -25,6 +25,7 @@ public sealed record LocalIngestionResult(
 public sealed class SpoLocalProcessor(
     TabularParser parser,
     SpoBronzeMapper mapper,
+    SpoRecordValidator validator,
     ISpoBronzeWriter writer,
     SpoIngestionOptions options)
 {
@@ -37,7 +38,7 @@ public sealed class SpoLocalProcessor(
     {
         var source = SpoConfiguration.Resolve(options, sourcePath);
         var rows = parser.Parse(content, Path.GetExtension(sourcePath), source);
-        var validation = Validate(source, rows, utcNow);
+        var validation = validator.Validate(source, rows, utcNow);
         if (currentOnly && source.Mapping.EndsWith("reading-v1", StringComparison.Ordinal))
             validation = validation with
             {
@@ -100,46 +101,4 @@ public sealed class SpoLocalProcessor(
             delivered, skipped, validation.TargetCounts, [], receipts);
     }
 
-    private ValidationResult Validate(SpoSourceDefinition source, IReadOnlyList<ParsedRow> rows, DateTime utcNow)
-    {
-        var issues = new List<RowIssue>();
-        var pointIdentities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var historyIdentities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var eventValues = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-        var expired = 0;
-        var catalogCount = 0;
-
-        foreach (var chunk in rows.Chunk(1000))
-        {
-            var mapped = mapper.Map(source, chunk, utcNow);
-            issues.AddRange(mapped.Issues);
-            expired += mapped.ExpiredHistory;
-            catalogCount += mapped.Records.Count(x => x.Kind is BronzeRecordKind.Building or BronzeRecordKind.Equipment);
-            foreach (var point in mapped.Records.Where(x => x.Kind == BronzeRecordKind.Point))
-            {
-                pointIdentities.Add(point.Identity);
-                var eventKey = $"{point.Identity}|{point.EventTimeUtc:O}";
-                var value = point.Entity.GetAttributeValue<decimal>("fmc_currentvalue");
-                if (eventValues.TryGetValue(eventKey, out var prior) && prior != value)
-                    issues.Add(new(point.SourceOrdinal, "SPO-DUPLICATE-EVENT",
-                        $"Event '{eventKey}' occurs with conflicting values {prior} and {value}."));
-                else eventValues.TryAdd(eventKey, value);
-            }
-            foreach (var history in mapped.Records.Where(x => x.Kind == BronzeRecordKind.History))
-                historyIdentities.Add(history.Identity);
-        }
-
-        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        if (pointIdentities.Count > 0) counts["fmc_bmspoint"] = pointIdentities.Count;
-        if (historyIdentities.Count > 0) counts["fmc_bmsreading"] = historyIdentities.Count;
-        if (source.Mapping is "building-v1") counts["fmc_bmsbuilding"] = catalogCount;
-        if (source.Mapping is "equipment-v1" or "water-meter-v1" or "electric-meter-v1") counts["fmc_bmsequipment"] = catalogCount;
-        if (expired > 0) counts["SkippedExpiredHistory"] = expired;
-        return new(issues, expired, counts);
-    }
-
-    private sealed record ValidationResult(
-        IReadOnlyList<RowIssue> Issues,
-        int ExpiredHistory,
-        IReadOnlyDictionary<string, int> TargetCounts);
 }

@@ -36,7 +36,8 @@ if (args[0] is "ingest-dataverse-once" or "watch-dataverse")
     using var connection = new DataverseConnection(dataverse);
     var client = connection.Get();
     var writer = new DataverseBronzeWriter(client, options);
-    var local = new SpoLocalProcessor(new TabularParser(), new SpoBronzeMapper(options), writer, options);
+    var mapper = new SpoBronzeMapper(options);
+    var local = new SpoLocalProcessor(new TabularParser(), mapper, new SpoRecordValidator(mapper), writer, options);
     var inbox = new SpoDataverseInboxProcessor(client, local, options);
     using var stop = new CancellationTokenSource();
     Console.CancelKeyPress += (_, eventArgs) => { eventArgs.Cancel = true; stop.Cancel(); };
@@ -73,7 +74,8 @@ if (args[0] == "ingest-local")
     var dataverse = LoadDataverseOptions(appsettingsPath);
     using var connection = new DataverseConnection(dataverse);
     var writer = new DataverseBronzeWriter(connection.Get(), options);
-    var runner = new SpoLocalProcessor(new TabularParser(), new SpoBronzeMapper(options), writer, options);
+    var mapper = new SpoBronzeMapper(options);
+    var runner = new SpoLocalProcessor(new TabularParser(), mapper, new SpoRecordValidator(mapper), writer, options);
     var selected = options.Sources
         .Where(x => x.Enabled && x.LocalSample is not null)
         .Where(x => string.IsNullOrWhiteSpace(sourceKey) || x.Key.Equals(sourceKey, StringComparison.OrdinalIgnoreCase))

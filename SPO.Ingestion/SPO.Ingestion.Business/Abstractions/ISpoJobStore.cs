@@ -2,6 +2,13 @@ using SPO.Ingestion.Domain;
 
 namespace SPO.Ingestion.Business.Abstractions;
 
+/// <summary>
+/// Kho bền vững của pipeline SPO.
+///
+/// Implementation hiện tại dùng Blob Storage cho raw file, manifest và receipt;
+/// Queue chỉ đánh thức worker. Không dùng EF Core ở boundary này vì job state
+/// cần Blob lease để claim/retry an toàn và không có relational database làm nguồn sự thật.
+/// </summary>
 public interface ISpoJobStore
 {
     Task Initialize(CancellationToken cancellationToken);

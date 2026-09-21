@@ -15,29 +15,29 @@ namespace SPO.Ingestion.DataAccess;
 
 public sealed class BlobJobStore : ISpoJobStore
 {
-    private readonly BlobContainerClient raw;
-    private readonly BlobContainerClient control;
-    private readonly QueueClient queue;
+    private readonly BlobContainerClient _raw;
+    private readonly BlobContainerClient _control;
+    private readonly QueueClient _queue;
 
     public BlobJobStore(string connectionString, SpoIngestionOptions options)
     {
-        raw = new BlobContainerClient(connectionString, options.RawContainer);
-        control = new BlobContainerClient(connectionString, options.ControlContainer);
-        queue = new QueueClient(connectionString, options.QueueName, new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
+        _raw = new BlobContainerClient(connectionString, options.RawContainer);
+        _control = new BlobContainerClient(connectionString, options.ControlContainer);
+        _queue = new QueueClient(connectionString, options.QueueName, new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
     }
 
     public async Task Initialize(CancellationToken ct)
     {
-        await raw.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: ct);
-        await control.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: ct);
-        await queue.CreateIfNotExistsAsync(cancellationToken: ct);
+        await _raw.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: ct);
+        await _control.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: ct);
+        await _queue.CreateIfNotExistsAsync(cancellationToken: ct);
     }
 
     public async Task<SpoJobManifest> FinalizeCapture(SpoCaptureRequest request, SpoIngestionOptions options, CancellationToken ct)
     {
         await Initialize(ct);
         var source = SpoConfiguration.Resolve(options, request.SourcePath);
-        var rawBlob = raw.GetBlobClient(request.RawBlobName);
+        var rawBlob = _raw.GetBlobClient(request.RawBlobName);
         var properties = await rawBlob.GetPropertiesAsync(cancellationToken: ct);
         if (request.ContentLength <= 0 || request.ContentLength > options.MaxFileBytes)
             throw new InvalidDataException($"File size must be 1..{options.MaxFileBytes} bytes.");
@@ -65,7 +65,7 @@ public sealed class BlobJobStore : ISpoJobStore
     }
 
     public async Task Enqueue(string jobId, CancellationToken ct) =>
-        await queue.SendMessageAsync(BinaryData.FromObjectAsJson(new SpoJobMessage(jobId), SpoConfiguration.Json), cancellationToken: ct);
+        await _queue.SendMessageAsync(BinaryData.FromObjectAsJson(new SpoJobMessage(jobId), SpoConfiguration.Json), cancellationToken: ct);
 
     public async Task<SpoJobManifest> Read(string jobId, CancellationToken ct)
     {
@@ -75,7 +75,7 @@ public sealed class BlobJobStore : ISpoJobStore
     }
 
     public async Task<Stream> OpenRaw(SpoJobManifest job, CancellationToken ct) =>
-        await raw.GetBlobClient(job.RawBlobName).OpenReadAsync(cancellationToken: ct);
+        await _raw.GetBlobClient(job.RawBlobName).OpenReadAsync(cancellationToken: ct);
 
     public async Task<SPO.Ingestion.Business.Abstractions.JobLease?> TryLease(string jobId, CancellationToken ct)
     {
@@ -99,16 +99,16 @@ public sealed class BlobJobStore : ISpoJobStore
     }
 
     public async Task SaveReceipts(string jobId, IReadOnlyList<RowReceipt> receipts, CancellationToken ct) =>
-        await control.GetBlobClient($"receipts/{jobId}.json").UploadAsync(
+        await _control.GetBlobClient($"receipts/{jobId}.json").UploadAsync(
             BinaryData.FromObjectAsJson(receipts, SpoConfiguration.Json), overwrite: true, cancellationToken: ct);
 
     public async Task SaveReceiptSegment(string jobId, string segment, IReadOnlyList<RowReceipt> receipts, CancellationToken ct) =>
-        await control.GetBlobClient($"receipts/{jobId}/{segment}.json").UploadAsync(
+        await _control.GetBlobClient($"receipts/{jobId}/{segment}.json").UploadAsync(
             BinaryData.FromObjectAsJson(receipts, SpoConfiguration.Json), overwrite: true, cancellationToken: ct);
 
     public async IAsyncEnumerable<SpoJobManifest> ReadyJobs([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
     {
-        await foreach (var blob in control.GetBlobsAsync(BlobTraits.None, BlobStates.None, "manifests/", ct))
+        await foreach (var blob in _control.GetBlobsAsync(BlobTraits.None, BlobStates.None, "manifests/", ct))
         {
             if (!blob.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) continue;
             var id = Path.GetFileNameWithoutExtension(blob.Name);
@@ -117,7 +117,7 @@ public sealed class BlobJobStore : ISpoJobStore
         }
     }
 
-    private BlobClient Manifest(string jobId) => control.GetBlobClient($"manifests/{jobId}.json");
+    private BlobClient Manifest(string jobId) => _control.GetBlobClient($"manifests/{jobId}.json");
     private static string Hash(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
 
     private sealed class BlobJobLease : IAsyncDisposable, SPO.Ingestion.Business.Abstractions.JobLease

@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(new BlobJobStore(storageConnectionString, options));
         services.AddSingleton<TabularParser>();
         services.AddSingleton<SpoBronzeMapper>();
+        services.AddSingleton<SpoRecordValidator>();
         services.AddSingleton(new ServiceClient(dataverseConnectionString));
         services.AddSingleton<ISpoBronzeWriter, DataverseBronzeWriter>();
         services.AddSingleton<SpoJobProcessor>();
