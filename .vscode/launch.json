@@ -1,0 +1,79 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "BMS Fake API",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/BMS.Fake/BMS.Fake.App/bin/Debug/net10.0/BMS.Fake.App.dll",
+            "cwd": "${workspaceFolder}/BMS.Fake/BMS.Fake.App",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "BMS Ingestion API",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/BMS.Ingestion/BMS.Ingestion.App/bin/Debug/net10.0/BMS.Ingestion.App.dll",
+            "cwd": "${workspaceFolder}/BMS.Ingestion/BMS.Ingestion.App",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Dataverse SQL Sync Worker",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/Dataverse.SyncWorker/Dataverse.SyncWorker.App/bin/Debug/net10.0/DataverseSyncWorker.dll",
+            "cwd": "${workspaceFolder}/Dataverse.SyncWorker/Dataverse.SyncWorker.App",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "SharePoint Dataverse Watcher",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/SPO.Ingestion/SPO.Ingestion.Cli/bin/Debug/net10.0/SPO.Ingestion.Cli.dll",
+            "args": [
+                "watch-dataverse",
+                "--config",
+                "${workspaceFolder}/config/spo-ingestion.json",
+                "--appsettings",
+                "${workspaceFolder}/Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json",
+                "--max",
+                "20",
+                "--poll-seconds",
+                "10"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Metasys POC - All Services",
+            "configurations": [
+                "BMS Fake API",
+                "BMS Ingestion API",
+                "Dataverse SQL Sync Worker",
+                "SharePoint Dataverse Watcher"
+            ],
+            "stopAll": true,
+            "preLaunchTask": "build-metasys-poc",
+            "presentation": {
+                "hidden": false,
+                "group": "Metasys POC",
+                "order": 1
+            }
+        }
+    ]
+}
