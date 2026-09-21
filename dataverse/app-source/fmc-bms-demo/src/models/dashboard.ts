@@ -12,6 +12,7 @@ import type {
     fmc_syncrequest,
 } from "../../RuntimeTypes";
 
+// Các alias này biến TableRow generated thành kiểu dễ đọc trong component dashboard.
 export type ReadableBuilding = ReadableTableRow<fmc_bmsbuilding>;
 export type ReadableEquipment = ReadableTableRow<fmc_bmsequipment>;
 export type ReadablePoint = ReadableTableRow<fmc_bmspoint>;
@@ -22,12 +23,14 @@ export type ReadableSpoFile = ReadableTableRow<fmc_spofile>;
 export type ReadableSpoImportRow = ReadableTableRow<fmc_spoimportrow>;
 
 export type BoundedCount = {
+    // label có thể có dấu "+" khi page API còn bản ghi ngoài giới hạn đọc.
     observed: number;
     label: string;
     isBounded: boolean;
 };
 
 export type DashboardData = {
+    // Snapshot dùng chung cho KPI, bảng gần nhất và thông tin trạng thái pipeline.
     buildings: BoundedCount;
     equipment: BoundedCount;
     bronzePoints: BoundedCount;

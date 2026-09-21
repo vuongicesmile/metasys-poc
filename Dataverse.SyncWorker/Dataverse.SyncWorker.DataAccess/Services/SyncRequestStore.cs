@@ -13,6 +13,7 @@ public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions
     ILogger<SyncRequestStore> logger)
     : ISyncRequestStore
 {
+    // ColumnSet tối thiểu cho claim/progress giúp giảm payload và tránh đọc field không cần thiết.
     private static readonly ColumnSet Columns = new(
         "fmc_correlationid", "fmc_requestedcutoffid", "fmc_baselinedelivered",
         "fmc_baselinedeadletters", "fmc_batches", "fmc_status", "fmc_workerowner",
@@ -21,6 +22,7 @@ public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions
     public async Task<(Guid Id, bool Created)> Enqueue(string requestedBy, CancellationToken ct,
         string? clientRequestId = null)
     {
+        // Correlation ID do client cung cấp giúp retry nút UI không tạo request trùng.
         var correlation = string.IsNullOrWhiteSpace(clientRequestId)
             ? Guid.NewGuid().ToString("D")
             : Guid.TryParse(clientRequestId, out var parsed) ? parsed.ToString("D")
@@ -89,6 +91,7 @@ public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions
         var candidates = await connection.Get().RetrieveMultipleAsync(query, ct);
         foreach (var candidate in candidates.Entities)
         {
+            // RowVersion + IfRowVersionMatches biến claim thành thao tác atomic giữa nhiều worker.
             if (string.IsNullOrWhiteSpace(candidate.RowVersion))
                 throw new InvalidOperationException("Sync request optimistic concurrency is unavailable.");
             var update = new Entity("fmc_syncrequest", candidate.Id) { RowVersion = candidate.RowVersion };
@@ -176,6 +179,8 @@ public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions
     private async Task UpdateOwned(Guid id, string workerOwner,
         IReadOnlyDictionary<string, object?> values, bool renewLease, CancellationToken ct)
     {
+        // Mọi progress/complete đều kiểm tra owner hiện tại trước khi update.
+        // Worker mất lease không được phép ghi đè trạng thái của worker khác.
         var current = await connection.Get().RetrieveAsync("fmc_syncrequest", id,
             new ColumnSet("fmc_status", "fmc_workerowner"), ct);
         if (current.GetAttributeValue<OptionSetValue>("fmc_status")?.Value != SyncRequestStatuses.Running ||

@@ -10,6 +10,7 @@ namespace FMCentralBms.Plugins
     {
         public void Execute(IServiceProvider serviceProvider)
         {
+            // PreValidation chạy trước khi Dataverse ghi record, nên lỗi trả trực tiếp về caller.
             ITracingService trace;
             IPluginExecutionContext context;
             PluginServices.Resolve(serviceProvider, out trace, out context);
@@ -50,6 +51,7 @@ namespace FMCentralBms.Plugins
 
             if (target.GetAttributeValue<EntityReference>("fmc_buildingid") == null)
             {
+                // Null rõ ràng có nghĩa caller đang xóa lookup, khác với Update không gửi column.
                 if (trace != null)
                     trace.Trace("RequireEquipmentBuilding BLOCK BMS-EQUIPMENT-001: Building missing/null; LookupIncluded={0}; CorrelationId={1}",
                         target.Contains("fmc_buildingid"), context.CorrelationId);

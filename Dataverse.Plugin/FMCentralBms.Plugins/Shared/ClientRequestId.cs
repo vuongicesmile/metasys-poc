@@ -8,6 +8,7 @@ namespace FMCentralBms.Plugins
     /// </summary>
     internal static class ClientRequestId
     {
+        // Đọc input optional của Custom API và chuẩn hóa thành Guid dùng trong correlation.
         public static Guid? ReadOptional(
             IPluginExecutionContext context,
             string invalidMessage = null)
@@ -19,6 +20,7 @@ namespace FMCentralBms.Plugins
                 context.InputParameters["ClientRequestId"] == null)
                 return null;
 
+            // Chỉ nhận string GUID có độ dài hợp lý; không nhận object tùy ý từ request body.
             var value = context.InputParameters["ClientRequestId"] as string;
             Guid parsed;
             if (string.IsNullOrWhiteSpace(value) || value.Length > 100 || !Guid.TryParse(value, out parsed))

@@ -4,6 +4,7 @@ import type { BoundedCount, DashboardData, ReadablePoint, ReadableSyncRequest, R
 export const MASTER_COUNT_LIMIT = 100;
 export const ELASTIC_COUNT_LIMIT = 25;
 export const LATEST_LIMIT = 5;
+// Chuyển số lượng trả về từ page API thành model UI có thể báo giới hạn dữ liệu.
 export function createBoundedCount(observed: number, hasMoreRows: boolean): BoundedCount {
     return {
         observed,
@@ -11,7 +12,9 @@ export function createBoundedCount(observed: number, hasMoreRows: boolean): Boun
         isBounded: hasMoreRows,
     };
 }
+// Đọc các bảng cần cho dashboard song song để giảm thời gian chờ tổng thể.
 export async function queryDashboard(dataApi: GeneratedComponentProps["dataApi"]): Promise<DashboardData> {
+    // Mỗi query chỉ lấy các cột cần hiển thị; không tải toàn bộ row về client.
     const [buildings, equipment, points, readings, silverRows, syncRequests, files, importRows] =
         await Promise.all([
             dataApi.queryTable("fmc_bmsbuilding", {
@@ -78,6 +81,7 @@ export async function queryDashboard(dataApi: GeneratedComponentProps["dataApi"]
             }),
         ]);
 
+    // Giữ tối đa vài bản ghi mới nhất cho bảng; KPI vẫn báo hasMoreRows chính xác.
     return {
         buildings: createBoundedCount(buildings.rows.length, buildings.hasMoreRows),
         equipment: createBoundedCount(equipment.rows.length, equipment.hasMoreRows),

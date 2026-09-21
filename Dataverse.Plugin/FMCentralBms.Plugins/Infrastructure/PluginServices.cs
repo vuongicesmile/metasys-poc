@@ -13,10 +13,12 @@ namespace FMCentralBms.Plugins
             out ITracingService trace,
             out IPluginExecutionContext context)
         {
+            // Không đoán dependency; thiếu context là lỗi cấu hình plugin registration.
             if (serviceProvider == null)
                 throw new InvalidPluginExecutionException(nameof(serviceProvider));
 
             trace = serviceProvider.GetService(typeof(ITracingService)) as ITracingService;
+            // Trace có thể null ở một số execution context nên caller luôn kiểm tra trước khi ghi.
             context = serviceProvider.GetService(typeof(IPluginExecutionContext)) as IPluginExecutionContext;
             if (context == null)
                 throw new InvalidPluginExecutionException("Plugin execution context is required.");
@@ -38,6 +40,7 @@ namespace FMCentralBms.Plugins
             IOrganizationServiceFactory factory,
             IPluginExecutionContext context)
         {
+            // Dùng UserId của context để Dataverse áp dụng đúng quyền của caller/plugin step.
             return factory.CreateOrganizationService(context.UserId);
         }
     }

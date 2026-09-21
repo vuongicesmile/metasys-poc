@@ -6,6 +6,7 @@ namespace FMCentralBms.Plugins
     /// </summary>
     public sealed class RequestFullSync : BusinessEventPluginBase
     {
+        // Plugin chỉ trả Accepted; flow bên ngoài chịu trách nhiệm gọi hai API con.
         protected override string MessageName => "fmc_RequestFullSync";
         protected override string AcceptedMessage =>
             "Full sync accepted. Power Automate will dispatch SQL and SharePoint sync requests.";

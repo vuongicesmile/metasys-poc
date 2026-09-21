@@ -1,5 +1,7 @@
 import { makeStyles, tokens } from "@fluentui/react-components";
 
+// Toàn bộ style của dashboard nằm trong một hook để dùng Fluent UI tokens
+// và tự thích ứng theo breakpoint của trang Power Apps.
 export const useStyles = makeStyles({
     root: {
         position: "relative",

@@ -10,6 +10,7 @@ namespace DataverseSyncWorker.Services;
 
 public sealed class SqlStore(IConfiguration configuration, SyncOptions options) : ISyncLedger, ISqlStore
 {
+    // Connection string nằm ở ConnectionStrings:Sql; không hard-code database vào adapter.
     private string ConnectionString => configuration.GetConnectionString("Sql")
         ?? throw new InvalidOperationException("Missing ConnectionStrings:Sql.");
     public async Task<SqlConnection> Open(CancellationToken ct)
@@ -46,6 +47,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
     {
         // Anti-join đọc delivery ledger thay vì chỉ nhìn watermark. Cách này bắt được
         // transaction commit muộn có id thấp hơn MAX(id); tuyệt đối không dùng NOLOCK/READPAST.
+        // Chỉ đọc row chưa hoàn thành current/history và chưa bị dead-letter unresolved.
+        // ORDER BY id giúp batch deterministic nhưng không được dùng làm watermark duy nhất.
         using var cmd = Command(c, $"SELECT TOP (@size) {Columns} FROM raw.bms_reading r LEFT JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id WHERE (@cutoff IS NULL OR r.id<=@cutoff) AND {Pending} AND NOT EXISTS (SELECT 1 FROM integration.dataverse_dead_letter x WHERE x.pipeline=@pipeline AND x.bms_reading_id=r.id AND x.resolved_at IS NULL) ORDER BY r.id;");
         cmd.Parameters.Add("@size", SqlDbType.Int).Value = options.BatchSize;
         cmd.Parameters.Add("@cutoff", SqlDbType.BigInt).Value = cutoffId is null ? DBNull.Value : cutoffId.Value;
@@ -102,6 +105,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
 
     public async Task Ack(SqlConnection c, BmsReading row, CancellationToken ct)
     {
+        // Ack là transaction quan trọng: đánh dấu delivery và cập nhật state cùng nhau.
+        // Nếu transaction fail, row vẫn pending để replay an toàn.
         using var cmd = Command(c, """
             SET XACT_ABORT ON;
             BEGIN TRAN;
@@ -117,6 +122,7 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
 
     public async Task Quarantine(SqlConnection c, BmsReading row, string reason, CancellationToken ct)
     {
+        // Giữ nguyên raw row, chỉ ghi payload/lỗi vào dead-letter để có thể sửa và replay.
         using var cmd = Command(c, """
             UPDATE integration.dataverse_dead_letter SET error_message=@error,attempt_count=attempt_count+1,last_failed_at=SYSUTCDATETIME(),resolved_at=NULL WHERE pipeline=@pipeline AND bms_reading_id=@id;
             IF @@ROWCOUNT=0 INSERT integration.dataverse_dead_letter(pipeline,bms_reading_id,target_table,payload_json,error_message) VALUES(@pipeline,@id,'validation',@payload,@error);
@@ -153,6 +159,7 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
     }
     public async Task<int> Replay(long id, CancellationToken ct)
     {
+        // resolved_at mở lại row cho delivery query; không xóa lịch sử lỗi.
         await using var c = await Open(ct);
         using var cmd = Command(c, "UPDATE integration.dataverse_dead_letter SET resolved_at=SYSUTCDATETIME() WHERE pipeline=@pipeline AND bms_reading_id=@id AND resolved_at IS NULL;");
         cmd.Parameters.Add("@id", SqlDbType.BigInt).Value = id;

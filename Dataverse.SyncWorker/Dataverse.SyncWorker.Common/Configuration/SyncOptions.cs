@@ -2,6 +2,7 @@ namespace DataverseSyncWorker.Models;
 
 public sealed class SyncOptions
 {
+    // URL và organization ID là guard bắt buộc để worker không ghi nhầm environment.
     public string Url { get; set; } = "https://org06cbc9ec.crm5.dynamics.com/";
     public Guid ExpectedOrganizationId { get; set; } = Guid.Parse("ab191700-b99e-f111-aaa0-000d3a80bb96");
     public string ClientId { get; set; } = "";
@@ -32,6 +33,7 @@ public sealed class SyncOptions
         (!string.IsNullOrWhiteSpace(ClientSecret) || !string.IsNullOrWhiteSpace(CertificateThumbprint)));
     public void Validate()
     {
+        // Validate sớm khi host khởi động thay vì để lỗi xuất hiện giữa một batch đang chạy.
         if (!Uri.TryCreate(Url, UriKind.Absolute, out var uri) || uri.Scheme != "https")
             throw new InvalidOperationException("Dataverse:Url must use HTTPS.");
         if (BatchSize is < 1 or > 100 || PollIntervalSeconds < 1 || HistoryTtlSeconds < 1)

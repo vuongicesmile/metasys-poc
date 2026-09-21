@@ -1,6 +1,7 @@
 
 
 export type Language = "en" | "vi";
+// Khóa lưu preference ngôn ngữ dùng chung với web resource demo.
 export const LANGUAGE_KEY = "fmc.bms.language";
 export const englishMessages: Record<string, string> = {
     "Bắt đầu": "Started",
@@ -91,10 +92,12 @@ export const englishMessages: Record<string, string> = {
     "Yêu cầu đồng bộ SQL": "SQL sync requests",
     "FMC · Vận hành BMS": "FMC · BMS operations"
 };
+// Đọc preference an toàn vì embedded host có thể chặn localStorage.
 export function readLanguage(): Language {
     try { return window.localStorage.getItem(LANGUAGE_KEY) === "vi" ? "vi" : "en"; }
     catch { return "en"; }
 }
+// English map dùng key tiếng Việt để component giữ một bộ text duy nhất.
 export function translate(text: string, language: Language): string {
     return language === "en" ? englishMessages[text] ?? text : text;
 }
@@ -103,10 +106,12 @@ export const statusMessages: Record<string, Record<number, [string, string]>> = 
     archive: {789110000:["Received","Đã nhận"],789110001:["Processing","Đang xử lý"],789110002:["Archived","Đã lưu"],789110003:["Failed","Thất bại"],789110004:["Ignored","Đã bỏ qua"]},
     import: {789111000:["Not requested","Chưa yêu cầu"],789111001:["Processing","Đang xử lý"],789111002:["Imported","Đã nhập"],789111003:["Failed","Thất bại"]}
 };
+// Đổi option-set value Dataverse thành label theo loại bảng và ngôn ngữ hiện tại.
 export function statusLabel(kind: string, value: number | undefined, language: Language, fallback?: string): string {
     const labels = value === undefined ? undefined : statusMessages[kind]?.[value];
     return labels ? labels[language === "vi" ? 1 : 0] : fallback || translate("Chưa xác định", language);
 }
+// Format Date theo locale nhưng vẫn trả text thân thiện khi value thiếu/hỏng.
 export function localizedDate(value: Date | undefined, language: Language): string {
     const t = (text: string) => translate(text, language);
     if (!value) return t("Chưa có");
@@ -118,6 +123,7 @@ export function localizedDate(value: Date | undefined, language: Language): stri
     }).format(parsed);
 }
 
+// Format số theo locale và giới hạn số chữ số thập phân hiển thị.
 export function localizedNumber(value: number | undefined, language: Language, maximumFractionDigits = 2): string {
     if (typeof value !== "number" || !Number.isFinite(value)) return "—";
     return new Intl.NumberFormat(language === "vi" ? "vi-VN" : "en-US", { maximumFractionDigits }).format(value);

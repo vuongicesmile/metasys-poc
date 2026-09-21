@@ -8,10 +8,12 @@ namespace DataverseSyncWorker.Services;
 public sealed class CommandProcessor(ISyncRequestStore requests, ISyncLedger sql, ISyncEngine engine,
     SyncOptions options, ILogger<CommandProcessor> logger) : ICommandProcessor
 {
+    // Owner duy nhất của process hiện tại; dùng để chống worker khác cập nhật request này.
     private readonly string _workerOwner = $"{Environment.MachineName}:{Environment.ProcessId}:{Guid.NewGuid():N}";
 
     public async Task<CommandRunResult> TryRun(CancellationToken ct)
     {
+        // Claim dùng optimistic concurrency và lease trên Dataverse request.
         var request = await requests.Claim(_workerOwner, ct);
         if (request is null) return new(false, null, "Idle");
 
@@ -21,6 +23,7 @@ public sealed class CommandProcessor(ISyncRequestStore requests, ISyncLedger sql
         {
             if (request.CutoffId is null)
             {
+                // Chụp cutoff một lần cho toàn request; row mới hơn được để request sau xử lý.
                 var cutoff = await sql.MaxId(ct);
                 var baseline = await sql.Summary(cutoff, ct);
                 request = await requests.Initialize(request, _workerOwner, cutoff, baseline, ct);
@@ -29,11 +32,13 @@ public sealed class CommandProcessor(ISyncRequestStore requests, ISyncLedger sql
 
             while (!ct.IsCancellationRequested)
             {
+                // Summary đọc delivery ledger, không suy backlog từ MAX(id) đơn thuần.
                 var summary = await sql.Summary(cutoffId, ct);
                 var delivered = Math.Max(0, summary.DeliveredRows - request.BaselineDelivered);
                 var quarantined = Math.Max(0, summary.DeadLetterRows - request.BaselineDeadLetters);
                 if (summary.EligiblePendingRows == 0)
                 {
+                    // Dead-letter còn lại không làm mất dữ liệu raw nhưng làm request có issues.
                     var status = summary.DeadLetterRows == 0
                         ? SyncRequestStatuses.Succeeded : SyncRequestStatuses.CompletedWithIssues;
                     await requests.Complete(request, _workerOwner, status, batches, delivered,
@@ -43,6 +48,7 @@ public sealed class CommandProcessor(ISyncRequestStore requests, ISyncLedger sql
                 }
                 if (timer.Elapsed >= TimeSpan.FromMinutes(options.CommandMaxDurationMinutes))
                 {
+                    // Giới hạn thời gian để lease không bị giữ quá lâu; request sẽ được claim lại.
                     await requests.Requeue(request, _workerOwner, batches, delivered, quarantined, summary, ct);
                     logger.LogInformation("Requeued sync request {RequestId} after bounded execution window", request.Id);
                     return new(true, request.Id, "Requeued");
@@ -56,6 +62,7 @@ public sealed class CommandProcessor(ISyncRequestStore requests, ISyncLedger sql
                 }
                 if (batch.Read > 0) batches++;
                 var after = await sql.Summary(cutoffId, ct);
+                // Progress dùng số liệu sau batch trừ baseline của request hiện tại.
                 delivered = Math.Max(0, after.DeliveredRows - request.BaselineDelivered);
                 quarantined = Math.Max(0, after.DeadLetterRows - request.BaselineDeadLetters);
                 await requests.Progress(request, _workerOwner, batches, delivered, quarantined, after, ct);

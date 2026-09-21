@@ -42,7 +42,8 @@ import {
     TableRegular,
 } from "@fluentui/react-icons";
 
-
+// Component entry point của dashboard generative page.
+// Nó kết nối dataApi của Power Apps với hook dữ liệu, bộ lọc, bảng và navigation.
 export const GeneratedComponent = (props: GeneratedComponentProps) => {
     const { dataApi, pageInput } = props;
     void pageInput;
@@ -57,6 +58,7 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
     const [search, setSearch] = useState("");
     const [navigationError, setNavigationError] = useState<string | null>(null);
 
+    // Mở record/page trong model-driven app và hiển thị lỗi thân thiện nếu host từ chối.
     const navigate = async (input: Record<string, unknown>) => {
         setNavigationError(null);
         try {
@@ -66,7 +68,9 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
         }
     };
 
+    // Chuẩn hóa một lần rồi dùng chung cho ba danh sách trên dashboard.
     const normalizedSearch = normalizeSearch(search);
+    // Lọc riêng từng danh sách để search không làm thay đổi snapshot dữ liệu gốc.
     const pointRows = (state.value?.latestPoints ?? []).filter((row) =>
         matchesSearch(
             [row.fmc_name, row.fmc_building, row.fmc_sourcesystem, row.fmc_currentvalue, row.fmc_unit],
@@ -107,6 +111,7 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
           ].every((metric) => metric.observed === 0)
         : false;
 
+    // Cấu hình cột cho bảng Point; compare dùng locale hiện tại để sort đúng ngôn ngữ.
     const pointColumns = [
         createTableColumn<ReadablePoint>({
             columnId: "pointName",
@@ -159,6 +164,7 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
         }),
     ];
 
+    // Cấu hình cột cho bảng Sync Request và trạng thái option-set.
     const syncColumns = [
         createTableColumn<ReadableSyncRequest>({
             columnId: "syncName",
@@ -220,6 +226,7 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
         }),
     ];
 
+    // Cấu hình cột cho bảng SPO File/Import receipt.
     const fileColumns = [
         createTableColumn<ReadableSpoFile>({
             columnId: "fileName",
@@ -277,6 +284,7 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
 
     const latestFile = fileRows[0];
 
+    // Phần render bên dưới chỉ dựng UI; việc đọc dữ liệu nằm trong useDashboard.
     return (
         <LanguageContext.Provider value={language}>
         <main lang={language} className={styles.root} aria-label={t("Trung tâm vận hành BMS")}>

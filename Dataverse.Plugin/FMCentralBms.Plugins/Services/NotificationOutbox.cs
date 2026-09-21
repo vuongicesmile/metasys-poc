@@ -23,6 +23,8 @@ namespace FMCentralBms.Plugins
     /// </summary>
     internal static class NotificationOutbox
     {
+        // Một sync request có thể chuyển terminal nhiều lần; key gồm request + status
+        // để mỗi trạng thái chỉ tạo một notification.
         public static string CorrelationKey(Guid syncRequestId, int statusValue)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -31,6 +33,7 @@ namespace FMCentralBms.Plugins
 
         public static Entity FindByCorrelation(IOrganizationService service, string correlationKey)
         {
+            // Query nhẹ chỉ cần biết correlation đã tồn tại hay chưa.
             var query = new QueryExpression(EntityNames.Notification)
             {
                 ColumnSet = new ColumnSet(false),
@@ -43,6 +46,7 @@ namespace FMCentralBms.Plugins
 
         public static Entity RetrieveSyncRequest(IOrganizationService service, Guid syncRequestId)
         {
+            // Lấy snapshot cần cho nội dung email, không tải toàn bộ request.
             return service.Retrieve(EntityNames.SyncRequest, syncRequestId,
                 new ColumnSet("fmc_name", "fmc_status", "fmc_requestedby", "fmc_deliveredrows",
                     "fmc_quarantinedrows", "fmc_pendingafter", "fmc_errormessage", "createdby"));
@@ -51,6 +55,7 @@ namespace FMCentralBms.Plugins
         public static NotificationRecipient ResolveRecipient(
             IOrganizationService service, Entity request, ITracingService trace)
         {
+            // fmc_requestedby có thể là email hoặc GUID tùy nguồn tạo request.
             var requestedBy = request.GetAttributeValue<string>("fmc_requestedby");
             if (EmailAddress.IsValid(requestedBy))
                 return new NotificationRecipient(requestedBy.Trim(), null);
@@ -66,6 +71,7 @@ namespace FMCentralBms.Plugins
 
             try
             {
+                // Nếu chỉ có GUID thì resolve email/name từ systemuser.
                 var user = service.Retrieve(EntityNames.SystemUser, userId,
                     new ColumnSet("internalemailaddress", "fullname"));
                 var email = user.GetAttributeValue<string>("internalemailaddress");
@@ -90,6 +96,7 @@ namespace FMCentralBms.Plugins
             NotificationRecipient recipient,
             ITracingService trace)
         {
+            // Kiểm tra trước để tránh gửi email trùng khi plugin bị retry.
             var correlationKey = CorrelationKey(syncRequestId, statusValue);
             if (FindByCorrelation(service, correlationKey) != null)
             {
@@ -121,6 +128,7 @@ namespace FMCentralBms.Plugins
 
             try
             {
+                // Alternate key/correlation vẫn được bảo vệ trong trường hợp hai execution race.
                 return service.Create(notification);
             }
             catch (FaultException<OrganizationServiceFault>)

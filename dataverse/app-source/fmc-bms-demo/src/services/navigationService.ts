@@ -9,6 +9,7 @@ export type NavigationApi = {
         getGlobalContext?: () => { userSettings?: { userName?: string } };
     };
 };
+// Lấy tên user từ Xrm nhưng luôn có fallback khi dashboard chạy ngoài Dataverse.
 export function getSignedInUserName(language: Language): string {
     const t = (text: string) => translate(text, language);
     try {
@@ -18,6 +19,7 @@ export function getSignedInUserName(language: Language): string {
         return t("Người dùng Microsoft Entra");
     }
 }
+// Mở record/page bằng navigation API của model-driven app.
 export async function openAppItem(input: Record<string, unknown>): Promise<void> {
     const xrm = (window as unknown as { Xrm?: NavigationApi }).Xrm;
     if (!xrm?.Navigation?.navigateTo) throw new Error("Navigation unavailable");

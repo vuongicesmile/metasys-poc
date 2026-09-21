@@ -12,21 +12,26 @@ public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, S
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
+        // Disabled là trạng thái hợp lệ: host vẫn khởi động được nhưng không đọc/ghi dữ liệu.
         if (!options.Enabled) { status.Set(new("Disabled")); return; }
         if (!options.HasCredentials)
         {
+            // Không retry khi chưa có credentials vì retry không thể tự sửa cấu hình.
             status.Set(new("AwaitingCredentials", Error: "Configure the Dataverse application identity, then restart."));
             return;
         }
         if (options.ExecutionMode == "CommandDriven")
         {
+            // Production flow queue fmc_syncrequest; worker chỉ claim request được flow tạo.
             await RunCommandDriven(ct);
             return;
         }
+        // Continuous mode phù hợp local/simple deployment: mỗi vòng đọc một batch pending.
         while (!ct.IsCancellationRequested)
         {
             try
             {
+                // SyncEngine tự serialize local process và SQL application lock giữa các process.
                 var result = await engine.Run(ct);
                 status.Set(new(result.Busy ? "Busy" : result.Read == 0 ? "Idle" : "Syncing", DateTime.UtcNow, result));
                 if (result.Read == options.BatchSize) continue;
@@ -35,6 +40,7 @@ public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, S
             catch (Exception ex) when (ex is InvalidOperationException ||
                 ex is FaultException<OrganizationServiceFault> && !DataverseRetryPolicy.IsTransient(ex))
             {
+                // Lỗi schema, quyền hoặc authentication permanent phải dừng để người vận hành sửa.
                 status.Set(new("Blocked", DateTime.UtcNow, Error: "Configuration, authentication, schema or permanent Dataverse error. Correct the cause and restart; SQL delivery remains pending."));
                 logger.LogWarning("Sync requires attention ({ErrorType}). No automatic retry for permanent failures", ex.GetType().Name);
                 return;
@@ -52,11 +58,13 @@ public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, S
 
     private async Task RunCommandDriven(CancellationToken ct)
     {
+        // CommandIdle nghĩa là worker đang sống nhưng chưa có request cần claim.
         status.Set(new("CommandIdle"));
         while (!ct.IsCancellationRequested)
         {
             try
             {
+                // TryRun xử lý tối đa một request hoặc trả Idle nếu queue đang rỗng.
                 var result = await commands.TryRun(ct);
                 status.Set(new(result.State == "Idle" ? "CommandIdle" : result.State,
                     DateTime.UtcNow, RequestId: result.RequestId));

@@ -9,21 +9,25 @@ namespace DataverseSyncWorker.Services;
 
 public sealed class DataverseConnection(SyncOptions options) : IDisposable
 {
+    // ServiceClient được cache trong process để không authenticate lại cho từng request.
     private ServiceClient? _client;
     private readonly SemaphoreSlim _tokenGate = new(1, 1);
     private string? _developerToken;
     private DateTimeOffset _developerTokenValidUntil;
     public ServiceClient Get()
     {
+        // ServiceClient sẵn sàng thì tái sử dụng connection/token hiện tại.
         if (_client is { IsReady: true }) return _client;
         if (!options.HasCredentials) throw new InvalidOperationException("Dataverse credentials are not configured. Set ClientId and ClientSecret or CertificateThumbprint.");
         _client?.Dispose();
         if (options.UsesDeveloperToken)
         {
+            // Developer mode lấy token từ helper/Azure CLI và tự refresh khi token gần hết hạn.
             _client = new ServiceClient(new Uri(options.Url), GetDeveloperToken, true, null);
         }
         else
         {
+            // Production mode dùng application identity: client secret hoặc certificate.
             var cs = new DbConnectionStringBuilder
             {
                 ["Url"] = options.Url,
@@ -46,6 +50,7 @@ public sealed class DataverseConnection(SyncOptions options) : IDisposable
             throw new InvalidOperationException("Dataverse authentication failed. Check app credentials, expiry and application-user role.");
         }
         var who = (WhoAmIResponse)_client.Execute(new WhoAmIRequest());
+        // Kiểm tra organization sau authentication để tránh ghi nhầm environment.
         if (who.OrganizationId != options.ExpectedOrganizationId)
         {
             _client.Dispose(); _client = null;
@@ -56,6 +61,7 @@ public sealed class DataverseConnection(SyncOptions options) : IDisposable
 
     private async Task<string> GetDeveloperToken(string _)
     {
+        // Token cache ngắn hạn tránh gọi Python/Azure CLI cho từng Dataverse request.
         if (_developerToken is not null && _developerTokenValidUntil > DateTimeOffset.UtcNow.AddMinutes(5))
             return _developerToken;
         await _tokenGate.WaitAsync();

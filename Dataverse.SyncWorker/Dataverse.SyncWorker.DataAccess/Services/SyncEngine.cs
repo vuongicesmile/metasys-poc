@@ -10,12 +10,15 @@ namespace DataverseSyncWorker.Services;
 public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader, ReadingMapper mapper, IDataverseWriter writer,
     SyncOptions options, ILogger<SyncEngine> logger) : ISyncEngine
 {
+    // Semaphore chống hai batch chạy đồng thời trong cùng process.
     private readonly SemaphoreSlim _gate = new(1, 1);
     public async Task<BatchResult> Run(CancellationToken ct, long? cutoffId = null)
     {
+        // Busy không phải lỗi; caller có thể requeue command hoặc đợi vòng sau.
         if (!await _gate.WaitAsync(0, ct)) return new(0, 0, 0, true);
         try
         {
+            // App lock có phạm vi SQL session nên connection phải sống suốt batch.
             await using var c = await store.Open(ct);
             if (!await store.Lock(c, ct)) return new(0, 0, 0, true);
             try { return await RunLocked(c, ct, cutoffId); }
@@ -35,10 +38,12 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
         logger.LogInformation("Catalog synchronized: {Buildings} buildings, {Equipment} equipment",
             catalog.Buildings.Count, catalog.Equipment.Count);
         var batch = await store.ReadBatch(c, ct, cutoffId);
+        // Catalog vẫn được đồng bộ dù không có reading pending để đảm bảo lookup cha tồn tại.
         if (batch.Count == 0) return new(0, 0, 0);
         var valid = new List<BmsReading>();
         foreach (var row in batch)
         {
+            // Validation lỗi từng row được quarantine; row hợp lệ tiếp tục cùng batch.
             if (mapper.Validate(row) is { } error) await store.Quarantine(c, row, error, ct);
             else valid.Add(row);
         }
@@ -55,6 +60,7 @@ public sealed class SyncEngine(ISqlStore store, ISqlCatalogReader catalogReader,
         await writer.WritePoints(points, ct);
         if (options.HistoryEnabled)
         {
+            // History có TTL theo reading time; mapper sẽ bỏ qua event đã hết hạn.
             var now = DateTime.UtcNow;
             var readings = valid.Select(r => mapper.History(r, now)).OfType<Entity>().ToArray();
             await writer.WriteHistory(readings, ct);

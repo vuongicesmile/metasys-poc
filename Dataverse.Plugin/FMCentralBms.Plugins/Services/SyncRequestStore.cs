@@ -12,6 +12,7 @@ namespace FMCentralBms.Plugins
     {
         public static Entity FindByCorrelation(IOrganizationService service, string correlationId)
         {
+            // Correlation ID là khóa idempotency do UI/client gửi lên.
             var query = new QueryExpression(EntityNames.SyncRequest)
             {
                 ColumnSet = new ColumnSet("fmc_status"),
@@ -23,6 +24,7 @@ namespace FMCentralBms.Plugins
 
         public static Entity FindActive(IOrganizationService service, string pipeline)
         {
+            // Active request dùng để coalesce nhiều lần bấm thành một queue item.
             var query = new QueryExpression(EntityNames.SyncRequest)
             {
                 ColumnSet = new ColumnSet("fmc_status"),
@@ -41,6 +43,7 @@ namespace FMCentralBms.Plugins
             string correlationId,
             string requestedBy)
         {
+            // Tạo request ở trạng thái Queued; worker sẽ claim và đổi sang Running.
             var request = new Entity(EntityNames.SyncRequest)
             {
                 ["fmc_name"] = "SQL Sync " + DateTime.UtcNow.ToString("O"),
@@ -69,11 +72,13 @@ namespace FMCentralBms.Plugins
         {
             try
             {
+                // Alternate key fmc_activekey là lớp bảo vệ race ở server.
                 created = true;
                 return CreateQueued(service, pipeline, correlationId, requestedBy);
             }
             catch (FaultException<OrganizationServiceFault>)
             {
+                // Nếu caller khác thắng race, đọc lại active row thay vì báo lỗi duplicate cho UI.
                 var winner = FindActive(service, pipeline);
                 if (winner == null) throw;
                 created = false;
@@ -84,6 +89,7 @@ namespace FMCentralBms.Plugins
         public static string ResolveRequestedBy(
             IOrganizationService service, Guid userId, ITracingService trace)
         {
+            // Ưu tiên email để notification không phải query user lần nữa ở flow.
             try
             {
                 var user = service.Retrieve(EntityNames.SystemUser, userId,
@@ -105,6 +111,7 @@ namespace FMCentralBms.Plugins
         public static void WriteResponse(
             IPluginExecutionContext context, Entity request, bool created, string message)
         {
+            // OutputParameters là response của unbound Custom API trả về cho Power Automate/UI.
             var status = request.GetAttributeValue<OptionSetValue>("fmc_status");
             context.OutputParameters["RequestId"] = request.Id;
             context.OutputParameters["Created"] = created;

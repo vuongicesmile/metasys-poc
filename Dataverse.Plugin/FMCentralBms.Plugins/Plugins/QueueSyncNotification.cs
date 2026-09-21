@@ -12,6 +12,7 @@ namespace FMCentralBms.Plugins
     {
         public void Execute(IServiceProvider serviceProvider)
         {
+            // Plugin chỉ tạo outbox record; email được gửi bất đồng bộ bởi Power Automate.
             ITracingService trace;
             IPluginExecutionContext context;
             IOrganizationServiceFactory factory;
@@ -22,6 +23,7 @@ namespace FMCentralBms.Plugins
                 context.PrimaryEntityId == Guid.Empty)
                 return;
 
+            // Update target chỉ chứa field thay đổi; chỉ terminal status mới tạo notification.
             var target = context.InputParameters.Contains("Target")
                 ? context.InputParameters["Target"] as Entity
                 : null;
@@ -32,6 +34,7 @@ namespace FMCentralBms.Plugins
                 return;
 
             var service = PluginServices.CreateOrgService(factory, context);
+            // Đọc request đầy đủ để dựng subject/body và tìm recipient.
             var request = NotificationOutbox.RetrieveSyncRequest(service, context.PrimaryEntityId);
             var recipient = NotificationOutbox.ResolveRecipient(service, request, trace);
             var notificationId = NotificationOutbox.CreateOrReuse(

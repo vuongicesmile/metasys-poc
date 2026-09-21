@@ -5,7 +5,8 @@ import { AddRegular, ArrowClockwiseRegular, ArrowSyncRegular, BuildingRegular, C
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 
 // Source: src/models/dashboard.ts
-type ReadableBuilding = ReadableTableRow<fmc_bmsbuilding>;
+// Các alias này biến TableRow generated thành kiểu dễ đọc trong component dashboard.
+ type ReadableBuilding = ReadableTableRow<fmc_bmsbuilding>;
 
 type ReadableEquipment = ReadableTableRow<fmc_bmsequipment>;
 
@@ -22,12 +23,14 @@ type ReadableSpoFile = ReadableTableRow<fmc_spofile>;
 type ReadableSpoImportRow = ReadableTableRow<fmc_spoimportrow>;
 
 type BoundedCount = {
+    // label có thể có dấu "+" khi page API còn bản ghi ngoài giới hạn đọc.
     observed: number;
     label: string;
     isBounded: boolean;
 };
 
 type DashboardData = {
+    // Snapshot dùng chung cho KPI, bảng gần nhất và thông tin trạng thái pipeline.
     buildings: BoundedCount;
     equipment: BoundedCount;
     bronzePoints: BoundedCount;
@@ -50,7 +53,8 @@ type DashboardState = {
 // Source: src/services/localization.ts
 type Language = "en" | "vi";
 
-const LANGUAGE_KEY = "fmc.bms.language";
+// Khóa lưu preference ngôn ngữ dùng chung với web resource demo.
+ const LANGUAGE_KEY = "fmc.bms.language";
 
 const englishMessages: Record<string, string> = {
     "Bắt đầu": "Started",
@@ -142,12 +146,14 @@ const englishMessages: Record<string, string> = {
     "FMC · Vận hành BMS": "FMC · BMS operations"
 };
 
-function readLanguage(): Language {
+// Đọc preference an toàn vì embedded host có thể chặn localStorage.
+ function readLanguage(): Language {
     try { return window.localStorage.getItem(LANGUAGE_KEY) === "vi" ? "vi" : "en"; }
     catch { return "en"; }
 }
 
-function translate(text: string, language: Language): string {
+// English map dùng key tiếng Việt để component giữ một bộ text duy nhất.
+ function translate(text: string, language: Language): string {
     return language === "en" ? englishMessages[text] ?? text : text;
 }
 
@@ -157,12 +163,14 @@ const statusMessages: Record<string, Record<number, [string, string]>> = {
     import: {789111000:["Not requested","Chưa yêu cầu"],789111001:["Processing","Đang xử lý"],789111002:["Imported","Đã nhập"],789111003:["Failed","Thất bại"]}
 };
 
-function statusLabel(kind: string, value: number | undefined, language: Language, fallback?: string): string {
+// Đổi option-set value Dataverse thành label theo loại bảng và ngôn ngữ hiện tại.
+ function statusLabel(kind: string, value: number | undefined, language: Language, fallback?: string): string {
     const labels = value === undefined ? undefined : statusMessages[kind]?.[value];
     return labels ? labels[language === "vi" ? 1 : 0] : fallback || translate("Chưa xác định", language);
 }
 
-function localizedDate(value: Date | undefined, language: Language): string {
+// Format Date theo locale nhưng vẫn trả text thân thiện khi value thiếu/hỏng.
+ function localizedDate(value: Date | undefined, language: Language): string {
     const t = (text: string) => translate(text, language);
     if (!value) return t("Chưa có");
     const parsed = value instanceof Date ? value : new Date(value);
@@ -173,7 +181,8 @@ function localizedDate(value: Date | undefined, language: Language): string {
     }).format(parsed);
 }
 
-function localizedNumber(value: number | undefined, language: Language, maximumFractionDigits = 2): string {
+// Format số theo locale và giới hạn số chữ số thập phân hiển thị.
+ function localizedNumber(value: number | undefined, language: Language, maximumFractionDigits = 2): string {
     if (typeof value !== "number" || !Number.isFinite(value)) return "—";
     return new Intl.NumberFormat(language === "vi" ? "vi-VN" : "en-US", { maximumFractionDigits }).format(value);
 }
@@ -185,7 +194,8 @@ const ELASTIC_COUNT_LIMIT = 25;
 
 const LATEST_LIMIT = 5;
 
-function createBoundedCount(observed: number, hasMoreRows: boolean): BoundedCount {
+// Chuyển số lượng trả về từ page API thành model UI có thể báo giới hạn dữ liệu.
+ function createBoundedCount(observed: number, hasMoreRows: boolean): BoundedCount {
     return {
         observed,
         label: hasMoreRows ? `${observed}+` : String(observed),
@@ -193,7 +203,9 @@ function createBoundedCount(observed: number, hasMoreRows: boolean): BoundedCoun
     };
 }
 
-async function queryDashboard(dataApi: GeneratedComponentProps["dataApi"]): Promise<DashboardData> {
+// Đọc các bảng cần cho dashboard song song để giảm thời gian chờ tổng thể.
+ async function queryDashboard(dataApi: GeneratedComponentProps["dataApi"]): Promise<DashboardData> {
+    // Mỗi query chỉ lấy các cột cần hiển thị; không tải toàn bộ row về client.
     const [buildings, equipment, points, readings, silverRows, syncRequests, files, importRows] =
         await Promise.all([
             dataApi.queryTable("fmc_bmsbuilding", {
@@ -260,6 +272,7 @@ async function queryDashboard(dataApi: GeneratedComponentProps["dataApi"]): Prom
             }),
         ]);
 
+    // Giữ tối đa vài bản ghi mới nhất cho bảng; KPI vẫn báo hasMoreRows chính xác.
     return {
         buildings: createBoundedCount(buildings.rows.length, buildings.hasMoreRows),
         equipment: createBoundedCount(equipment.rows.length, equipment.hasMoreRows),
@@ -276,16 +289,19 @@ async function queryDashboard(dataApi: GeneratedComponentProps["dataApi"]): Prom
 }
 
 // Source: src/services/presentation.ts
-function getFormattedValue(row: Record<string, unknown>, column: string): string | undefined {
+// Đọc label đã format bởi OData cho choice/status field.
+ function getFormattedValue(row: Record<string, unknown>, column: string): string | undefined {
     const value = row[`${column}@OData.Community.Display.V1.FormattedValue`];
     return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
-function normalizeSearch(value: string): string {
+// Chuẩn hóa search theo locale tiếng Việt để tìm kiếm không phân biệt hoa thường.
+ function normalizeSearch(value: string): string {
     return value.trim().toLocaleLowerCase("vi-VN");
 }
 
-function matchesSearch(values: Array<string | number | undefined>, search: string): boolean {
+// Kiểm tra một row có khớp ít nhất một field đang được hiển thị hay không.
+ function matchesSearch(values: Array<string | number | undefined>, search: string): boolean {
     if (!search) return true;
     return values.some((value) => String(value ?? "").toLocaleLowerCase("vi-VN").includes(search));
 }
@@ -300,7 +316,8 @@ type NavigationApi = {
     };
 };
 
-function getSignedInUserName(language: Language): string {
+// Lấy tên user từ Xrm nhưng luôn có fallback khi dashboard chạy ngoài Dataverse.
+ function getSignedInUserName(language: Language): string {
     const t = (text: string) => translate(text, language);
     try {
         const xrm = (window as unknown as { Xrm?: NavigationApi }).Xrm;
@@ -310,14 +327,17 @@ function getSignedInUserName(language: Language): string {
     }
 }
 
-async function openAppItem(input: Record<string, unknown>): Promise<void> {
+// Mở record/page bằng navigation API của model-driven app.
+ async function openAppItem(input: Record<string, unknown>): Promise<void> {
     const xrm = (window as unknown as { Xrm?: NavigationApi }).Xrm;
     if (!xrm?.Navigation?.navigateTo) throw new Error("Navigation unavailable");
     await xrm.Navigation.navigateTo(input);
 }
 
 // Source: src/styles/dashboardStyles.ts
-const useStyles = makeStyles({
+// Toàn bộ style của dashboard nằm trong một hook để dùng Fluent UI tokens
+// và tự thích ứng theo breakpoint của trang Power Apps.
+ const useStyles = makeStyles({
     root: {
         position: "relative",
         contain: "layout",
@@ -657,21 +677,26 @@ const useStyles = makeStyles({
 });
 
 // Source: src/hooks/useLanguage.ts
-const LanguageContext = createContext<Language>("en");
+// Context truyền ngôn ngữ xuống các component mà không cần truyền prop qua từng lớp.
+ const LanguageContext = createContext<Language>("en");
 
 function useTranslation() {
+    // Trả về hàm dịch ngắn gọn để component chỉ cần gọi t("text").
     const language = useContext(LanguageContext);
     return (text: string) => translate(text, language);
 }
 
 function useLanguagePreference() {
+    // Khởi tạo từ localStorage; nếu host chặn storage, localization tự fallback English.
     const [language, setLanguage] = useState<Language>(readLanguage);
     const changeLanguage = (value: string) => {
+        // Chỉ chấp nhận vi/en để state không rơi vào ngôn ngữ không được hỗ trợ.
         const next: Language = value === "vi" ? "vi" : "en";
         setLanguage(next);
         try { window.localStorage.setItem(LANGUAGE_KEY, next); } catch { /* Session-only if storage is blocked. */ }
     };
     useEffect(() => {
+        // Đồng bộ lựa chọn nếu user đổi ngôn ngữ ở một tab khác.
         const onStorage = (event: StorageEvent) => {
             if (event.key === LANGUAGE_KEY || event.key === null) setLanguage(readLanguage());
         };
@@ -682,7 +707,8 @@ function useLanguagePreference() {
 }
 
 // Source: src/hooks/useDashboard.ts
-const CACHE_KEY = "__genpage_bms_operations_dashboard_v1";
+// Các key này nằm trên window để nhiều lần render/instance trong host dùng chung cache.
+ const CACHE_KEY = "__genpage_bms_operations_dashboard_v1";
 
 const INFLIGHT_KEY = "__genpage_bms_operations_dashboard_inflight_v1";
 
@@ -691,6 +717,7 @@ const GENERATION_KEY = "__genpage_bms_operations_dashboard_generation_v1";
 const winAny = window as unknown as Record<string, unknown>;
 
 function useDashboard(dataApi: GeneratedComponentProps["dataApi"]) {
+    // dataApi chưa sẵn sàng khi Power Apps còn đang khởi tạo page.
     const dataReady = !!dataApi;
     const [state, setState] = useState<DashboardState>(() => {
         const cached = winAny[CACHE_KEY] as DashboardData | undefined;
@@ -699,6 +726,7 @@ function useDashboard(dataApi: GeneratedComponentProps["dataApi"]) {
     const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
+        // Không gọi Dataverse trước khi host cấp data API.
         if (!dataReady) return;
 
         const cached = winAny[CACHE_KEY] as DashboardData | undefined;
@@ -708,8 +736,10 @@ function useDashboard(dataApi: GeneratedComponentProps["dataApi"]) {
         }
 
         let cancelled = false;
+        // Dùng request đang chạy nếu component khác đã khởi động cùng dashboard.
         let inflight = winAny[INFLIGHT_KEY] as Promise<DashboardData> | undefined;
         if (!inflight) {
+            // Generation ngăn response cũ ghi đè cache sau khi người dùng bấm Refresh.
             const generation = Number(winAny[GENERATION_KEY] ?? 0);
             inflight = queryDashboard(dataApi)
                 .then((dashboard) => {
@@ -746,6 +776,7 @@ function useDashboard(dataApi: GeneratedComponentProps["dataApi"]) {
     }, [dataReady, reloadKey]);
 
     const refresh = () => {
+        // Xóa cache và tăng generation để lần effect kế tiếp đọc dữ liệu mới.
         winAny[GENERATION_KEY] = Number(winAny[GENERATION_KEY] ?? 0) + 1;
         delete winAny[CACHE_KEY];
         delete winAny[INFLIGHT_KEY];
@@ -756,7 +787,8 @@ function useDashboard(dataApi: GeneratedComponentProps["dataApi"]) {
 }
 
 // Source: src/components/DashboardCards.tsx
-function KpiCard(props: { icon: ReactNode; label: string; count: BoundedCount; note: string }) {
+// Thẻ KPI dùng cho các số liệu tổng quan đã được giới hạn bởi pageSize.
+ function KpiCard(props: { icon: ReactNode; label: string; count: BoundedCount; note: string }) {
     const styles = useStyles();
     const t = useTranslation();
     return (
@@ -778,7 +810,8 @@ function KpiCard(props: { icon: ReactNode; label: string; count: BoundedCount; n
     );
 }
 
-function PipelineStep(props: {
+// Một bước trong sơ đồ pipeline Bronze -> Silver hoặc ingestion.
+ function PipelineStep(props: {
     icon: ReactNode;
     label: string;
     detail: string;
@@ -799,7 +832,8 @@ function PipelineStep(props: {
     );
 }
 
-function EmptyList(props: { title: string; description: string }) {
+// Empty state dùng chung cho các bảng không có dữ liệu hoặc không khớp bộ lọc.
+ function EmptyList(props: { title: string; description: string }) {
     const styles = useStyles();
     return (
         <div className={styles.empty} role="status">
@@ -811,7 +845,9 @@ function EmptyList(props: { title: string; description: string }) {
 }
 
 // Source: src/Dashboard.tsx
-const GeneratedComponent = (props: GeneratedComponentProps) => {
+// Component entry point của dashboard generative page.
+// Nó kết nối dataApi của Power Apps với hook dữ liệu, bộ lọc, bảng và navigation.
+ const GeneratedComponent = (props: GeneratedComponentProps) => {
     const { dataApi, pageInput } = props;
     void pageInput;
     const styles = useStyles();
@@ -825,6 +861,7 @@ const GeneratedComponent = (props: GeneratedComponentProps) => {
     const [search, setSearch] = useState("");
     const [navigationError, setNavigationError] = useState<string | null>(null);
 
+    // Mở record/page trong model-driven app và hiển thị lỗi thân thiện nếu host từ chối.
     const navigate = async (input: Record<string, unknown>) => {
         setNavigationError(null);
         try {
@@ -834,7 +871,9 @@ const GeneratedComponent = (props: GeneratedComponentProps) => {
         }
     };
 
+    // Chuẩn hóa một lần rồi dùng chung cho ba danh sách trên dashboard.
     const normalizedSearch = normalizeSearch(search);
+    // Lọc riêng từng danh sách để search không làm thay đổi snapshot dữ liệu gốc.
     const pointRows = (state.value?.latestPoints ?? []).filter((row) =>
         matchesSearch(
             [row.fmc_name, row.fmc_building, row.fmc_sourcesystem, row.fmc_currentvalue, row.fmc_unit],
@@ -875,6 +914,7 @@ const GeneratedComponent = (props: GeneratedComponentProps) => {
           ].every((metric) => metric.observed === 0)
         : false;
 
+    // Cấu hình cột cho bảng Point; compare dùng locale hiện tại để sort đúng ngôn ngữ.
     const pointColumns = [
         createTableColumn<ReadablePoint>({
             columnId: "pointName",
@@ -927,6 +967,7 @@ const GeneratedComponent = (props: GeneratedComponentProps) => {
         }),
     ];
 
+    // Cấu hình cột cho bảng Sync Request và trạng thái option-set.
     const syncColumns = [
         createTableColumn<ReadableSyncRequest>({
             columnId: "syncName",
@@ -988,6 +1029,7 @@ const GeneratedComponent = (props: GeneratedComponentProps) => {
         }),
     ];
 
+    // Cấu hình cột cho bảng SPO File/Import receipt.
     const fileColumns = [
         createTableColumn<ReadableSpoFile>({
             columnId: "fileName",
@@ -1045,6 +1087,7 @@ const GeneratedComponent = (props: GeneratedComponentProps) => {
 
     const latestFile = fileRows[0];
 
+    // Phần render bên dưới chỉ dựng UI; việc đọc dữ liệu nằm trong useDashboard.
     return (
         <LanguageContext.Provider value={language}>
         <main lang={language} className={styles.root} aria-label={t("Trung tâm vận hành BMS")}>

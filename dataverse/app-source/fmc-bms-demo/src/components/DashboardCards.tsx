@@ -5,6 +5,7 @@ import type { BoundedCount } from "../models/dashboard";
 import { useStyles } from "../styles/dashboardStyles";
 import { useTranslation } from "../hooks/useLanguage";
 
+// Thẻ KPI dùng cho các số liệu tổng quan đã được giới hạn bởi pageSize.
 export function KpiCard(props: { icon: ReactNode; label: string; count: BoundedCount; note: string }) {
     const styles = useStyles();
     const t = useTranslation();
@@ -27,6 +28,7 @@ export function KpiCard(props: { icon: ReactNode; label: string; count: BoundedC
     );
 }
 
+// Một bước trong sơ đồ pipeline Bronze -> Silver hoặc ingestion.
 export function PipelineStep(props: {
     icon: ReactNode;
     label: string;
@@ -48,6 +50,7 @@ export function PipelineStep(props: {
     );
 }
 
+// Empty state dùng chung cho các bảng không có dữ liệu hoặc không khớp bộ lọc.
 export function EmptyList(props: { title: string; description: string }) {
     const styles = useStyles();
     return (

@@ -6,6 +6,7 @@ namespace FMCentralBms.Plugins
     /// </summary>
     public sealed class RequestSpoSync : BusinessEventPluginBase
     {
+        // Plugin không gọi SharePoint trong sandbox; Power Automate dùng connector riêng.
         protected override string MessageName => "fmc_RequestSpoSync";
         protected override string AcceptedMessage =>
             "SharePoint scan accepted. Power Automate will archive only new or updated files.";
