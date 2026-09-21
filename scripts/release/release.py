@@ -59,6 +59,7 @@ def classify(files):
     paths = set(files)
     infrastructure = any(p.startswith(("scripts/release/", "config/release.", ".github/workflows/")) for p in paths)
     solution = any(p.startswith("dataverse/FMCentralBms/") for p in paths)
+    pcf = any(p.startswith("dataverse/pcf/") for p in paths)
     plugin = any(p.startswith(("Dataverse.Plugin/", "plugins/")) for p in paths)
     web = [p for p in CONFIG["webResources"] if p in paths]
     dashboard = solution or plugin or infrastructure or any(p.startswith(CONFIG["pageDirectory"] + "/") for p in paths)
@@ -66,11 +67,15 @@ def classify(files):
                                    or p.endswith((".sln", "Directory.Build.props", "Directory.Packages.props")) for p in paths)
     if CONFIG["pageDirectory"] + "/app-spec.json" in paths and not solution:
         raise ValueError("app-spec changed: build/export the model-driven solution into dataverse/FMCentralBms before tagging")
+    if pcf and not solution:
+        # PCF source alone is not inside the ZIP made by `pac solution pack` below.
+        # Import it into FMCentralBms, configure the host, then export/unpack the canonical solution first.
+        raise ValueError("PCF changed: add it to FMCentralBms and export/unpack dataverse/FMCentralBms before tagging")
     if any(p.endswith("Provisioner.cs") for p in paths) and not solution:
         raise ValueError("Provisioning code changed: apply/verify and export the schema into dataverse/FMCentralBms before tagging")
     if any(p.startswith("sql/") for p in paths):
         raise ValueError("SQL migration changed: apply/verify it separately before setting a new deployment baseline")
-    return dict(dashboard=dashboard, backend=backend, plugin=plugin, solution=solution,
+    return dict(dashboard=dashboard, backend=backend, plugin=plugin, pcf=pcf, solution=solution,
                 webResources=web, changedFiles=sorted(paths))
 
 
@@ -118,6 +123,11 @@ def get_plan(tag):
 
 
 def validate(plan, out):
+    if plan["pcf"]:
+        for package_file in sorted((ROOT / "dataverse/pcf").glob("*/package.json")):
+            # Mỗi control có lockfile riêng để dependency build tái lập được trên runner Windows.
+            command("npm", "ci", "--no-audit", "--no-fund", cwd=package_file.parent)
+            command("npm", "run", "build", cwd=package_file.parent)
     if plan["backend"] or plan["plugin"]:
         command("dotnet", "test", "tests/MetasysPoc.Tests/MetasysPoc.Tests.csproj", "-c", "Release")
         for project, project_file in (

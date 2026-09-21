@@ -34,6 +34,17 @@ class ReleaseTests(unittest.TestCase):
         self.assertTrue(plan["dashboard"])
         self.assertFalse(plan["solution"])
 
+    def test_pcf_change_requires_exported_solution_source(self):
+        with self.assertRaises(ValueError):
+            release.classify(["dataverse/pcf/BmsPointGrid/BmsPointGrid/index.ts"])
+
+        plan = release.classify([
+            "dataverse/pcf/BmsPointGrid/BmsPointGrid/index.ts",
+            "dataverse/FMCentralBms/Other/Solution.xml",
+        ])
+        self.assertTrue(plan["pcf"])
+        self.assertTrue(plan["solution"])
+
     def test_solution_import_reapplies_authored_dashboard(self):
         self.assertTrue(release.classify(["dataverse/FMCentralBms/Other/Solution.xml"])["dashboard"])
 

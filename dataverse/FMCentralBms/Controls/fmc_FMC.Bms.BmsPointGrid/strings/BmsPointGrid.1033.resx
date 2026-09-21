@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="BmsPointGrid_DisplayName" xml:space="preserve"><value>BMS Point grid</value></data>
+  <data name="BmsPointGrid_Description" xml:space="preserve"><value>Read-only current BMS Point dataset grid.</value></data>
+  <data name="Points_DisplayName" xml:space="preserve"><value>Points</value></data>
+  <data name="ObjectId_DisplayName" xml:space="preserve"><value>Object ID column</value></data>
+  <data name="ObjectId_Description" xml:space="preserve"><value>Metasys source Object ID for the Point.</value></data>
+  <data name="Name_DisplayName" xml:space="preserve"><value>Point name column</value></data>
+  <data name="Name_Description" xml:space="preserve"><value>Display name of the Point.</value></data>
+  <data name="CurrentValue_DisplayName" xml:space="preserve"><value>Current value column</value></data>
+  <data name="CurrentValue_Description" xml:space="preserve"><value>Latest numeric reading; it can be empty.</value></data>
+  <data name="Unit_DisplayName" xml:space="preserve"><value>Unit column</value></data>
+  <data name="Unit_Description" xml:space="preserve"><value>Unit for the current reading.</value></data>
+  <data name="LastReadingTime_DisplayName" xml:space="preserve"><value>Reading time column</value></data>
+  <data name="LastReadingTime_Description" xml:space="preserve"><value>UTC time of the current reading.</value></data>
+  <data name="SourceSystem_DisplayName" xml:space="preserve"><value>Source system column</value></data>
+  <data name="SourceSystem_Description" xml:space="preserve"><value>Source system that supplied the Point.</value></data>
+  <data name="StaleAfterMinutes_DisplayName" xml:space="preserve"><value>Stale after minutes</value></data>
+  <data name="StaleAfterMinutes_Description" xml:space="preserve"><value>Minutes before the UI labels a reading as stale; this does not change data.</value></data>
+</root>

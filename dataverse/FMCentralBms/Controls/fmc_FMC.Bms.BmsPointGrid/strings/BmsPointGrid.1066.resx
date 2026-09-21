@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="BmsPointGrid_DisplayName" xml:space="preserve"><value>Lưới Point BMS</value></data>
+  <data name="BmsPointGrid_Description" xml:space="preserve"><value>Lưới chỉ đọc cho dataset Point BMS hiện tại.</value></data>
+  <data name="Points_DisplayName" xml:space="preserve"><value>Points</value></data>
+  <data name="ObjectId_DisplayName" xml:space="preserve"><value>Cột Object ID</value></data>
+  <data name="ObjectId_Description" xml:space="preserve"><value>Object ID nguồn Metasys của Point.</value></data>
+  <data name="Name_DisplayName" xml:space="preserve"><value>Cột tên Point</value></data>
+  <data name="Name_Description" xml:space="preserve"><value>Tên hiển thị của Point.</value></data>
+  <data name="CurrentValue_DisplayName" xml:space="preserve"><value>Cột giá trị hiện tại</value></data>
+  <data name="CurrentValue_Description" xml:space="preserve"><value>Reading số mới nhất, có thể trống.</value></data>
+  <data name="Unit_DisplayName" xml:space="preserve"><value>Cột đơn vị</value></data>
+  <data name="Unit_Description" xml:space="preserve"><value>Đơn vị của reading hiện tại.</value></data>
+  <data name="LastReadingTime_DisplayName" xml:space="preserve"><value>Cột thời điểm reading</value></data>
+  <data name="LastReadingTime_Description" xml:space="preserve"><value>Thời điểm UTC của reading hiện tại.</value></data>
+  <data name="SourceSystem_DisplayName" xml:space="preserve"><value>Cột hệ thống nguồn</value></data>
+  <data name="SourceSystem_Description" xml:space="preserve"><value>Hệ thống nguồn cung cấp Point.</value></data>
+  <data name="StaleAfterMinutes_DisplayName" xml:space="preserve"><value>Số phút dữ liệu cũ</value></data>
+  <data name="StaleAfterMinutes_Description" xml:space="preserve"><value>Số phút trước khi UI gắn nhãn dữ liệu cũ; không thay đổi dữ liệu.</value></data>
+</root>
