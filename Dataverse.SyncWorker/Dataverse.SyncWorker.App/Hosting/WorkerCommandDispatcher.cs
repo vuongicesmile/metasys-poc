@@ -11,6 +11,21 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
     {
         var args = commandLine.CommandArgs;
         var relationCommand = commandLine.RelationCommand;
+        if (args.Contains("--deploy-change-log"))
+        {
+            var path = args.SingleOrDefault(a => a.StartsWith("--plugin-path=", StringComparison.OrdinalIgnoreCase))?.Split('=', 2)[1]
+                ?? ResolveDefaultPluginPath();
+            DataversePluginProvisioner.ValidateChangeLogAssembly(path);
+            await services.GetRequiredService<DataverseProvisioner>().ProvisionChangeLog();
+            await services.GetRequiredService<DataversePluginProvisioner>().RegisterChangeLog(path);
+            await services.GetRequiredService<DataverseProvisioner>().PrintChangeLogStatus();
+            return true;
+        }
+        if (args.Contains("--change-log-status"))
+        {
+            await services.GetRequiredService<DataverseProvisioner>().PrintChangeLogStatus();
+            return true;
+        }
         // Maintenance exits before app.RunAsync: it never starts the hosted sync worker.
         if (relationCommand is not null)
         {

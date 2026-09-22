@@ -5,6 +5,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| Runbook | [Change Log bằng plugin](runbooks/change-log-plugin.vi.md) | Ghi vết Create/Update/Delete Building và Equipment; source chuẩn bị, chưa deploy do thiếu khóa ký |
 | Reference | [Persistence boundaries và DI](reference/persistence-boundaries.vi.md) | Unit of Work, scoped context và transaction boundary của các service |
 | Plan | [PCF components cho FMC BMS Demo](plans/pcf-components-demo.vi.md) | `BmsPointGrid` 1.0.1 đã deploy và bind Current Points; kiểm tra UI và Equipment subgrid còn chờ |
 | Plan | [Notification người dùng qua email](plans/user-email-notifications.vi.md) | Yêu cầu PDF, notification outbox, plug-in producer, Power Automate dispatcher và roadmap approval/escalation |

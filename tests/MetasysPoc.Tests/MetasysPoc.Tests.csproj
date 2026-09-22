@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Plugins/RecordChangeLog.cs" Link="Plugin/RecordChangeLog.cs" />
+    <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Infrastructure/PluginServices.cs" Link="Plugin/PluginServices.cs" />
   </ItemGroup>
 
   <ItemGroup>

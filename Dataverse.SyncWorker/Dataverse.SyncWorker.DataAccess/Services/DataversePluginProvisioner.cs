@@ -12,7 +12,7 @@ namespace DataverseSyncWorker.Services;
 /// Registers the BMS plug-in assembly, validation steps and sync-request Custom API.
 /// This is an explicit deployment command; ordinary worker startup never calls it.
 /// </summary>
-public sealed class DataversePluginProvisioner(DataverseConnection connection, SyncOptions options)
+public sealed partial class DataversePluginProvisioner(DataverseConnection connection, SyncOptions options)
 {
     private const string AssemblyName = "FMCentralBms.Plugins";
     private const string ValidationPluginTypeName = "FMCentralBms.Plugins.RequireEquipmentBuilding";
@@ -393,7 +393,7 @@ public sealed class DataversePluginProvisioner(DataverseConnection connection, S
     }
 
     private static async Task<Entity> EnsureStep(
-        ServiceClient client, StepDefinition definition, Guid messageId, Guid filterId, Guid pluginTypeId)
+        ServiceClient client, StepDefinition definition, Guid messageId, Guid filterId, Guid pluginTypeId, bool enabled = true)
     {
         var query = new QueryExpression("sdkmessageprocessingstep")
         {
@@ -419,8 +419,8 @@ public sealed class DataversePluginProvisioner(DataverseConnection connection, S
             ["plugintypeid"] = new EntityReference("plugintype", pluginTypeId),
             ["sdkmessageid"] = new EntityReference("sdkmessage", messageId),
             ["sdkmessagefilterid"] = new EntityReference("sdkmessagefilter", filterId),
-            ["statecode"] = new OptionSetValue(0),
-            ["statuscode"] = new OptionSetValue(1)
+            ["statecode"] = new OptionSetValue(enabled ? 0 : 1),
+            ["statuscode"] = new OptionSetValue(enabled ? 1 : 2)
         };
 
         if (matches.Count == 0)

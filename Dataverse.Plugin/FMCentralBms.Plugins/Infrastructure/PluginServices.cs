@@ -1,3 +1,6 @@
+#if NET10_0_OR_GREATER
+#nullable disable
+#endif
 using System;
 using Microsoft.Xrm.Sdk;
 
