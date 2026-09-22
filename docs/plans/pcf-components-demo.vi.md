@@ -249,3 +249,24 @@ Không xóa control chuẩn trong MVP. Ghi lại cấu hình trước thay đổ
 Nên thêm **một module frontend PCF có phân tầng**, không thêm một backend API/EF Core/database mới. Tận dụng bảng, quyền và solution hiện có; giữ dashboard generative page độc lập. Khi bắt đầu implement, thứ tự là **P0 → P1 → P2 → P3 → P4**; chỉ mở rộng chart/field control sau khi grid đã được nghiệm thu.
 
 Lần cập nhật sau đã scaffold và implement local P1/P2 trong `dataverse/pcf/BmsPointGrid`, có comment tiếng Việt và README. Release planner cũng bắt buộc thay đổi PCF phải đi cùng source solution `FMCentralBms` đã export/unpack, đồng thời build PCF trước deploy. `FMC.Bms.BmsPointGrid` đã được import/export xác nhận trong Developer environment ngày 2026-09-21. Live export có các thay đổi không thuộc PCF đang lệch với Git, nên chỉ artifact PCF, root component và version đã được merge vào source; chưa overwrite toàn bộ solution. Chưa chạy test host hoặc thay database.
+
+## 11. Receipt `ScrollDownButton`
+
+Ngày 2026-09-22, component tối giản `fmc_FMC.Bms.ScrollDownButton` version
+`1.0.0` đã được push vào đúng Developer organization
+`ab191700-b99e-f111-aaa0-000d3a80bb96` và thêm vào solution `FMCentralBms`.
+Binding thử nghiệm với `fmc_name` trên form `BMS Point - Demo` sau đó đã được gỡ
+và publish lại vì yêu cầu cuối là đặt nút ở Home, không phải Current Point.
+
+Home generative page `9d05b7f9-f4c4-4572-b6b8-0220b51812f3` được cập nhật bằng
+nút Fluent UI `↓` cố định ở góc dưới phải. Nút cuộn smooth tới cuối page, tôn
+trọng `prefers-reduced-motion`, có nhãn Việt/Anh và không thêm data query.
+Upload/read-back xác nhận source live có handler và button; `ValidateApp` của
+`FMC BMS Demo` thành công. PCF vẫn là root component của solution nhưng không
+còn form binding (`FormBindingPresent: false`). Script kiểm tra metadata là
+`scripts/Deploy-ScrollDownButton.ps1 -Mode Verify`.
+
+Sau phản hồi runtime cùng ngày, `contain: layout` được gỡ khỏi scroll root vì
+containment này làm `position: fixed` neo theo chính container và bị cuốn lên.
+Regression test xác nhận tọa độ button không đổi trước/sau khi scroll; bản sửa
+đã được upload, publish và đọc ngược lại từ đúng Home page ID.

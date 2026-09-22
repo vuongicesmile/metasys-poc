@@ -5,7 +5,6 @@ import { makeStyles, tokens } from "@fluentui/react-components";
 export const useStyles = makeStyles({
     root: {
         position: "relative",
-        contain: "layout",
         display: "flex",
         flexDirection: "column",
         width: "100%",
@@ -28,6 +27,20 @@ export const useStyles = makeStyles({
         "@media (max-width: 768px)": {
             padding: tokens.spacingHorizontalL,
             gap: tokens.spacingVerticalL,
+        },
+    },
+    scrollDownButton: {
+        position: "fixed",
+        right: tokens.spacingHorizontalXXL,
+        bottom: tokens.spacingVerticalXXL,
+        zIndex: 1000,
+        minWidth: "3rem",
+        width: "3rem",
+        height: "3rem",
+        boxShadow: tokens.shadow16,
+        "@media (max-width: 480px)": {
+            right: tokens.spacingHorizontalL,
+            bottom: tokens.spacingVerticalL,
         },
     },
     hero: {

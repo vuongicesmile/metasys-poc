@@ -15,6 +15,7 @@ export const englishMessages: Record<string, string> = {
     "Chưa đặt tên": "Untitled",
     "Chỉ đọc trang đầu có giới hạn; dấu “+” cho biết còn bản ghi phía sau.": "Counts show a limited first page; “+” means more records are available.",
     "Các bước xử lý Bronze sang Silver": "Bronze to Silver processing steps",
+    "Cuộn xuống cuối trang": "Scroll to bottom",
     "Danh mục vận hành": "Operations catalog",
     "Danh sách tệp SharePoint": "SharePoint files",
     "Danh sách điểm BMS": "BMS points",

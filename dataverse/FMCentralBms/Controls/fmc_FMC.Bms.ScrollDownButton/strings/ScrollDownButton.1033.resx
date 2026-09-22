@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="ScrollDownButton_DisplayName" xml:space="preserve"><value>Scroll Down Button</value></data>
+  <data name="ScrollDownButton_Description" xml:space="preserve"><value>A fixed button that scrolls the nearest container to the bottom.</value></data>
+  <data name="AnchorValue_DisplayName" xml:space="preserve"><value>Anchor column</value></data>
+  <data name="AnchorValue_Description" xml:space="preserve"><value>Column used only to place the field control.</value></data>
+</root>

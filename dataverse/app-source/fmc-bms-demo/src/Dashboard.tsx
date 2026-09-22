@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { GeneratedComponentProps } from "../RuntimeTypes";
 import type { ReadablePoint, ReadableSyncRequest, ReadableSpoFile } from "./models/dashboard";
 import { localizedDate, localizedNumber, translate, statusLabel } from "./services/localization";
@@ -28,6 +28,7 @@ import {
 } from "@fluentui/react-components";
 import {
     AddRegular,
+    ArrowDownRegular,
     ArrowClockwiseRegular,
     ArrowSyncRegular,
     BuildingRegular,
@@ -57,6 +58,16 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
     const { state, refresh, dataReady } = useDashboard(dataApi);
     const [search, setSearch] = useState("");
     const [navigationError, setNavigationError] = useState<string | null>(null);
+    const pageRef = useRef<HTMLElement>(null);
+
+    const scrollToBottom = () => {
+        const page = pageRef.current;
+        if (!page) return;
+        const target = page.scrollHeight > page.clientHeight ? page : document.scrollingElement;
+        if (!target) return;
+        const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+        target.scrollTo({ top: target.scrollHeight, behavior: reduceMotion ? "auto" : "smooth" });
+    };
 
     // Mở record/page trong model-driven app và hiển thị lỗi thân thiện nếu host từ chối.
     const navigate = async (input: Record<string, unknown>) => {
@@ -287,7 +298,7 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
     // Phần render bên dưới chỉ dựng UI; việc đọc dữ liệu nằm trong useDashboard.
     return (
         <LanguageContext.Provider value={language}>
-        <main lang={language} className={styles.root} aria-label={t("Trung tâm vận hành BMS")}>
+        <main ref={pageRef} lang={language} className={styles.root} aria-label={t("Trung tâm vận hành BMS")}>
             <div className={styles.content}>
                 <header className={styles.hero}>
                     <div className={styles.heroCopy}>
@@ -563,6 +574,16 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
                     </div>
                 </section>
             </div>
+            <Button
+                className={styles.scrollDownButton}
+                appearance="primary"
+                shape="circular"
+                size="large"
+                icon={<ArrowDownRegular />}
+                onClick={scrollToBottom}
+                aria-label={t("Cuộn xuống cuối trang")}
+                title={t("Cuộn xuống cuối trang")}
+            />
         </main>
         </LanguageContext.Provider>
     );

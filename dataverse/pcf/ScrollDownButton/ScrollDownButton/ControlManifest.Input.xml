@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="FMC.Bms" constructor="ScrollDownButton" version="1.0.0" display-name-key="ScrollDownButton_DisplayName" description-key="ScrollDownButton_Description" control-type="standard">
+    <external-service-usage enabled="false" />
+    <!-- Bind vào một text column bất kỳ; control không đọc hoặc sửa giá trị này. -->
+    <property name="anchorValue" display-name-key="AnchorValue_DisplayName" description-key="AnchorValue_Description" of-type="SingleLine.Text" usage="bound" required="true" />
+    <resources>
+      <code path="index.ts" order="1" />
+      <css path="css/ScrollDownButton.css" order="1" />
+      <resx path="strings/ScrollDownButton.1033.resx" version="1.0.0" />
+      <resx path="strings/ScrollDownButton.1066.resx" version="1.0.0" />
+    </resources>
+  </control>
+</manifest>

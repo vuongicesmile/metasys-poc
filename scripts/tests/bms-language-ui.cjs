@@ -62,6 +62,26 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         assert.ok((await page.locator('main').innerText()).includes('9/12/26'));
         const count = await page.evaluate(() => window.queries);
         assert.equal(count, 8);
+        const scrollButton = page.getByRole('button', { name: 'Scroll to bottom' });
+        const beforeScroll = await scrollButton.boundingBox();
+        assert.ok(beforeScroll, 'Scroll button must be visible');
+        assert.equal(await scrollButton.evaluate(element => getComputedStyle(element).position), 'fixed', 'Scroll button must use viewport-fixed positioning');
+        await scrollButton.click();
+        await page.waitForFunction(() => {
+            const main = document.querySelector('main');
+            if (!main) return false;
+            const target = main.scrollHeight > main.clientHeight ? main : document.scrollingElement;
+            return target && target.scrollTop > 0 && target.scrollTop + target.clientHeight >= target.scrollHeight - 2;
+        });
+        const afterScroll = await scrollButton.boundingBox();
+        assert.ok(afterScroll, 'Scroll button must remain visible after scrolling');
+        assert.ok(Math.abs(afterScroll.x - beforeScroll.x) < 1 && Math.abs(afterScroll.y - beforeScroll.y) < 1, 'Scroll button must stay fixed while the page scrolls');
+        assert.equal(await page.evaluate(() => window.queries), count, 'Scrolling must not reload business data');
+        await page.evaluate(() => {
+            const main = document.querySelector('main');
+            const target = main && main.scrollHeight > main.clientHeight ? main : document.scrollingElement;
+            target?.scrollTo({ top: 0 });
+        });
         await page.getByRole('combobox', { name: 'Language' }).selectOption('vi');
         await page.getByRole('heading', { name: 'Trung tâm vận hành BMS' }).waitFor();
         await page.getByText('Đang chờ', { exact: true }).waitFor();
@@ -101,7 +121,7 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         await blockedPage.getByRole('heading', { name: 'Trung tâm vận hành BMS' }).waitFor();
         await blocked.close();
         assert.deepEqual(errors, []);
-        console.log('PASS: English default, Vietnamese switch, locale formats, statuses, persistence, cross-tab sync, translated errors, no refetch, blocked storage and mobile layout.');
+        console.log('PASS: language, locale, statuses, persistence, fixed scroll button, no refetch, blocked storage and mobile layout.');
     } finally {
         if (browser) await browser.close();
         await new Promise(resolve => server.close(resolve));
