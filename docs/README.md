@@ -6,7 +6,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
 | Reference | [Persistence boundaries và DI](reference/persistence-boundaries.vi.md) | Unit of Work, scoped context và transaction boundary của các service |
-| Plan | [PCF components cho FMC BMS Demo](plans/pcf-components-demo.vi.md) | Dataset control đã import vào Dev solution; gắn Current Points view/subgrid và kiểm tra UI còn chờ |
+| Plan | [PCF components cho FMC BMS Demo](plans/pcf-components-demo.vi.md) | `BmsPointGrid` 1.0.1 đã deploy và bind Current Points; kiểm tra UI và Equipment subgrid còn chờ |
 | Plan | [Notification người dùng qua email](plans/user-email-notifications.vi.md) | Yêu cầu PDF, notification outbox, plug-in producer, Power Automate dispatcher và roadmap approval/escalation |
 | Runbook | [Deploy và test user email notification](runbooks/user-email-notifications.vi.md) | Provision schema/plug-in, cấu hình Outlook connection reference, deploy flow và đọc delivery receipt |
 | Runbook | [Release Dataverse bằng Git tag](runbooks/tag-release-dataverse.vi.md) | Push tag, tự build/test/deploy qua runner local, receipt, retry và rollback |

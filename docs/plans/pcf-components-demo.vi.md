@@ -1,6 +1,6 @@
 # Plan PCF components cho FMC BMS Demo
 
-Ngày: 2026-09-21. Trạng thái: **P1/P2/P4 đã implement; `BmsPointGrid` đã import vào Dataverse Dev, chưa gắn Current Points view/subgrid**.
+Ngày: 2026-09-22. Trạng thái: **P1/P2/P4 đã implement; `BmsPointGrid` 1.0.1 đã deploy và bind vào view `Active BMS Points`; Equipment subgrid chưa bind**.
 
 Tài liệu này chọn component đầu tiên, thiết kế cấu trúc source tương ứng với các tầng .NET trong repo và chia công việc thành các bước có thể nghiệm thu. Cây thư mục bên dưới phản ánh source PCF hiện có; các bước gắn host/deploy vẫn chưa thực hiện.
 

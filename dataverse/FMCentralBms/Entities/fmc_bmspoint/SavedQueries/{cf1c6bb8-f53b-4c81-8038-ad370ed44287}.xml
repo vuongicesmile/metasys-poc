@@ -10,14 +10,63 @@
     <layoutxml>
       <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
         <row name="result" id="fmc_bmspointid">
-          <cell name="fmc_objectid" width="220" />
-          <cell name="fmc_name" width="220" />
-          <cell name="fmc_objecttype" width="140" />
-          <cell name="fmc_currentvalue" width="140" />
-          <cell name="fmc_unit" width="140" />
-          <cell name="fmc_lastreadingtime" width="140" />
-          <cell name="fmc_building" width="140" />
+          <cell name="fmc_objectid" width="180" />
+          <cell name="fmc_name" width="180" />
+          <cell name="fmc_equipmentid" width="180" />
+          <cell name="fmc_building" width="180" />
+          <cell name="fmc_currentvalue" width="180" />
+          <cell name="fmc_unit" width="180" />
+          <cell name="fmc_lastreadingtime" width="180" />
         </row>
+        <controlDescriptions>
+          <controlDescription>
+            <customControl id="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+              <parameters />
+            </customControl>
+            <customControl formFactor="0" name="fmc_FMC.Bms.BmsPointGrid">
+              <parameters>
+                <data-set name="points">
+                  <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
+                  <fmc_objectid>fmc_name</fmc_objectid>
+                  <fmc_name>fmc_objectid</fmc_name>
+                  <fmc_currentvalue>fmc_currentvalue</fmc_currentvalue>
+                  <fmc_unit>fmc_unit</fmc_unit>
+                  <fmc_lastreadingtime>fmc_lastreadingtime</fmc_lastreadingtime>
+                  <fmc_sourcesystem>fmc_sourcesystem</fmc_sourcesystem>
+                </data-set>
+                <staleAfterMinutes static="true" type="Whole.None">60</staleAfterMinutes>
+              </parameters>
+            </customControl>
+            <customControl formFactor="1" name="fmc_FMC.Bms.BmsPointGrid">
+              <parameters>
+                <data-set name="points">
+                  <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
+                  <fmc_objectid>fmc_name</fmc_objectid>
+                  <fmc_name>fmc_objectid</fmc_name>
+                  <fmc_currentvalue>fmc_currentvalue</fmc_currentvalue>
+                  <fmc_unit>fmc_unit</fmc_unit>
+                  <fmc_lastreadingtime>fmc_lastreadingtime</fmc_lastreadingtime>
+                  <fmc_sourcesystem>fmc_sourcesystem</fmc_sourcesystem>
+                </data-set>
+                <staleAfterMinutes static="true" type="Whole.None">60</staleAfterMinutes>
+              </parameters>
+            </customControl>
+            <customControl formFactor="2" name="fmc_FMC.Bms.BmsPointGrid">
+              <parameters>
+                <data-set name="points">
+                  <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
+                  <fmc_objectid>fmc_name</fmc_objectid>
+                  <fmc_name>fmc_objectid</fmc_name>
+                  <fmc_currentvalue>fmc_currentvalue</fmc_currentvalue>
+                  <fmc_unit>fmc_unit</fmc_unit>
+                  <fmc_lastreadingtime>fmc_lastreadingtime</fmc_lastreadingtime>
+                  <fmc_sourcesystem>fmc_sourcesystem</fmc_sourcesystem>
+                </data-set>
+                <staleAfterMinutes static="true" type="Whole.None">60</staleAfterMinutes>
+              </parameters>
+            </customControl>
+          </controlDescription>
+        </controlDescriptions>
       </grid>
     </layoutxml>
     <querytype>0</querytype>
@@ -27,12 +76,15 @@
           <attribute name="fmc_bmspointid" />
           <attribute name="fmc_objectid" />
           <attribute name="fmc_name" />
-          <attribute name="fmc_objecttype" />
+          <attribute name="fmc_equipmentid" />
+          <attribute name="fmc_building" />
           <attribute name="fmc_currentvalue" />
           <attribute name="fmc_unit" />
           <attribute name="fmc_lastreadingtime" />
-          <attribute name="fmc_building" />
           <order attribute="fmc_name" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
         </entity>
       </fetch>
     </fetchxml>

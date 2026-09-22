@@ -41,10 +41,13 @@ npm run lint
 
 ## Gắn vào Dataverse
 
-Control đã được import vào Developer environment thuộc solution `FMCentralBms` version `1.0.3.0` ngày 2026-09-21. Chưa gắn nó vào view/subgrid, nên chưa hiển thị trong FMC BMS Demo.
+Control version `1.0.1` đã được build, push và export xác nhận trong Developer
+environment thuộc solution `FMCentralBms` ngày 2026-09-22. View `Active BMS Points`
+đã bind control cho web, tablet và phone; Equipment subgrid vẫn chưa bind.
 
-1. Trong Current Points view, chọn `BmsPointGrid`, map đúng sáu cột ở bảng trên và đặt `staleAfterMinutes`.
-2. Publish, kiểm tra bằng role Viewer/Operator, rồi export/unpack `FMCentralBms` vào repository.
-3. Chỉ sau export mới thêm binding/custom control artifact vào source solution và bật phát hành qua tag.
+1. Sau khi sửa code, tăng `control version` trong `ControlManifest.Input.xml`.
+2. Build rồi push vào solution `FMCentralBms`; publish và hard refresh app.
+3. Kiểm tra bằng role Viewer/Operator, rồi export/unpack `FMCentralBms` vào repository.
+4. Khi tái sử dụng cho Equipment subgrid, map đúng sáu cột và kiểm tra filter quan hệ của host.
 
 Không sửa tay `dataverse/FMCentralBms` để mô phỏng bước 2–4. Xem [plan](../../../docs/plans/pcf-components-demo.vi.md) để biết checklist deployment, rollback và giới hạn của history elastic.

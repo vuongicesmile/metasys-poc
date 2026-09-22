@@ -4,7 +4,7 @@ Thư mục này chứa source TypeScript của các Power Apps Component Framewo
 
 | Control | Dùng cho | Trạng thái |
 | --- | --- | --- |
-| [BmsPointGrid](BmsPointGrid/README.md) | Current Points view và Equipment subgrid của `fmc_bmspoint` | Đã import vào Developer solution `FMCentralBms` 1.0.3.0; chưa được gắn vào view/subgrid |
+| [BmsPointGrid](BmsPointGrid/README.md) | Current Points view và Equipment subgrid của `fmc_bmspoint` | PCF `1.0.1` đã deploy và bind `Active BMS Points`; Equipment subgrid chưa bind |
 
 Mỗi control có `package-lock.json`; CI phải dùng `npm ci`. `node_modules`, `out`, `bin` và `obj` là output local, không commit. Khi sửa một control, chạy build riêng của control trước; `dotnet build MetasysPoc.sln` không build TypeScript PCF.
 
