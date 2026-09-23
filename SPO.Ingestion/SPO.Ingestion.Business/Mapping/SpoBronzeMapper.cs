@@ -100,6 +100,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
         {
             ["fmc_name"] = code,
             ["fmc_equipmentcode"] = code,
+            ["fmc_buildingcode"] = building,
             ["fmc_equipmenttype"] = new TargetChoice(typeValue),
             ["fmc_buildingid"] = new TargetReference("fmc_bmsbuilding", StableGuid($"metasys-building|{options.SourceId}|{building}")),
             ["fmc_description"] = Describe(row, descriptionFields)
@@ -128,6 +129,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
                 ["fmc_objectid"] = objectId,
                 ["fmc_objecttype"] = metric.Label,
                 ["fmc_building"] = building,
+                ["fmc_buildingcode"] = building,
                 ["fmc_currentvalue"] = value,
                 ["fmc_unit"] = metric.Unit,
                 ["fmc_lastreadingtime"] = time,

@@ -187,8 +187,9 @@ public static class Verification
         foreach (var equipment in catalog.Equipment)
         {
             var actual = await client.RetrieveAsync("fmc_bmsequipment", mapper.EquipmentId(equipment.EquipmentCode),
-                new ColumnSet("fmc_equipmentcode", "fmc_buildingid"));
+                new ColumnSet("fmc_equipmentcode", "fmc_buildingcode", "fmc_buildingid"));
             Assert(actual.GetAttributeValue<string>("fmc_equipmentcode") == equipment.EquipmentCode &&
+                   actual.GetAttributeValue<string>("fmc_buildingcode") == equipment.BuildingCode &&
                    actual.GetAttributeValue<EntityReference>("fmc_buildingid")?.Id == mapper.BuildingId(equipment.BuildingCode),
                 $"live equipment {equipment.EquipmentCode} -> {equipment.BuildingCode}");
         }
@@ -223,7 +224,7 @@ public static class Verification
         await using (var reader = await cmd.ExecuteReaderAsync())
             while (await reader.ReadAsync()) mappings.Add((reader.GetString(0), reader.GetString(1)));
         var query = new QueryExpression("fmc_bmspoint")
-            { ColumnSet = new ColumnSet("fmc_objectid", "fmc_equipmentid") };
+            { ColumnSet = new ColumnSet("fmc_objectid", "fmc_equipmentid", "fmc_buildingcode") };
         query.Criteria.AddCondition("fmc_objectid", ConditionOperator.In, mappings.Select(m => (object)m.ObjectId).ToArray());
         var equipment = query.AddLink("fmc_bmsequipment", "fmc_equipmentid", "fmc_bmsequipmentid");
         equipment.EntityAlias = "equipment";
@@ -241,6 +242,8 @@ public static class Verification
             var buildingCode = (string)row.GetAttributeValue<AliasedValue>("building.fmc_buildingcode").Value;
             Assert(equipmentCode == expected.EquipmentCode,
                 $"live relationship {objectId} -> {equipmentCode} -> {buildingCode}");
+            Assert(row.GetAttributeValue<string>("fmc_buildingcode") == buildingCode,
+                $"normalized point building code {objectId} -> {buildingCode}");
         }
     }
 

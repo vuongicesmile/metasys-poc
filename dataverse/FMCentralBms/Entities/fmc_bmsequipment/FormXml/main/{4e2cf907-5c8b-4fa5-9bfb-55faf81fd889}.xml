@@ -94,6 +94,14 @@
                         </control>
                       </cell>
                     </row>
+                    <row>
+                      <cell id="{857761fa-dd2a-816c-89fc-dd44279b0bd6}">
+                        <labels>
+                          <label description="Building Code" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_buildingcode" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_buildingcode" />
+                      </cell>
+                    </row>
                   </rows>
                 </section>
               </sections>

@@ -147,9 +147,11 @@ public static class BmsRelationshipVerification
             "form customization preserves existing controls and is idempotent");
         Check(XElement.Parse(form).Descendants("RelationshipName").Single().Value == DataverseProvisioner.EquipmentRelationship,
             "equipment subgrid targets the actual proposed point relationship");
-        var mappedPoint = new ReadingMapper(options).Point(new BmsReading(1, "WATER-001", "Water", "WaterConsumption", "Building A", "EQ-A-WM-001", DateTime.UtcNow, 1.1234m, "m3", "Fake Metasys COV", null));
+        var mappedPoint = new ReadingMapper(options).Point(new BmsReading(1, "WATER-001", "Water", "WaterConsumption", "Building A", "EQ-A-WM-001", DateTime.UtcNow, 1.1234m, "m3", "Fake Metasys COV", null), "BLD-A");
         Check(mappedPoint.Get<DataverseReference>("fmc_equipmentid")?.Id == new ReadingMapper(options).EquipmentId("EQ-A-WM-001"),
             "ordinary sync payload carries the deterministic equipment lookup");
+        Check(mappedPoint.Get<string>("fmc_buildingcode") == "BLD-A",
+            "point Building Code is mapped independently of legacy building text");
         Console.WriteLine($"BMS relationship self-test completed. Receipts: {testRoot}. No SQL or Dataverse connection was made.");
     }
 

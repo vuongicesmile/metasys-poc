@@ -87,6 +87,11 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             await services.GetRequiredService<DataverseProvisioner>().VerifySpoIngestion();
             return true;
         }
+        if (args.Contains("--provision-building-code"))
+        {
+            await services.GetRequiredService<DataverseProvisioner>().ProvisionBuildingCode();
+            return true;
+        }
         if (args.Contains("--provision")) { await services.GetRequiredService<DataverseProvisioner>().Run(); return true; }
         if (args.Contains("--register-plugin"))
         {

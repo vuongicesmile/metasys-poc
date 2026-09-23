@@ -77,6 +77,14 @@
                         <control id="fmc_unit" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_unit" />
                       </cell>
                     </row>
+                    <row>
+                      <cell id="{3025b1af-0a14-854b-baf6-7666d44d62cd}">
+                        <labels>
+                          <label description="Building Code" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_buildingcode" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_buildingcode" />
+                      </cell>
+                    </row>
                   </rows>
                 </section>
               </sections>

@@ -47,13 +47,15 @@ public sealed class ReadingMapper(SyncOptions options)
     }
 
     /// <summary>Tạo trạng thái hiện tại của một point từ reading mới nhất.</summary>
-    public DataverseRecord Point(BmsReading r)
+    public DataverseRecord Point(BmsReading r, string? buildingCode = null)
     {
         var e = new DataverseRecord("fmc_bmspoint", PointId(r.ObjectId));
         e["fmc_name"] = r.ObjectName ?? r.ObjectId;
         e["fmc_objectid"] = r.ObjectId;
         e["fmc_objecttype"] = r.ObjectType;
         e["fmc_building"] = r.Building;
+        if (!string.IsNullOrWhiteSpace(buildingCode))
+            e["fmc_buildingcode"] = buildingCode;
         e["fmc_currentvalue"] = r.ReadingValue;
         e["fmc_unit"] = r.Unit;
         e["fmc_lastreadingtime"] = ReadingUtc(r);
@@ -78,6 +80,7 @@ public sealed class ReadingMapper(SyncOptions options)
     {
         ["fmc_name"] = row.Name,
         ["fmc_equipmentcode"] = row.EquipmentCode,
+        ["fmc_buildingcode"] = row.BuildingCode,
         ["fmc_equipmenttype"] = new DataverseChoice(BmsRelationManifest.TypeValue(row.EquipmentType)),
         ["fmc_buildingid"] = new DataverseReference("fmc_bmsbuilding", BuildingId(row.BuildingCode)),
         ["fmc_description"] = row.Description

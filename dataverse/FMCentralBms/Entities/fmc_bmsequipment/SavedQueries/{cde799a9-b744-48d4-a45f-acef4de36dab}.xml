@@ -13,6 +13,7 @@
           <cell name="fmc_equipmentcode" width="180" />
           <cell name="fmc_name" width="180" />
           <cell name="fmc_equipmenttype" width="180" />
+          <cell name="fmc_buildingcode" width="180" />
           <cell name="fmc_buildingid" width="180" />
           <cell name="statecode" width="180" />
         </row>
@@ -26,6 +27,7 @@
           <attribute name="fmc_equipmentcode" />
           <attribute name="fmc_name" />
           <attribute name="fmc_equipmenttype" />
+          <attribute name="fmc_buildingcode" />
           <attribute name="fmc_buildingid" />
           <attribute name="statecode" />
           <order attribute="fmc_name" descending="false" />

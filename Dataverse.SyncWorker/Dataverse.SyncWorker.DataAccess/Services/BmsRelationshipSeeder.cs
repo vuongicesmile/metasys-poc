@@ -98,7 +98,7 @@ public sealed class BmsRelationshipSeeder(IBmsRelationStore store, SyncOptions o
 {
     internal static readonly string[] PointColumns = ["fmc_objectid", "fmc_building", "fmc_equipmentid", "fmc_currentvalue", "fmc_lastsqlid", "fmc_lastreadingtime", "fmc_unit", "versionnumber"];
     private static readonly string[] BuildingColumns = ["fmc_buildingcode", "fmc_name", "fmc_sourcebuilding", "fmc_description", "statecode"];
-    private static readonly string[] EquipmentColumns = ["fmc_equipmentcode", "fmc_name", "fmc_equipmenttype", "fmc_buildingid", "fmc_description", "statecode"];
+    private static readonly string[] EquipmentColumns = ["fmc_equipmentcode", "fmc_buildingcode", "fmc_name", "fmc_equipmenttype", "fmc_buildingid", "fmc_description", "statecode"];
 
     internal static Entity BuildingRecord(BuildingSeed b) => new(DataverseProvisioner.BuildingTable)
     {
@@ -108,6 +108,7 @@ public sealed class BmsRelationshipSeeder(IBmsRelationStore store, SyncOptions o
     internal static Entity EquipmentRecord(EquipmentSeed e, Guid buildingId) => new(DataverseProvisioner.EquipmentTable)
     {
         ["fmc_equipmentcode"] = e.Code, ["fmc_name"] = e.Name,
+        ["fmc_buildingcode"] = e.BuildingCode,
         ["fmc_equipmenttype"] = new OptionSetValue(BmsRelationManifest.TypeValue(e.Type)),
         ["fmc_buildingid"] = new EntityReference(DataverseProvisioner.BuildingTable, buildingId),
         ["fmc_description"] = e.Description

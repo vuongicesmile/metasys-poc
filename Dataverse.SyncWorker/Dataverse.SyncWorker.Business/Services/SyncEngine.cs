@@ -38,6 +38,8 @@ public sealed class SyncEngine(ISyncBatchUnitOfWorkFactory sessions, ISqlCatalog
         var catalog = await catalogReader.Read(ct);
         await writer.WriteBuildings(catalog.Buildings.Select(mapper.Building).ToArray(), ct);
         await writer.WriteEquipment(catalog.Equipment.Select(mapper.Equipment).ToArray(), ct);
+        var buildingCodeByEquipment = catalog.Equipment
+            .ToDictionary(x => x.EquipmentCode, x => x.BuildingCode, StringComparer.OrdinalIgnoreCase);
         logger.LogInformation("Catalog synchronized: {Buildings} buildings, {Equipment} equipment",
             catalog.Buildings.Count, catalog.Equipment.Count);
         var batch = await session.ReadBatch( ct, cutoffId);
@@ -59,7 +61,8 @@ public sealed class SyncEngine(ISyncBatchUnitOfWorkFactory sessions, ISqlCatalog
             var latest = await session.Latest( group.Key, ct);
             if (mapper.Validate(latest) is { } error)
                 throw new InvalidOperationException($"Latest reading {latest.Id} requires correction: {error}");
-            points.Add(mapper.Point(latest));
+            buildingCodeByEquipment.TryGetValue(latest.EquipmentCode ?? "", out var buildingCode);
+            points.Add(mapper.Point(latest, buildingCode));
         }
         await writer.WritePoints(points, ct);
         if (options.HistoryEnabled)

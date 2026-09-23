@@ -135,7 +135,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
             });
         // Elastic uses its built-in primary GUID + partitionid key only.
         await ConfigureDefaultView(client, "fmc_bmspoint", "Active BMS Points",
-            ["fmc_objectid", "fmc_name", "fmc_objecttype", "fmc_currentvalue", "fmc_unit", "fmc_lastreadingtime", "fmc_building"]);
+            ["fmc_objectid", "fmc_name", "fmc_objecttype", "fmc_currentvalue", "fmc_unit", "fmc_lastreadingtime", "fmc_buildingcode", "fmc_building"]);
         await ConfigureDefaultView(client, "fmc_bmsreading", "All BMS Readings",
             ["fmc_objectid", "fmc_objectname", "fmc_objecttype", "fmc_readingvalue", "fmc_unit", "fmc_readingtime", "fmc_building"]);
         await ConfigureDefaultView(client, "fmc_syncrequest", "Active Sync Requests",
@@ -300,6 +300,8 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
         yield return Text("fmc_objectid", "Object ID", 100);
         yield return Text("fmc_objecttype", "Object Type", 100);
         yield return Text("fmc_building", "Building", 100);
+        if (!history)
+            yield return Text("fmc_buildingcode", "Building Code", 50);
         yield return Text("fmc_unit", "Unit", 50);
         yield return Text("fmc_sourcesystem", "Source System", 100);
         yield return Text(history ? "fmc_sqlreadingid" : "fmc_lastsqlid", "SQL Reading ID", 20);

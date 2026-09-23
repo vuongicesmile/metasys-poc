@@ -7,8 +7,8 @@ namespace DataverseSyncWorker.Services;
 public sealed partial class DataverseProvisioner
 {
     private static readonly string[] BuildingViewColumns = ["fmc_buildingcode", "fmc_name", "fmc_sourcebuilding", "statecode"];
-    private static readonly string[] EquipmentViewColumns = ["fmc_equipmentcode", "fmc_name", "fmc_equipmenttype", "fmc_buildingid", "statecode"];
-    private static readonly string[] PointViewColumns = ["fmc_objectid", "fmc_name", "fmc_equipmentid", "fmc_building", "fmc_currentvalue", "fmc_unit", "fmc_lastreadingtime"];
+    private static readonly string[] EquipmentViewColumns = ["fmc_equipmentcode", "fmc_name", "fmc_equipmenttype", "fmc_buildingcode", "fmc_buildingid", "statecode"];
+    private static readonly string[] PointViewColumns = ["fmc_objectid", "fmc_name", "fmc_equipmentid", "fmc_buildingcode", "fmc_building", "fmc_currentvalue", "fmc_unit", "fmc_lastreadingtime"];
     private static readonly (string Table, string Name, string[] Columns, bool Unassigned)[] RelationViews =
     [
         (BuildingTable, "Active BMS Buildings", BuildingViewColumns, false),
@@ -126,8 +126,8 @@ public sealed partial class DataverseProvisioner
         var fields = table switch
         {
             BuildingTable => new[] { ("fmc_buildingcode", "Building Code", "text"), ("fmc_sourcebuilding", "Source Building", "text"), ("fmc_description", "Description", "memo") },
-            EquipmentTable => new[] { ("fmc_equipmentcode", "Equipment Code", "text"), ("fmc_equipmenttype", "Equipment Type", "choice"), ("fmc_buildingid", "Building", "lookup"), ("fmc_description", "Description", "memo") },
-            PointTable => new[] { ("fmc_objectid", "Object ID", "text"), ("fmc_equipmentid", "Equipment", "lookup"), ("fmc_building", "Source Building", "text"), ("fmc_unit", "Unit", "text") },
+            EquipmentTable => new[] { ("fmc_equipmentcode", "Equipment Code", "text"), ("fmc_equipmenttype", "Equipment Type", "choice"), ("fmc_buildingid", "Building", "lookup"), ("fmc_buildingcode", "Building Code", "text"), ("fmc_description", "Description", "memo") },
+            PointTable => new[] { ("fmc_objectid", "Object ID", "text"), ("fmc_equipmentid", "Equipment", "lookup"), ("fmc_buildingcode", "Building Code", "text"), ("fmc_building", "Legacy Building Value", "text"), ("fmc_unit", "Unit", "text") },
             _ => throw new InvalidOperationException("Unexpected BMS form table.")
         };
         foreach (var (name, label, kind) in fields)

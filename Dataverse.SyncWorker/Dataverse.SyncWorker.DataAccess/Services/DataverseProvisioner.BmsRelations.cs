@@ -32,6 +32,8 @@ public sealed partial class DataverseProvisioner
         if (table == BuildingTable)
             yield return RelationText("fmc_sourcebuilding", "Source Building", 100);
         else
+        {
+            yield return RelationTextOptional("fmc_buildingcode", "Building Code", 50);
             yield return new PicklistAttributeMetadata
             {
                 SchemaName = "fmc_equipmenttype", DisplayName = new Label("Equipment Type", 1033),
@@ -48,12 +50,19 @@ public sealed partial class DataverseProvisioner
                     }
                 }
             };
+        }
         yield return new MemoAttributeMetadata
         {
             SchemaName = "fmc_description", DisplayName = new Label("Description", 1033),
             MaxLength = 2000, RequiredLevel = new(AttributeRequiredLevel.None)
         };
     }
+
+    private static StringAttributeMetadata RelationTextOptional(string name, string label, int length) => new()
+    {
+        SchemaName = name, DisplayName = new Label(label, 1033), MaxLength = length,
+        RequiredLevel = new(AttributeRequiredLevel.None), FormatName = StringFormatName.Text
+    };
 
     public async Task<Dictionary<string, EntityMetadata>> ReadBmsRelationMetadata(bool requireReady)
     {
