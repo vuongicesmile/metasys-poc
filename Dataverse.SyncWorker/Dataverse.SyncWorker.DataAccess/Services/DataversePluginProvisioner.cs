@@ -20,6 +20,10 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
     private const string RequestApiName = "fmc_RequestBmsSync";
     private const string SpoRequestPluginTypeName = "FMCentralBms.Plugins.RequestSpoSync";
     private const string SpoRequestApiName = "fmc_RequestSpoSync";
+    private const string DetectSpoChangePluginTypeName = "FMCentralBms.Plugins.DetectSpoChange";
+    private const string DetectSpoChangeApiName = "fmc_DetectSpoChange";
+    private const string ClaimSpoChangePluginTypeName = "FMCentralBms.Plugins.ClaimSpoChange";
+    private const string ClaimSpoChangeApiName = "fmc_ClaimSpoChange";
     private const string FullRequestPluginTypeName = "FMCentralBms.Plugins.RequestFullSync";
     private const string FullRequestApiName = "fmc_RequestFullSync";
     private const string NotificationPluginTypeName = "FMCentralBms.Plugins.QueueSyncNotification";
@@ -46,6 +50,10 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
             RequestPluginTypeName, "Request BMS Sync");
         var spoRequestPluginType = await EnsurePluginType(client, assembly.Id,
             SpoRequestPluginTypeName, "Request SPO Sync");
+        var detectSpoChangePluginType = await EnsurePluginType(client, assembly.Id,
+            DetectSpoChangePluginTypeName, "Detect SPO Change");
+        var claimSpoChangePluginType = await EnsurePluginType(client, assembly.Id,
+            ClaimSpoChangePluginTypeName, "Claim SPO Change");
         var fullRequestPluginType = await EnsurePluginType(client, assembly.Id,
             FullRequestPluginTypeName, "Request Full Sync");
         var notificationPluginType = await EnsurePluginType(client, assembly.Id,
@@ -81,6 +89,8 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
 
         await EnsureRequestCustomApi(client, requestPluginType.Id);
         await EnsureSpoRequestCustomApi(client, spoRequestPluginType.Id);
+        await EnsureDetectSpoChangeCustomApi(client, detectSpoChangePluginType.Id);
+        await EnsureClaimSpoChangeCustomApi(client, claimSpoChangePluginType.Id);
         await EnsureFullRequestCustomApi(client, fullRequestPluginType.Id);
 
         Console.WriteLine($"Plug-in registration complete in {options.Url.TrimEnd('/')}");
@@ -288,12 +298,102 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
 
         await EnsureApiProperty(client, SpoRequestApiName, "customapirequestparameter", apiId,
             "ClientRequestId", "Client Request ID", 10, optional: true);
+        await EnsureApiProperty(client, SpoRequestApiName, "customapirequestparameter", apiId,
+            "SourceKey", "Source Key", 10, optional: true);
+        await EnsureApiProperty(client, SpoRequestApiName, "customapirequestparameter", apiId,
+            "ExpectedETag", "Expected ETag", 10, optional: true);
+        await EnsureApiProperty(client, SpoRequestApiName, "customapirequestparameter", apiId,
+            "SharePointIdentifier", "SharePoint Identifier", 10, optional: true);
         await EnsureApiProperty(client, SpoRequestApiName, "customapiresponseproperty", apiId,
             "RequestId", "Request ID", 12);
         await EnsureApiProperty(client, SpoRequestApiName, "customapiresponseproperty", apiId,
             "Accepted", "Accepted", 0);
         await EnsureApiProperty(client, SpoRequestApiName, "customapiresponseproperty", apiId,
             "Message", "Message", 10);
+        await EnsureApiProperty(client, SpoRequestApiName, "customapiresponseproperty", apiId,
+            "SourceKey", "Source Key", 10);
+        await EnsureApiProperty(client, SpoRequestApiName, "customapiresponseproperty", apiId,
+            "ExpectedETag", "Expected ETag", 10);
+        await EnsureApiProperty(client, SpoRequestApiName, "customapiresponseproperty", apiId,
+            "SharePointIdentifier", "SharePoint Identifier", 10);
+    }
+
+    private static async Task EnsureDetectSpoChangeCustomApi(ServiceClient client, Guid pluginTypeId)
+    {
+        var apiId = await EnsureUnboundCustomApi(client, DetectSpoChangeApiName, "Detect SharePoint File Change",
+            "Creates or updates one debounced SharePoint file-change request.", "prvCreatefmc_spochangerequest", pluginTypeId);
+        foreach (var property in new[]
+        {
+            ("SourceKey", "Source Key", 10, false), ("LibraryId", "SharePoint Library ID", 10, false),
+            ("ItemId", "SharePoint Item ID", 10, false), ("SharePointIdentifier", "SharePoint Identifier", 10, false),
+            ("SharePointPath", "SharePoint Path", 10, false), ("FileName", "File Name", 10, false),
+            ("ExpectedETag", "Expected ETag", 10, false)
+        })
+            await EnsureApiProperty(client, DetectSpoChangeApiName, "customapirequestparameter", apiId, property.Item1, property.Item2, property.Item3, property.Item4);
+        await EnsureApiProperty(client, DetectSpoChangeApiName, "customapiresponseproperty", apiId, "RequestId", "Request ID", 12);
+        await EnsureApiProperty(client, DetectSpoChangeApiName, "customapiresponseproperty", apiId, "Created", "Created", 0);
+        await EnsureApiProperty(client, DetectSpoChangeApiName, "customapiresponseproperty", apiId, "Status", "Status", 10);
+        await EnsureApiProperty(client, DetectSpoChangeApiName, "customapiresponseproperty", apiId, "DueAt", "Auto Sync Due At", 1);
+        await EnsureApiProperty(client, DetectSpoChangeApiName, "customapiresponseproperty", apiId, "Message", "Message", 10);
+    }
+
+    private static async Task EnsureClaimSpoChangeCustomApi(ServiceClient client, Guid pluginTypeId)
+    {
+        var apiId = await EnsureUnboundCustomApi(client, ClaimSpoChangeApiName, "Claim SharePoint File Change",
+            "Atomically claims one debounced SharePoint file change for manual or automatic dispatch.", "prvWritefmc_spochangerequest", pluginTypeId);
+        await EnsureApiProperty(client, ClaimSpoChangeApiName, "customapirequestparameter", apiId, "ChangeRequestId", "Change Request ID", 12, optional: false);
+        await EnsureApiProperty(client, ClaimSpoChangeApiName, "customapirequestparameter", apiId, "ExpectedETag", "Expected ETag", 10, optional: false);
+        await EnsureApiProperty(client, ClaimSpoChangeApiName, "customapirequestparameter", apiId, "DispatchSource", "Dispatch Source", 10, optional: true);
+        await EnsureApiProperty(client, ClaimSpoChangeApiName, "customapirequestparameter", apiId, "ClientRequestId", "Client Request ID", 10, optional: true);
+        foreach (var property in new[]
+        {
+            ("Accepted", "Accepted", 0), ("Status", "Status", 10), ("Message", "Message", 10),
+            ("RequestId", "Request ID", 12), ("DispatchId", "Dispatch ID", 12),
+            ("SourceKey", "Source Key", 10), ("ExpectedETag", "Expected ETag", 10),
+            ("SharePointIdentifier", "SharePoint Identifier", 10)
+        })
+            await EnsureApiProperty(client, ClaimSpoChangeApiName, "customapiresponseproperty", apiId, property.Item1, property.Item2, property.Item3);
+    }
+
+    private static async Task<Guid> EnsureUnboundCustomApi(ServiceClient client, string uniqueName, string displayName,
+        string description, string executePrivilegeName, Guid pluginTypeId)
+    {
+        var query = new QueryExpression("customapi")
+        {
+            ColumnSet = new ColumnSet("uniquename", "bindingtype", "isfunction", "isprivate", "allowedcustomprocessingsteptype")
+        };
+        query.Criteria.AddCondition("uniquename", ConditionOperator.Equal, uniqueName);
+        var matches = (await client.RetrieveMultipleAsync(query)).Entities;
+        if (matches.Count > 1) throw new InvalidOperationException($"Found multiple Custom APIs named '{uniqueName}'.");
+        if (matches.Count == 0)
+        {
+            var create = new CreateRequest
+            {
+                Target = new Entity("customapi")
+                {
+                    ["name"] = uniqueName, ["uniquename"] = uniqueName, ["displayname"] = displayName,
+                    ["description"] = description, ["bindingtype"] = new OptionSetValue(0), ["isfunction"] = false,
+                    ["isprivate"] = false, ["allowedcustomprocessingsteptype"] = new OptionSetValue(1),
+                    ["workflowsdkstepenabled"] = true, ["executeprivilegename"] = executePrivilegeName,
+                    ["plugintypeid"] = new EntityReference("plugintype", pluginTypeId)
+                }
+            };
+            create["SolutionUniqueName"] = Solution;
+            var id = ((CreateResponse)await client.ExecuteAsync(create)).id;
+            Console.WriteLine($"Created Custom API {uniqueName} ({id}).");
+            return id;
+        }
+        var api = matches[0];
+        if (api.GetAttributeValue<OptionSetValue>("bindingtype")?.Value != 0 || api.GetAttributeValue<bool>("isfunction") ||
+            api.GetAttributeValue<bool>("isprivate") || api.GetAttributeValue<OptionSetValue>("allowedcustomprocessingsteptype")?.Value != 1)
+            throw new InvalidOperationException($"Existing Custom API {uniqueName} has an incompatible immutable contract.");
+        await client.UpdateAsync(new Entity("customapi", api.Id)
+        {
+            ["displayname"] = displayName, ["description"] = description, ["workflowsdkstepenabled"] = true,
+            ["executeprivilegename"] = executePrivilegeName, ["plugintypeid"] = new EntityReference("plugintype", pluginTypeId)
+        });
+        Console.WriteLine($"Custom API already exists ({api.Id}).");
+        return api.Id;
     }
 
     private static async Task EnsureFullRequestCustomApi(ServiceClient client, Guid pluginTypeId)

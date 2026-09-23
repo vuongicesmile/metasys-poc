@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="SourceKey">
+  <displayname default="Source Key">
+    <label description="Source Key" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>SourceKey</name>
+  <type>10</type>
+</customapiresponseproperty>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Workflow WorkflowId="{d13bfe37-ca87-412b-9531-d3ed381b5b21}" Name="FMC - App Request BMS Sync Event" Description="Records successful fmc_RequestBmsSync calls from the demo app. The Custom API queues work; the worker performs SQL synchronization." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <JsonFileName>/Workflows/FMC-AppRequestBMSSyncEvent-D13BFE37-CA87-412B-9531-D3ED381B5B21.json</JsonFileName>
   <Type>1</Type>
@@ -11,8 +11,8 @@
   <TriggerOnDelete>0</TriggerOnDelete>
   <AsyncAutodelete>0</AsyncAutodelete>
   <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
-  <StateCode>1</StateCode>
-  <StatusCode>2</StatusCode>
+  <StateCode>0</StateCode>
+  <StatusCode>1</StatusCode>
   <RunAs>1</RunAs>
   <IsTransacted>1</IsTransacted>
   <IntroducedVersion>1.0.0.0</IntroducedVersion>

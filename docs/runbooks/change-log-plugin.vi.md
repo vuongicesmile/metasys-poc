@@ -66,7 +66,7 @@ dotnet run --project Dataverse.SyncWorker/Dataverse.SyncWorker.App --no-launch-p
 dotnet run --project Dataverse.SyncWorker/Dataverse.SyncWorker.App --no-launch-profile -- --deploy-change-log --plugin-path="D:\Coder\metasys-poc\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentralBms.Plugins.dll"
 ```
 
-Deploy kiểm tra version 1.0.0.6 và public key token `e122b5e4dcc2589d` trước cloud
+Deploy kiểm tra version 1.0.0.7 và public key token `e122b5e4dcc2589d` trước cloud
 write; WhoAmI được guard bằng organization ID. Command chỉ tạo cấu hình log, thêm
 quyền của bảng mới và cập nhật app; không start worker hoặc chạy SQL sync.
 Schema/UI được provision trước khi bật 6 steps. Nếu deployment lỗi giữa chừng,

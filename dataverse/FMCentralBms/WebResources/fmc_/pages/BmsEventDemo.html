@@ -1,11 +1,16 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Khai báo charset để tiếng Việt và nội dung trả về từ Dataverse hiển thị đúng. -->
   <meta charset="utf-8">
+  <!-- Cho phép trang co giãn khi được mở trong model-driven app trên màn hình nhỏ. -->
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Tên hiển thị của web resource trong tab trình duyệt/khung nhúng. -->
   <title>Power Automate Demo</title>
+  <!-- API này do Dataverse cung cấp để trang lấy URL của environment hiện tại. -->
   <script src="../../ClientGlobalContext.js.aspx" type="text/javascript"></script>
   <style>
+    /* Các style dưới đây giữ trang độc lập, không phụ thuộc CSS của model-driven app. */
     :root{font-family:Segoe UI,Arial,sans-serif;color:#183447;background:#f3f6fa}
     *{box-sizing:border-box}body{margin:0;padding:40px 24px}main{max-width:850px;margin:auto}
     .label{color:#176a66;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
@@ -24,10 +29,12 @@
 </head>
 <body>
 <main>
+  <!-- Header chứa tên trang và lựa chọn ngôn ngữ của riêng web resource. -->
   <div class="header"><span class="label" data-i18n="eyebrow">FMC BMS · Event demo</span><div class="language"><label for="language" data-i18n="language">Language</label><select id="language"><option value="en">English</option><option value="vi">Tiếng Việt</option></select></div></div>
   <h1 data-i18n="heading">One click, one sync request.</h1>
   <p data-i18n="description">Click to call the Custom API, queue a sync request and send an event to Power Automate. No form is required.</p>
   <section id="full-card" class="card" aria-label="Sync SQL and SharePoint">
+    <!-- Full Sync chỉ tạo một request; flow phía sau sẽ dispatch SQL và SPO riêng biệt. -->
     <div class="steps">
       <div class="step"><span data-i18n="fullStep1">01 · One request</span><small>fmc_RequestFullSync</small></div>
       <div class="step"><span data-i18n="fullStep2">02 · Dispatch both sources</span><small>Power Automate</small></div>
@@ -40,6 +47,7 @@
   <p class="foot" data-i18n="fullFoot">The orchestration flow dispatches both existing Custom APIs. Keep both local workers running; acceptance does not mean ingestion has completed.</p>
   <p class="detail">Custom API: fmc_RequestFullSync</p>
   <section id="event-card" class="card" aria-label="Send a test event">
+    <!-- Card này chỉ gửi yêu cầu SQL BMS sync và ghi nhận event cho Power Automate. -->
     <div class="steps">
       <div class="step"><span data-i18n="step1">01 · Click the button</span><small data-i18n="step1Detail">In FMC BMS Demo</small></div>
       <div class="step"><span data-i18n="step2">02 · Queue the request</span><small>Dataverse Custom API</small></div>
@@ -52,6 +60,7 @@
   <p class="foot"><span data-i18n="footStart">The Custom API queues or reuses an </span><strong>fmc_syncrequest</strong><span data-i18n="footMiddle">. The flow </span><strong>FMC - App Request BMS Sync Event</strong><span data-i18n="footEnd"> records the action in its run history. SQL sync requires the worker to be running.</span></p>
   <p class="detail">Custom API: fmc_RequestBmsSync</p>
   <section id="spo-card" class="card" aria-label="Sync SharePoint files">
+    <!-- Card này yêu cầu flow quét SharePoint và archive các file có ETag mới. -->
     <div class="steps">
       <div class="step"><span data-i18n="spoStep1">01 · Scan FMC-Inbox</span><small>SharePoint Connector</small></div>
       <div class="step"><span data-i18n="spoStep2">02 · Compare ETag</span><small data-i18n="spoStep2Detail">Archive only changed files</small></div>
@@ -67,6 +76,7 @@
 <script>
 (function () {
   'use strict';
+  // Lấy các control DOM một lần để những hàm render và event handler dùng chung.
   const button = document.getElementById('send');
   const status = document.getElementById('status');
   const spoButton = document.getElementById('spo-send');
@@ -74,7 +84,9 @@
   const fullButton = document.getElementById('full-send');
   const fullStatus = document.getElementById('full-status');
   const languageSelect = document.getElementById('language');
+  // Khóa localStorage dùng để nhớ lựa chọn ngôn ngữ trên các lần mở trang sau.
   const languageKey = 'fmc.bms.language';
+  // Một bộ message phục vụ cả tiếng Anh và tiếng Việt; key phải khớp data-i18n trong HTML.
   const messages = {
     en: {
       language: 'Language', eyebrow: 'FMC BMS · Event demo', heading: 'One click, one sync request.',
@@ -121,12 +133,17 @@
       statuses: {Queued: 'Đang chờ', Running: 'Đang chạy', Completed: 'Hoàn tất', Failed: 'Thất bại'}
     }
   };
+  // Chỉ chấp nhận hai ngôn ngữ được hỗ trợ; giá trị khác quay về English.
   const normalizeLanguage = value => value === 'vi' ? 'vi' : 'en';
   let language = 'en';
+  // Embedded host có thể chặn storage, nên lỗi ở đây không được làm hỏng trang.
   try { language = normalizeLanguage(localStorage.getItem(languageKey)); } catch { /* Storage can be unavailable in embedded hosts. */ }
+  // Mỗi card có state độc lập để SQL, SPO và Full Sync không ghi đè trạng thái của nhau.
   let current = {state: 'ready'};
   let spoCurrent = {state: 'ready'};
   let fullCurrent = {state: 'ready'};
+
+  // Render trạng thái của nút Request BMS Sync, bao gồm kết quả Custom API hoặc lỗi.
   function renderStatus() {
     const t = messages[language];
     status.dataset.state = current.state;
@@ -142,6 +159,8 @@
       status.textContent = t[current.state];
     }
   }
+
+  // Render trạng thái của luồng archive/import SharePoint.
   function renderSpoStatus() {
     const t = messages[language];
     spoStatus.dataset.state = spoCurrent.state;
@@ -154,6 +173,8 @@
       spoStatus.textContent = t[spoCurrent.state === 'sending' ? 'spoSending' : 'spoReady'];
     }
   }
+
+  // Render trạng thái của Full Sync, tức flow điều phối cả SQL và SharePoint.
   function renderFullStatus() {
     const t = messages[language];
     fullStatus.dataset.state = fullCurrent.state;
@@ -166,6 +187,8 @@
       fullStatus.textContent = t[fullCurrent.state === 'sending' ? 'fullSending' : 'fullReady'];
     }
   }
+
+  // Dịch các element có data-i18n rồi render lại status để message đang hiển thị cũng đổi ngôn ngữ.
   function renderLanguage() {
     const t = messages[language];
     document.documentElement.lang = language;
@@ -178,33 +201,45 @@
     renderSpoStatus();
     renderFullStatus();
   }
+
+  // Khi người dùng đổi select, lưu lựa chọn và cập nhật toàn bộ text trên trang.
   languageSelect.addEventListener('change', function () {
     language = normalizeLanguage(languageSelect.value);
     try { localStorage.setItem(languageKey, language); } catch { /* Keep the in-memory choice. */ }
     renderLanguage();
   });
+
+  // Đồng bộ ngôn ngữ nếu một tab/khung khác thay đổi cùng khóa localStorage.
   window.addEventListener('storage', function (event) {
     if (event.key !== languageKey && event.key !== null) return;
     try { if (event.storageArea && event.storageArea !== localStorage) return; } catch { return; }
     language = normalizeLanguage(event.newValue);
     renderLanguage();
   });
+
+  // Render lần đầu trước khi người dùng tương tác với bất kỳ nút nào.
   renderLanguage();
+
+  // Gửi request riêng cho SQL BMS sync.
   button.addEventListener('click', async function () {
+    // Chặn double-click trong lúc request trước vẫn đang chờ.
     if (button.disabled) return;
     button.disabled = true;
     current = {state: 'sending'};
     renderStatus();
     const id = crypto.randomUUID();
+    // AbortController giới hạn thời gian chờ để UI không bị treo vô hạn.
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
+      // Web resource phải được mở bên trong Dataverse để có GetGlobalContext().
       if (typeof GetGlobalContext !== 'function') {
         const error = new Error('Dataverse context unavailable');
         error.kind = 'context';
         throw error;
       }
       const base = GetGlobalContext().getClientUrl();
+      // Gọi unbound Custom API; API sẽ queue hoặc reuse fmc_syncrequest.
       const response = await fetch(base + '/api/data/v9.2/fmc_RequestBmsSync', {
         method: 'POST', credentials: 'same-origin', signal: controller.signal,
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'OData-Version': '4.0', 'OData-MaxVersion': '4.0'},
@@ -215,9 +250,11 @@
         throw new Error(body.error?.message || ('Dataverse HTTP ' + response.status));
       }
       const result = await response.json();
+      // HTTP thành công chỉ có nghĩa Dataverse đã nhận request, không có nghĩa sync đã hoàn tất.
       current = {state: 'accepted', result, id};
       renderStatus();
     } catch (error) {
+      // Phân biệt timeout/context để render hướng xử lý phù hợp cho người dùng.
       current = {state: 'error', id, errorKind: error.name === 'AbortError' ? 'timeout' : error.kind, errorMessage: error.message};
       renderStatus();
     } finally {
@@ -225,21 +262,27 @@
       button.disabled = false;
     }
   });
+
+  // Gửi request để Power Automate quét và archive file SharePoint thay đổi.
   spoButton.addEventListener('click', async function () {
+    // Không cho phép tạo nhiều request quét đồng thời từ cùng một nút.
     if (spoButton.disabled) return;
     spoButton.disabled = true;
     spoCurrent = {state: 'sending'};
     renderSpoStatus();
     const id = crypto.randomUUID();
+    // Timeout này chỉ áp dụng cho request tới Dataverse, không giới hạn thời gian import phía worker.
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
+      // Kiểm tra context trước khi gọi Web API của Dataverse.
       if (typeof GetGlobalContext !== 'function') {
         const error = new Error('Dataverse context unavailable');
         error.kind = 'context';
         throw error;
       }
       const base = GetGlobalContext().getClientUrl();
+      // Flow sau đó đọc connection reference SharePoint và cập nhật fmc_spofile.
       const response = await fetch(base + '/api/data/v9.2/fmc_RequestSpoSync', {
         method: 'POST', credentials: 'same-origin', signal: controller.signal,
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'OData-Version': '4.0', 'OData-MaxVersion': '4.0'},
@@ -252,6 +295,7 @@
       spoCurrent = {state: 'accepted', result: await response.json(), id};
       renderSpoStatus();
     } catch (error) {
+      // Giữ request id để người vận hành đối chiếu với flow run history.
       spoCurrent = {state: 'error', id, errorKind: error.name === 'AbortError' ? 'timeout' : error.kind, errorMessage: error.message};
       renderSpoStatus();
     } finally {
@@ -259,21 +303,27 @@
       spoButton.disabled = false;
     }
   });
+
+  // Gửi một request điều phối cả hai pipeline SQL và SharePoint.
   fullButton.addEventListener('click', async function () {
+    // Chặn thao tác lặp khi Full Sync request đang được gửi.
     if (fullButton.disabled) return;
     fullButton.disabled = true;
     fullCurrent = {state: 'sending'};
     renderFullStatus();
     const id = crypto.randomUUID();
+    // Full Sync cũng chỉ chờ API nhận request tối đa 30 giây.
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
+      // Full Sync chỉ chạy được khi trang đang ở trong Dataverse context.
       if (typeof GetGlobalContext !== 'function') {
         const error = new Error('Dataverse context unavailable');
         error.kind = 'context';
         throw error;
       }
       const base = GetGlobalContext().getClientUrl();
+      // Flow fmc_RequestFullSync sẽ gọi hai Custom API hiện có, không gộp retry state.
       const response = await fetch(base + '/api/data/v9.2/fmc_RequestFullSync', {
         method: 'POST', credentials: 'same-origin', signal: controller.signal,
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'OData-Version': '4.0', 'OData-MaxVersion': '4.0'},
@@ -286,6 +336,7 @@
       fullCurrent = {state: 'accepted', result: await response.json(), id};
       renderFullStatus();
     } catch (error) {
+      // Người vận hành dùng click id/request id để kiểm tra flow history khi có lỗi.
       fullCurrent = {state: 'error', id, errorKind: error.name === 'AbortError' ? 'timeout' : error.kind, errorMessage: error.message};
       renderFullStatus();
     } finally {

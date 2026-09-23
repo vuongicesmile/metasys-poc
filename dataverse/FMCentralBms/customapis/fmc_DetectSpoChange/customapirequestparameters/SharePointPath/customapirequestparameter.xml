@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="SharePointPath">
+  <displayname default="SharePoint Path">
+    <label description="SharePoint Path" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>SharePointPath</name>
+  <type>10</type>
+</customapirequestparameter>

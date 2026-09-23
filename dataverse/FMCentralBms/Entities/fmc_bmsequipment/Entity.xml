@@ -1,14 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Name LocalizedName="BMS Equipment" OriginalName="BMS Equipment">fmc_bmsequipment</Name>
+  <Name LocalizedName="[Bronze] BMS Equipment" OriginalName="BMS Equipment">fmc_bmsequipment</Name>
   <EntityInfo>
     <entity Name="fmc_bmsequipment">
       <LocalizedNames>
-        <LocalizedName description="BMS Equipment" languagecode="1033" />
+        <LocalizedName description="[Bronze] BMS Equipment" languagecode="1033" />
       </LocalizedNames>
       <LocalizedCollectionNames>
-        <LocalizedCollectionName description="BMS Equipment" languagecode="1033" />
+        <LocalizedCollectionName description="[Bronze] BMS Equipments" languagecode="1033" />
       </LocalizedCollectionNames>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
       <attributes>
         <attribute PhysicalName="CreatedBy">
           <Type>lookup</Type>
@@ -211,6 +214,7 @@
           <LogicalName>fmc_buildingid</LogicalName>
           <RequiredLevel>required</RequiredLevel>
           <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
           <ValidForUpdateApi>1</ValidForUpdateApi>
           <ValidForReadApi>1</ValidForReadApi>
           <ValidForCreateApi>1</ValidForCreateApi>
@@ -343,6 +347,7 @@
           <IsFilterable>0</IsFilterable>
           <IsRetrievable>0</IsRetrievable>
           <IsLocalizable>0</IsLocalizable>
+          <AppDefaultValue>-1</AppDefaultValue>
           <optionset Name="fmc_bmsequipment_fmc_equipmenttype">
             <OptionSetType>picklist</OptionSetType>
             <IntroducedVersion>1.0.0.0</IntroducedVersion>
@@ -356,6 +361,11 @@
                   <label description="Water Meter" languagecode="1033" />
                 </labels>
               </option>
+              <option value="789100003" IsHidden="0">
+                <labels>
+                  <label description="Electric Meter" languagecode="1033" />
+                </labels>
+              </option>
               <option value="789100001" IsHidden="0">
                 <labels>
                   <label description="Temperature Sensor" languagecode="1033" />
@@ -364,11 +374,6 @@
               <option value="789100002" IsHidden="0">
                 <labels>
                   <label description="Test Rig" languagecode="1033" />
-                </labels>
-              </option>
-              <option value="789100003" IsHidden="0">
-                <labels>
-                  <label description="Electric Meter" languagecode="1033" />
                 </labels>
               </option>
             </options>
@@ -870,6 +875,7 @@
       <IsCollaboration>0</IsCollaboration>
       <AutoRouteToOwnerQueue>0</AutoRouteToOwnerQueue>
       <IsConnectionsEnabled>0</IsConnectionsEnabled>
+      <EntityColor></EntityColor>
       <IsDocumentManagementEnabled>0</IsDocumentManagementEnabled>
       <AutoCreateAccessTeams>0</AutoCreateAccessTeams>
       <IsOneNoteIntegrationEnabled>0</IsOneNoteIntegrationEnabled>
@@ -916,9 +922,11 @@
       <CanCreateViews>1</CanCreateViews>
       <CanModifyAdditionalSettings>1</CanModifyAdditionalSettings>
       <CanEnableSyncToExternalSearchIndex>1</CanEnableSyncToExternalSearchIndex>
+      <IconVectorName></IconVectorName>
       <EnforceStateTransitions>0</EnforceStateTransitions>
       <CanChangeHierarchicalRelationship>1</CanChangeHierarchicalRelationship>
       <EntityHelpUrlEnabled>0</EntityHelpUrlEnabled>
+      <EntityHelpUrl></EntityHelpUrl>
       <ChangeTrackingEnabled>0</ChangeTrackingEnabled>
       <CanChangeTrackingBeEnabled>1</CanChangeTrackingBeEnabled>
       <IsEnabledForExternalChannels>0</IsEnabledForExternalChannels>

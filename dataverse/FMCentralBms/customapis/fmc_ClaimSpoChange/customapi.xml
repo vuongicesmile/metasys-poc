@@ -1,0 +1,19 @@
+<customapi uniquename="fmc_ClaimSpoChange">
+  <allowedcustomprocessingsteptype>1</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Atomically claims one debounced SharePoint file change for manual or automatic dispatch.">
+    <label description="Atomically claims one debounced SharePoint file change for manual or automatic dispatch." languagecode="1033" />
+  </description>
+  <displayname default="Claim SharePoint File Change">
+    <label description="Claim SharePoint File Change" languagecode="1033" />
+  </displayname>
+  <executeprivilegename>prvWritefmc_spochangerequest</executeprivilegename>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>fmc_ClaimSpoChange</name>
+  <plugintypeid>
+    <plugintypeexportkey>57ee3426-01b7-f111-aaae-00224819a344</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>1</workflowsdkstepenabled>
+</customapi>

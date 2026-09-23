@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="DispatchId">
+  <displayname default="Dispatch ID">
+    <label description="Dispatch ID" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>DispatchId</name>
+  <type>12</type>
+</customapiresponseproperty>

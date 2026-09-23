@@ -15,17 +15,20 @@
       "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
       "contentVersion": "1.0.0.0",
       "parameters": {
-        "$authentication": {
-          "defaultValue": {},
-          "type": "SecureObject"
-        },
         "$connections": {
           "defaultValue": {},
           "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
         }
       },
       "triggers": {
         "When_full_sync_requested": {
+          "metadata": {
+            "operationMetadataId": "f8a03064-27ea-4b90-b844-87d9dd68281a"
+          },
           "type": "OpenApiConnectionWebhook",
           "inputs": {
             "host": {
@@ -37,7 +40,8 @@
               "catalog": "eef0e546-6cbf-49a7-acc3-0d6b1c3f940f",
               "category": "31f00635-c05c-4de8-9619-f63fef619d9b",
               "subscriptionRequest/entityname": "none",
-              "subscriptionRequest/sdkmessagename": "fmc_RequestFullSync"
+              "subscriptionRequest/sdkmessagename": "fmc_RequestFullSync",
+              "subscriptionRequest/name": "7c61ab3d-e46e-4c48-9e1b-b7d14438fe08:MTA"
             },
             "authentication": "@parameters('$authentication')"
           }
@@ -45,37 +49,44 @@
       },
       "actions": {
         "Request_SQL_sync": {
-          "type": "OpenApiConnection",
           "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "45a3a0c6-cb6c-4b53-8210-1f0f3994dd68"
+          },
+          "type": "OpenApiConnection",
           "inputs": {
             "host": {
-              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
               "connectionName": "shared_commondataserviceforapps",
-              "operationId": "PerformUnboundAction"
+              "operationId": "PerformUnboundAction",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
             },
             "parameters": {
               "actionName": "fmc_RequestBmsSync",
               "item/ClientRequestId": "@string(triggerBody()?['OutputParameters']?['RequestId'])"
-            }
+            },
+            "authentication": "@parameters('$authentication')"
           }
         },
         "Request_SharePoint_sync": {
-          "type": "OpenApiConnection",
           "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "8070de59-165e-41c6-9ce9-9a48fcd29b0e"
+          },
+          "type": "OpenApiConnection",
           "inputs": {
             "host": {
-              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
               "connectionName": "shared_commondataserviceforapps",
-              "operationId": "PerformUnboundAction"
+              "operationId": "PerformUnboundAction",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
             },
             "parameters": {
               "actionName": "fmc_RequestSpoSync",
               "item/ClientRequestId": "@string(triggerBody()?['OutputParameters']?['RequestId'])"
-            }
+            },
+            "authentication": "@parameters('$authentication')"
           }
         },
         "Dispatch_summary": {
-          "type": "Compose",
           "runAfter": {
             "Request_SQL_sync": [
               "Succeeded",
@@ -90,6 +101,10 @@
               "TimedOut"
             ]
           },
+          "metadata": {
+            "operationMetadataId": "2ca24db1-de7c-4154-b90b-d67b3104a5af"
+          },
+          "type": "Compose",
           "inputs": {
             "requestId": "@triggerBody()?['OutputParameters']?['RequestId']",
             "dispatchedAt": "@utcNow()",
@@ -100,7 +115,7 @@
         }
       }
     },
-    "templateName": null
+    "templateName": ""
   },
   "schemaVersion": "1.0.0.0"
 }

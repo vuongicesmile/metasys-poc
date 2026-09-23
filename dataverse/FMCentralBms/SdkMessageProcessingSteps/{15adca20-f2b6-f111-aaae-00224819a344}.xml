@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SdkMessageProcessingStep Name="BMS: Change Log fmc_bmsequipment Create" SdkMessageProcessingStepId="{15adca20-f2b6-f111-aaae-00224819a344}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SdkMessageId>9ebdbb1b-ea3e-db11-86a7-000a3a5473e8</SdkMessageId>
+  <PluginTypeName>FMCentralBms.Plugins.RecordChangeLog, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d</PluginTypeName>
+  <PluginTypeId>f1dd7391-f1b6-f111-aaae-00224819a344</PluginTypeId>
+  <PrimaryEntity>fmc_bmsequipment</PrimaryEntity>
+  <AsyncAutoDelete>0</AsyncAutoDelete>
+  <Description>Writes a business change log in the source transaction using selected entity images.</Description>
+  <FilteringAttributes></FilteringAttributes>
+  <InvocationSource>1</InvocationSource>
+  <Mode>0</Mode>
+  <Rank>10</Rank>
+  <EventHandlerTypeCode>4602</EventHandlerTypeCode>
+  <Stage>40</Stage>
+  <IsCustomizable>1</IsCustomizable>
+  <IsHidden>0</IsHidden>
+  <SupportedDeployment>0</SupportedDeployment>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <SdkMessageProcessingStepImages>
+    <SdkMessageProcessingStepImage Name="After">
+      <SdkMessageProcessingStepImageId>{17adca20-f2b6-f111-aaae-00224819a344}</SdkMessageProcessingStepImageId>
+      <Attributes>fmc_name,fmc_equipmentcode,fmc_equipmenttype,fmc_buildingid,fmc_description,statecode,statuscode</Attributes>
+      <EntityAlias>After</EntityAlias>
+      <ImageType>1</ImageType>
+      <MessagePropertyName>Id</MessagePropertyName>
+      <IsCustomizable>1</IsCustomizable>
+    </SdkMessageProcessingStepImage>
+  </SdkMessageProcessingStepImages>
+</SdkMessageProcessingStep>

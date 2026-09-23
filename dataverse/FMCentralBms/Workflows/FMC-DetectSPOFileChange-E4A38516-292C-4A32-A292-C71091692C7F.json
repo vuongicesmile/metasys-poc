@@ -1,0 +1,148 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedsharepointonline"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "SpoSiteUrl": {
+          "type": "String",
+          "defaultValue": "https://titancorpvncom.sharepoint.com/sites/Powerplatform",
+          "metadata": {
+            "schemaName": "fmc_SpoSiteUrl"
+          }
+        },
+        "SpoLibraryId": {
+          "type": "String",
+          "defaultValue": "7d9282a4-c45d-4ef8-8719-18f78e71d0d0",
+          "metadata": {
+            "schemaName": "fmc_SpoLibraryId"
+          }
+        },
+        "SpoInboxPath": {
+          "type": "String",
+          "defaultValue": "/Shared Documents/FMC-Inbox",
+          "metadata": {
+            "schemaName": "fmc_SpoInboxPath"
+          }
+        },
+        "SpoSourceNamespace": {
+          "type": "String",
+          "defaultValue": "bms_spo_dev01",
+          "metadata": {
+            "schemaName": "fmc_SpoSourceNamespace"
+          }
+        }
+      },
+      "triggers": {
+        "When_file_created_or_modified": {
+          "type": "OpenApiConnection",
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 1
+          },
+          "splitOn": "@triggerBody()?['value']",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetOnUpdatedFileItems"
+            },
+            "parameters": {
+              "dataset": "@parameters('SpoSiteUrl')",
+              "table": "@parameters('SpoLibraryId')"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Get_file_metadata": {
+          "type": "OpenApiConnection",
+          "runAfter": {},
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetFileMetadata"
+            },
+            "parameters": {
+              "dataset": "@parameters('SpoSiteUrl')",
+              "id": "@triggerBody()?['{Identifier}']"
+            }
+          }
+        },
+        "Enabled_xlsx_source": {
+          "type": "If",
+          "runAfter": {
+            "Get_file_metadata": [
+              "Succeeded"
+            ]
+          },
+          "expression": "@and(endsWith(toLower(concat('/', triggerBody()?['{FullPath}'])), '.xlsx'),or(startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])), toLower(concat(parameters('SpoInboxPath'), '/01-Master/Building/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])), toLower(concat(parameters('SpoInboxPath'), '/01-Master/Equipment/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])), toLower(concat(parameters('SpoInboxPath'), '/01-Master/ElectricMeter/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])), toLower(concat(parameters('SpoInboxPath'), '/01-Master/WaterMeter/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])), toLower(concat(parameters('SpoInboxPath'), '/02-Telemetry/Electricity/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])), toLower(concat(parameters('SpoInboxPath'), '/02-Telemetry/Water/')))))",
+          "actions": {
+            "Record_debounced_change": {
+              "type": "OpenApiConnection",
+              "runAfter": {},
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "PerformUnboundAction"
+                },
+                "parameters": {
+                  "actionName": "fmc_DetectSpoChange",
+                  "item/SourceKey": "@concat(parameters('SpoSourceNamespace'), '_', toLower(parameters('SpoLibraryId')), '_', string(triggerBody()?['ID']))",
+                  "item/LibraryId": "@parameters('SpoLibraryId')",
+                  "item/ItemId": "@string(triggerBody()?['ID'])",
+                  "item/SharePointIdentifier": "@triggerBody()?['{Identifier}']",
+                  "item/SharePointPath": "@concat('/', triggerBody()?['{FullPath}'])",
+                  "item/FileName": "@triggerBody()?['{FilenameWithExtension}']",
+                  "item/ExpectedETag": "@body('Get_file_metadata')?['ETag']"
+                }
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Skip_unsupported": {
+                "type": "Compose",
+                "inputs": "Not an enabled FMC-Inbox .xlsx source",
+                "runAfter": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

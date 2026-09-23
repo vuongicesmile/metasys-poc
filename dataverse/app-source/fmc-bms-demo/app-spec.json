@@ -390,6 +390,28 @@
       ]
     },
     {
+      "schemaName": "fmc_spochangerequest",
+      "displayName": "SPO Change Request",
+      "pluralName": "SPO Change Requests",
+      "description": "Debounced SharePoint file-version requests that can be dispatched immediately or automatically after five minutes.",
+      "existing": true,
+      "primaryAttribute": {
+        "schemaName": "fmc_name",
+        "displayName": "Name"
+      },
+      "columns": [
+        { "schemaName": "fmc_filename", "displayName": "File Name", "type": "Text" },
+        { "schemaName": "fmc_sharepointpath", "displayName": "SharePoint Path", "type": "Text" },
+        { "schemaName": "fmc_expectedetag", "displayName": "Expected ETag", "type": "Text" },
+        { "schemaName": "fmc_status", "displayName": "Change Status", "type": "Choice", "options": ["Pending", "Dispatching", "Dispatched", "Superseded", "Failed", "Imported"] },
+        { "schemaName": "fmc_detectedat", "displayName": "Detected At", "type": "DateTime" },
+        { "schemaName": "fmc_dueat", "displayName": "Auto Sync Due At", "type": "DateTime" },
+        { "schemaName": "fmc_dispatchedat", "displayName": "Dispatched At", "type": "DateTime" },
+        { "schemaName": "fmc_dispatchsource", "displayName": "Dispatch Source", "type": "Text" },
+        { "schemaName": "fmc_errormessage", "displayName": "Error Message", "type": "Memo" }
+      ]
+    },
+    {
       "schemaName": "fmc_spoimportrow",
       "displayName": "SPO Import Row",
       "pluralName": "SPO Import Rows",
@@ -659,6 +681,18 @@
           "attr": "createdon",
           "dir": "desc"
         }
+      ],
+      "activeOnly": true
+    },
+    {
+      "entity": "fmc_spochangerequest",
+      "name": "Pending SharePoint Changes",
+      "columns": ["fmc_filename", "fmc_status", "fmc_dueat", "fmc_detectedat", "fmc_dispatchsource", "fmc_errormessage"],
+      "filters": [
+        { "attr": "fmc_status", "op": "eq", "value": "Pending" }
+      ],
+      "sort": [
+        { "attr": "fmc_dueat", "dir": "asc" }
       ],
       "activeOnly": true
     },
@@ -1006,7 +1040,8 @@
         "cr3c8_silvernewbmspoint",
         "fmc_syncrequest",
         "fmc_spofile",
-        "fmc_spoimportrow"
+        "fmc_spoimportrow",
+        "fmc_spochangerequest"
       ],
       "source": {
         "kind": "tsx",
@@ -1080,6 +1115,10 @@
               {
                 "entity": "fmc_spofile",
                 "title": "Received Files"
+              },
+              {
+                "entity": "fmc_spochangerequest",
+                "title": "Pending File Changes"
               },
               {
                 "entity": "fmc_spoimportrow",
@@ -1173,6 +1212,13 @@
                 "read"
               ],
               "scope": "organization"
+            },
+            {
+              "entity": "fmc_spochangerequest",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
             }
           ]
         },
@@ -1234,6 +1280,14 @@
               "scope": "organization"
             },
             {
+              "entity": "fmc_spochangerequest",
+              "access": [
+                "read",
+                "write"
+              ],
+              "scope": "organization"
+            },
+            {
               "entity": "fmc_bmspoint",
               "access": [
                 "read"
@@ -1266,6 +1320,13 @@
             },
             {
               "entity": "fmc_spoimportrow",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_spochangerequest",
               "access": [
                 "read"
               ],
@@ -1340,6 +1401,13 @@
             },
             {
               "entity": "fmc_spoimportrow",
+              "access": [
+                "read"
+              ],
+              "scope": "organization"
+            },
+            {
+              "entity": "fmc_spochangerequest",
               "access": [
                 "read"
               ],

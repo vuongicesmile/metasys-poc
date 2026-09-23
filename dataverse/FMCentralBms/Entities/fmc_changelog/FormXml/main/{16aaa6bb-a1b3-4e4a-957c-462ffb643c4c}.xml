@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{16aaa6bb-a1b3-4e4a-957c-462ffb643c4c}</formid>
+    <IntroducedVersion>1.0.3.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{b0ce8200-937c-4b16-b725-3c6f63268598}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{7811c97e-e05e-40ff-bd47-9f145cf572c3}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{2848ee54-f97f-4336-948f-de9ba1a4c20d}">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="fmc_name" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{bdfe18cd-531e-4fa8-a651-fc268094d11c}">
+                        <labels>
+                          <label description="Operation" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_operation" datafieldname="fmc_operation" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{aec127bd-178a-4810-8fd8-309ed4a6c860}">
+                        <labels>
+                          <label description="Table" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_tablename" datafieldname="fmc_tablename" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ac53908f-b6c6-4283-a097-6a293d038ea4}">
+                        <labels>
+                          <label description="Record ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_recordid" datafieldname="fmc_recordid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ffb6129a-fe6d-464b-bc5f-931ea1984dc8}">
+                        <labels>
+                          <label description="Record Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_recordname" datafieldname="fmc_recordname" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{e17223ec-e6f4-46f4-a614-859a5304188d}">
+                        <labels>
+                          <label description="Initiating User ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_userid" datafieldname="fmc_userid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{8c5a5e3f-3ff3-4fd7-b6cf-36042229ef3d}">
+                        <labels>
+                          <label description="Changed By" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_username" datafieldname="fmc_username" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{d2e32a56-1675-460a-9a3d-31f4ecba8ab8}">
+                        <labels>
+                          <label description="Execution User ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_runasuserid" datafieldname="fmc_runasuserid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{2a90b5d3-df57-4ffb-a1e5-51c6d822f2dc}">
+                        <labels>
+                          <label description="Correlation ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_correlationid" datafieldname="fmc_correlationid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ed338e26-373c-46ae-8dfd-5b8149d4ce5f}">
+                        <labels>
+                          <label description="Changed Fields" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_changedfields" datafieldname="fmc_changedfields" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{c4dde69b-1e63-4fd5-9304-4d8e48de06ee}">
+                        <labels>
+                          <label description="Changed On" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_occurredon" datafieldname="fmc_occurredon" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{17b58e1a-69f3-4928-9a4c-60794b2c251d}">
+                        <labels>
+                          <label description="Before (JSON)" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_before" datafieldname="fmc_before" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{59537d84-f386-4e74-b0ba-3bb5c88874a6}">
+                        <labels>
+                          <label description="After (JSON)" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_after" datafieldname="fmc_after" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" disabled="true" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

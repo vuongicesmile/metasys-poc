@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="ItemId">
+  <displayname default="SharePoint Item ID">
+    <label description="SharePoint Item ID" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>ItemId</name>
+  <type>10</type>
+</customapirequestparameter>

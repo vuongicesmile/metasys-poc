@@ -116,7 +116,7 @@ public sealed partial class DataverseProvisioner
             if ((await FindSpoViews(client, view)).Count != 1)
                 throw new InvalidOperationException($"Expected exactly one public view named '{view}'.");
 
-        foreach (var table in new[] { SpoFileTable, SpoImportRowTable })
+        foreach (var table in new[] { SpoFileTable, SpoImportRowTable, SpoChangeRequestTable })
         foreach (var form in await SpoMainForms(client, table))
         {
             var xml = XElement.Parse(form.GetAttributeValue<string>("formxml"));

@@ -13,7 +13,7 @@
   "pageName": "BMS Operations Center1",
   "pageDirectory": "dataverse/app-source/fmc-bms-demo",
   "pageFile": "trung-tam-van-hanh.tsx",
-  "dataSources": "fmc_bmsbuilding,fmc_bmsequipment,fmc_bmspoint,fmc_bmsreading,cr3c8_silvernewbmspoint,fmc_syncrequest,fmc_spofile,fmc_spoimportrow",
+  "dataSources": "fmc_bmsbuilding,fmc_bmsequipment,fmc_bmspoint,fmc_bmsreading,cr3c8_silvernewbmspoint,fmc_syncrequest,fmc_spofile,fmc_spoimportrow,fmc_spochangerequest",
   "webResources": {
     "dataverse/app-source/BmsEventDemo.html": "fmc_/pages/BmsEventDemo.html",
     "dataverse/app-source/EquipmentPluginTest.js": "fmc_/scripts/EquipmentPluginTest.js"

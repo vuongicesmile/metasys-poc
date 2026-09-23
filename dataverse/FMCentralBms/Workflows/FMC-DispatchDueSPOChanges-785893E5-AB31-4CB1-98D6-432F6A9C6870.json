@@ -1,0 +1,131 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedsharepointonline"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "SpoSiteUrl": {
+          "type": "String",
+          "defaultValue": "https://titancorpvncom.sharepoint.com/sites/Powerplatform",
+          "metadata": {
+            "schemaName": "fmc_SpoSiteUrl"
+          }
+        },
+        "SpoLibraryId": {
+          "type": "String",
+          "defaultValue": "7d9282a4-c45d-4ef8-8719-18f78e71d0d0",
+          "metadata": {
+            "schemaName": "fmc_SpoLibraryId"
+          }
+        },
+        "SpoInboxPath": {
+          "type": "String",
+          "defaultValue": "/Shared Documents/FMC-Inbox",
+          "metadata": {
+            "schemaName": "fmc_SpoInboxPath"
+          }
+        },
+        "SpoSourceNamespace": {
+          "type": "String",
+          "defaultValue": "bms_spo_dev01",
+          "metadata": {
+            "schemaName": "fmc_SpoSourceNamespace"
+          }
+        }
+      },
+      "triggers": {
+        "Every_minute": {
+          "type": "Recurrence",
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 1
+          }
+        }
+      },
+      "actions": {
+        "List_due_changes": {
+          "type": "OpenApiConnection",
+          "runAfter": {},
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "ListRecords"
+            },
+            "parameters": {
+              "entityName": "fmc_spochangerequests",
+              "$select": "fmc_spochangerequestid,fmc_expectedetag",
+              "$filter": "@concat('fmc_status eq 789112000 and fmc_dueat le ', utcNow())",
+              "$orderby": "fmc_dueat asc",
+              "$top": 25
+            }
+          }
+        },
+        "Claim_each_due_change": {
+          "type": "Foreach",
+          "foreach": "@body('List_due_changes')?['value']",
+          "runAfter": {
+            "List_due_changes": [
+              "Succeeded"
+            ]
+          },
+          "runtimeConfiguration": {
+            "concurrency": {
+              "repetitions": 1
+            }
+          },
+          "actions": {
+            "Claim_for_auto_sync": {
+              "type": "OpenApiConnection",
+              "runAfter": {},
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "PerformUnboundAction"
+                },
+                "parameters": {
+                  "actionName": "fmc_ClaimSpoChange",
+                  "item/ChangeRequestId": "@items('Claim_each_due_change')?['fmc_spochangerequestid']",
+                  "item/ExpectedETag": "@items('Claim_each_due_change')?['fmc_expectedetag']",
+                  "item/DispatchSource": "Auto",
+                  "item/ClientRequestId": "@guid()"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

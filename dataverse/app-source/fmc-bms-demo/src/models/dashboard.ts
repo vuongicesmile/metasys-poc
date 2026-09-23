@@ -8,6 +8,7 @@ import type {
     fmc_bmspoint,
     fmc_bmsreading,
     fmc_spofile,
+    fmc_spochangerequest,
     fmc_spoimportrow,
     fmc_syncrequest,
 } from "../../RuntimeTypes";
@@ -20,6 +21,7 @@ export type ReadableReading = ReadableTableRow<fmc_bmsreading>;
 export type ReadableSilverPoint = ReadableTableRow<cr3c8_silvernewbmspoint>;
 export type ReadableSyncRequest = ReadableTableRow<fmc_syncrequest>;
 export type ReadableSpoFile = ReadableTableRow<fmc_spofile>;
+export type ReadableSpoChangeRequest = ReadableTableRow<fmc_spochangerequest>;
 export type ReadableSpoImportRow = ReadableTableRow<fmc_spoimportrow>;
 
 export type BoundedCount = {

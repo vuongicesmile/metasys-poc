@@ -23,34 +23,42 @@
           "defaultValue": {},
           "type": "SecureObject"
         },
-        "FmcSyncPipeline": {
+        "FM Central Sync Pipeline (fmc_SyncPipeline)": {
           "defaultValue": "ab191700-b99e-f111-aaa0-000d3a80bb96:FMC",
           "type": "String",
           "metadata": {
-            "schemaName": "fmc_SyncPipeline"
+            "schemaName": "fmc_SyncPipeline",
+            "description": "Expected Dataverse organization ID and SourceId used to coalesce synchronization requests."
           }
         }
       },
       "triggers": {
         "manual": {
+          "metadata": {
+            "operationMetadataId": "d28292fa-4d5f-4df3-85ea-4ae44fdc5a61"
+          },
           "type": "Request",
           "kind": "Button",
-          "runtimeConfiguration": {
-            "concurrency": {
-              "runs": 1
-            }
-          },
           "inputs": {
             "schema": {
               "type": "object",
               "properties": {},
               "required": []
             }
+          },
+          "runtimeConfiguration": {
+            "concurrency": {
+              "runs": 1
+            }
           }
         }
       },
       "actions": {
         "List_active_sync_requests": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "f41087df-f909-45da-87bd-e1ce36756021"
+          },
           "type": "OpenApiConnection",
           "inputs": {
             "host": {
@@ -61,21 +69,23 @@
             "parameters": {
               "entityName": "fmc_syncrequests",
               "$select": "fmc_syncrequestid,fmc_name,fmc_status",
-              "$filter": "@concat('fmc_pipeline eq ''', parameters('FmcSyncPipeline'), ''' and (fmc_status eq 789100000 or fmc_status eq 789100001)')",
+              "$filter": "@concat('fmc_pipeline eq ''', parameters('FM Central Sync Pipeline (fmc_SyncPipeline)'), ''' and (fmc_status eq 789100000 or fmc_status eq 789100001)')",
               "$orderby": "createdon asc",
               "$top": 1
             },
             "authentication": "@parameters('$authentication')"
-          },
-          "runAfter": {}
+          }
         },
         "Initialize_request_id": {
-          "type": "InitializeVariable",
           "runAfter": {
             "List_active_sync_requests": [
               "Succeeded"
             ]
           },
+          "metadata": {
+            "operationMetadataId": "d9ee1c30-bf83-488f-915f-0e5d1a9426c3"
+          },
+          "type": "InitializeVariable",
           "inputs": {
             "variables": [
               {
@@ -87,20 +97,12 @@
           }
         },
         "Create_or_reuse_request": {
-          "type": "If",
-          "runAfter": {
-            "Initialize_request_id": [
-              "Succeeded"
-            ]
-          },
-          "expression": {
-            "equals": [
-              "@length(outputs('List_active_sync_requests')?['body/value'])",
-              0
-            ]
-          },
           "actions": {
             "Create_sync_request": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "2064a783-9510-4828-9e4c-d24f3ec46d6f"
+              },
               "type": "OpenApiConnection",
               "inputs": {
                 "host": {
@@ -112,48 +114,71 @@
                   "entityName": "fmc_syncrequests",
                   "item/fmc_name": "@concat('SQL Sync ', utcNow())",
                   "item/fmc_command": "DrainPending",
-                  "item/fmc_pipeline": "@parameters('FmcSyncPipeline')",
+                  "item/fmc_pipeline": "@parameters('FM Central Sync Pipeline (fmc_SyncPipeline)')",
                   "item/fmc_correlationid": "@workflow()?['run']?['name']",
                   "item/fmc_requestedby": "@coalesce(triggerOutputs()?['headers']?['x-ms-user-email'], triggerOutputs()?['headers']?['x-ms-user-name'], 'Power Automate')",
                   "item/fmc_status": 789100000
                 },
                 "authentication": "@parameters('$authentication')"
-              },
-              "runAfter": {}
+              }
             },
             "Set_created_request_id": {
-              "type": "SetVariable",
               "runAfter": {
                 "Create_sync_request": [
                   "Succeeded"
                 ]
               },
+              "metadata": {
+                "operationMetadataId": "1c8dfa32-6cf0-4169-ab42-c9cb6dd219cb"
+              },
+              "type": "SetVariable",
               "inputs": {
                 "name": "requestId",
                 "value": "@outputs('Create_sync_request')?['body/fmc_syncrequestid']"
               }
             }
           },
+          "runAfter": {
+            "Initialize_request_id": [
+              "Succeeded"
+            ]
+          },
           "else": {
             "actions": {
               "Set_existing_request_id": {
-                "type": "SetVariable",
                 "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "272117bb-22ed-40e3-8b66-74babfeda756"
+                },
+                "type": "SetVariable",
                 "inputs": {
                   "name": "requestId",
                   "value": "@first(outputs('List_active_sync_requests')?['body/value'])?['fmc_syncrequestid']"
                 }
               }
             }
-          }
+          },
+          "expression": {
+            "equals": [
+              "@length(outputs('List_active_sync_requests')?['body/value'])",
+              0
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c5a99c38-0902-473d-bdb6-11949857ae35"
+          },
+          "type": "If"
         },
         "Request_result": {
-          "type": "Compose",
           "runAfter": {
             "Create_or_reuse_request": [
               "Succeeded"
             ]
           },
+          "metadata": {
+            "operationMetadataId": "68d7a28f-94a8-48c4-889f-a765b2230f56"
+          },
+          "type": "Compose",
           "inputs": {
             "requestId": "@variables('requestId')",
             "status": "QueuedOrRunning"
@@ -161,7 +186,7 @@
         }
       }
     },
-    "templateName": null
+    "templateName": ""
   },
   "schemaVersion": "1.0.0.0"
 }

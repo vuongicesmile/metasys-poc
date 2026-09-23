@@ -7,6 +7,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | --- | --- | --- |
 | Runbook | [Change Log bằng plugin](runbooks/change-log-plugin.vi.md) | Ghi vết Create/Update/Delete Building và Equipment; source chuẩn bị, chưa deploy do thiếu khóa ký |
 | Plan | [Agents trong Power Apps BMS](plans/power-apps-bms-agents.vi.md) | Assistant tra dữ liệu/chẩn đoán sync, gọi Custom API, roadmap Agent feed và tích hợp PCF; Agent MVP đã publish, tools/host còn chờ |
+| Plan | [Thông báo SPO đổi file và tự sync sau 5 phút](plans/spo-change-notification-auto-sync.vi.md) | Home báo file đổi, nút Sync now và Power Automate tự dispatch khi đến hạn; đề xuất, chưa triển khai |
 | Runbook | [BMS Operations Assistant](runbooks/power-apps-bms-agents.vi.md) | Deploy, test guardrail Agent, đóng gói source và điều kiện thêm Agent Flow tools |
 | Reference | [BMS Operations Assistant](reference/bms-operations-assistant.vi.md) | Tool contract, guardrail và evaluation cases của Agent source |
 | Reference | [Persistence boundaries và DI](reference/persistence-boundaries.vi.md) | Unit of Work, scoped context và transaction boundary của các service |

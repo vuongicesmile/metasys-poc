@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <systemform>
     <formid>{47330992-406e-4c8c-896e-ac796e53c55f}</formid>
@@ -95,6 +95,32 @@
             </column>
           </columns>
         </tab>
+        <tab name="fmc_bmsrelations" id="{6666b1d7-ba95-8b37-8522-51f5c41aee50}" showlabel="true" expanded="true">
+          <labels>
+            <label description="BMS Details and Relationships" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_bmsrelation_details" id="{ad375052-45bd-88e6-bce6-863f464f1c45}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="BMS Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{75366863-5337-8003-9f5b-b90f942c29fe}">
+                        <labels>
+                          <label description="Building Code" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_buildingcode" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_buildingcode" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
       </tabs>
       <header id="{0f25456d-0358-4886-8fd2-e096a4931c32}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
         <rows>
@@ -141,6 +167,7 @@
       <DisplayConditions Order="0" FallbackForm="true">
         <Everyone />
       </DisplayConditions>
+      <controlDescriptions></controlDescriptions>
     </form>
     <IsCustomizable>1</IsCustomizable>
     <CanBeDeleted>1</CanBeDeleted>

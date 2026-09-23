@@ -15,15 +15,15 @@ public sealed partial class DataversePluginProvisioner
     {
         var assembly = System.Reflection.AssemblyName.GetAssemblyName(Path.GetFullPath(path));
         var token = Convert.ToHexString(assembly.GetPublicKeyToken() ?? []).ToLowerInvariant();
-        if (assembly.Name != AssemblyName || token != "e122b5e4dcc2589d" || assembly.Version != new Version(1, 0, 0, 6))
-            throw new InvalidOperationException("Change log deployment requires signed FMCentralBms.Plugins 1.0.0.6 with the existing public key token e122b5e4dcc2589d. No writes made.");
+        if (assembly.Name != AssemblyName || token != "e122b5e4dcc2589d" || assembly.Version != new Version(1, 0, 0, 7))
+            throw new InvalidOperationException("Change log deployment requires signed FMCentralBms.Plugins 1.0.0.7 with the existing public key token e122b5e4dcc2589d. No writes made.");
     }
 
     public async Task RegisterChangeLog(string path)
     {
         ValidateChangeLogAssembly(path);
         var client = connection.Get();
-        var assembly = await EnsureAssembly(client, path, "1.0.0.6");
+        var assembly = await EnsureAssembly(client, path, "1.0.0.7");
         var type = await EnsurePluginType(client, assembly.Id, "FMCentralBms.Plugins.RecordChangeLog", "Record BMS Change Log");
         var solution = await FindSolutionId(client);
         await AddToSolution(client, solution, assembly.Id, PluginAssemblyComponent, "change log assembly", false);

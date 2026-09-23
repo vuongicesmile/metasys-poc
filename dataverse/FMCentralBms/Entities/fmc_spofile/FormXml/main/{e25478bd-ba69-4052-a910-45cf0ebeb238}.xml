@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <systemform>
     <formid>{e25478bd-ba69-4052-a910-45cf0ebeb238}</formid>
@@ -117,6 +117,73 @@
                             <RelationshipName>fmc_spofile_spoimportrow</RelationshipName>
                             <ChartGridMode>Grid</ChartGridMode>
                             <RecordsPerPage>10</RecordsPerPage>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_spoingestion" id="{2e2418e7-c27d-8c87-9d45-c6499705e24b}" showlabel="true" expanded="true">
+          <labels>
+            <label description="SPO File Ingestion" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_spoingestion_details" id="{eb709c37-64d2-8e63-a9ce-465b8c62da1f}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="SPO File Ingestion" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{b392b459-b0d6-8345-ba78-eb2f34ff0938}">
+                        <labels>
+                          <label description="Source Key" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_sourcekey" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_sourcekey" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{21e67e7f-efd5-8c3e-a79d-d181aac412ca}">
+                        <labels>
+                          <label description="Archived ETag" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_etag" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_etag" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{9958aefc-f154-88aa-88a8-e6538558e7b6}">
+                        <labels>
+                          <label description="Candidate ETag" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_candidateetag" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_candidateetag" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{154a7ac0-de20-8796-8f32-994b570cdfb8}">
+                        <labels>
+                          <label description="Flow Run ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_runid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="fmc_runid" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{276f0516-b9b0-804b-95e2-b2ff823afb33}">
+                        <labels>
+                          <label description="Imported JSON Rows" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_spoimportrows" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+                          <parameters>
+                            <TargetEntityType>fmc_spoimportrow</TargetEntityType>
+                            <ViewId>{517ce905-05ae-f111-aaad-00224819a344}</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_spofile_spoimportrow</RelationshipName>
+                            <RecordsPerPage>10</RecordsPerPage>
+                            <EnableQuickFind>false</EnableQuickFind>
                           </parameters>
                         </control>
                       </cell>

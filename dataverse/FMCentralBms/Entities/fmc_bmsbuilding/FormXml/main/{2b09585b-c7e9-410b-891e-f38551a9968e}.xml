@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <systemform>
     <formid>{2b09585b-c7e9-410b-891e-f38551a9968e}</formid>
@@ -72,7 +72,7 @@
                     <row>
                       <cell id="{b16f15e4-3807-8b10-9936-8a4e98b2e526}" showlabel="true">
                         <labels>
-                          <label description="BMS Equipment" languagecode="1033" />
+                          <label description="[Bronze] BMS Equipments" languagecode="1033" />
                         </labels>
                         <control id="fmc_bmsrelatedrecords" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
                           <parameters>

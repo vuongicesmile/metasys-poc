@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <savedquery>
     <IsCustomizable>1</IsCustomizable>
@@ -19,55 +19,6 @@
           <cell name="fmc_unit" width="180" />
           <cell name="fmc_lastreadingtime" width="180" />
         </row>
-        <controlDescriptions>
-          <controlDescription>
-            <customControl id="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
-              <parameters />
-            </customControl>
-            <customControl formFactor="0" name="fmc_FMC.Bms.BmsPointGrid">
-              <parameters>
-                <data-set name="points">
-                  <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
-                  <fmc_objectid>fmc_name</fmc_objectid>
-                  <fmc_name>fmc_objectid</fmc_name>
-                  <fmc_currentvalue>fmc_currentvalue</fmc_currentvalue>
-                  <fmc_unit>fmc_unit</fmc_unit>
-                  <fmc_lastreadingtime>fmc_lastreadingtime</fmc_lastreadingtime>
-                  <fmc_sourcesystem>fmc_sourcesystem</fmc_sourcesystem>
-                </data-set>
-                <staleAfterMinutes static="true" type="Whole.None">60</staleAfterMinutes>
-              </parameters>
-            </customControl>
-            <customControl formFactor="1" name="fmc_FMC.Bms.BmsPointGrid">
-              <parameters>
-                <data-set name="points">
-                  <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
-                  <fmc_objectid>fmc_name</fmc_objectid>
-                  <fmc_name>fmc_objectid</fmc_name>
-                  <fmc_currentvalue>fmc_currentvalue</fmc_currentvalue>
-                  <fmc_unit>fmc_unit</fmc_unit>
-                  <fmc_lastreadingtime>fmc_lastreadingtime</fmc_lastreadingtime>
-                  <fmc_sourcesystem>fmc_sourcesystem</fmc_sourcesystem>
-                </data-set>
-                <staleAfterMinutes static="true" type="Whole.None">60</staleAfterMinutes>
-              </parameters>
-            </customControl>
-            <customControl formFactor="2" name="fmc_FMC.Bms.BmsPointGrid">
-              <parameters>
-                <data-set name="points">
-                  <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
-                  <fmc_objectid>fmc_name</fmc_objectid>
-                  <fmc_name>fmc_objectid</fmc_name>
-                  <fmc_currentvalue>fmc_currentvalue</fmc_currentvalue>
-                  <fmc_unit>fmc_unit</fmc_unit>
-                  <fmc_lastreadingtime>fmc_lastreadingtime</fmc_lastreadingtime>
-                  <fmc_sourcesystem>fmc_sourcesystem</fmc_sourcesystem>
-                </data-set>
-                <staleAfterMinutes static="true" type="Whole.None">60</staleAfterMinutes>
-              </parameters>
-            </customControl>
-          </controlDescription>
-        </controlDescriptions>
       </grid>
     </layoutxml>
     <querytype>0</querytype>

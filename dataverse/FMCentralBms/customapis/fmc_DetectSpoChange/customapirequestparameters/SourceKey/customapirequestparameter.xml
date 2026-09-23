@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="SourceKey">
+  <displayname default="Source Key">
+    <label description="Source Key" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>SourceKey</name>
+  <type>10</type>
+</customapirequestparameter>

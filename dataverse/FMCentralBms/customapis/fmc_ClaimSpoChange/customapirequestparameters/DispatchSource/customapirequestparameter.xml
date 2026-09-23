@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="DispatchSource">
+  <displayname default="Dispatch Source">
+    <label description="Dispatch Source" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>DispatchSource</name>
+  <type>10</type>
+</customapirequestparameter>

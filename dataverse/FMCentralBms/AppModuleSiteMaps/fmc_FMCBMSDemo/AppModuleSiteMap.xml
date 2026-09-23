@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <AppModuleSiteMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SiteMapUniqueName>fmc_FMCBMSDemo</SiteMapUniqueName>
   <EnableCollapsibleGroups>False</EnableCollapsibleGroups>
@@ -22,6 +22,11 @@
         <SubArea Id="sub_0_0_1" Url="$webresource:fmc_/pages/BmsEventDemo.html" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
             <Title LCID="1033" Title="Sync Data" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="fmc_changelogs" Entity="fmc_changelog">
+          <Titles>
+            <Title LCID="1033" Title="Change Logs" />
           </Titles>
         </SubArea>
       </Group>
@@ -77,6 +82,11 @@
         <SubArea Id="sub_0_4_1" Entity="fmc_spoimportrow" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
             <Title LCID="1033" Title="Parsed Rows" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="fmc_spochangerequests" Entity="fmc_spochangerequest">
+          <Titles>
+            <Title LCID="1033" Title="SPO Change Requests" />
           </Titles>
         </SubArea>
       </Group>

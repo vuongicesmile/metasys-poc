@@ -5,6 +5,7 @@ export interface TableRegistrations extends BaseTableRegistrations {
     "fmc_bmsequipment": fmc_bmsequipment,
     "fmc_bmspoint": fmc_bmspoint,
     "fmc_bmsreading": fmc_bmsreading,
+    "fmc_spochangerequest": fmc_spochangerequest,
     "fmc_spofile": fmc_spofile,
     "fmc_spoimportrow": fmc_spoimportrow,
     "fmc_syncrequest": fmc_syncrequest,
@@ -19,6 +20,9 @@ export interface EnumRegistrations extends BaseEnumRegistrations {
     "fmc_bmsequipment-statuscode": fmc_bmsequipment_statuscode,
     "fmc_bmspoint-statecode": fmc_bmspoint_statecode,
     "fmc_bmspoint-statuscode": fmc_bmspoint_statuscode,
+    "fmc_spochangerequest-fmc_status": fmc_spochangerequest_fmc_status,
+    "fmc_spochangerequest-statecode": fmc_spochangerequest_statecode,
+    "fmc_spochangerequest-statuscode": fmc_spochangerequest_statuscode,
     "fmc_spofile-fmc_importstatus": fmc_spofile_fmc_importstatus,
     "fmc_spofile-fmc_status": fmc_spofile_fmc_status,
     "fmc_spofile-statecode": fmc_spofile_statecode,
@@ -88,6 +92,7 @@ export type fmc_bmsequipment = TableRow<{
     readonly createdbyyominame: string,
     readonly createdonbehalfbyname: string,
     readonly createdonbehalfbyyominame: string,
+    fmc_buildingcode: string,
     // Foreign Key Column
     _fmc_buildingid_value: `/fmc_bmsbuilding(${string})`,
     readonly fmc_buildingidname: string,
@@ -114,6 +119,7 @@ export type fmc_bmspoint = TableRow<{
     readonly createdonbehalfbyname: string,
     readonly createdonbehalfbyyominame: string,
     fmc_building: string,
+    fmc_buildingcode: string,
     fmc_currentvalue: number,
     // Foreign Key Column
     _fmc_equipmentid_value: `/fmc_bmsequipment(${string})`,
@@ -162,6 +168,41 @@ export type fmc_bmsreading = TableRow<{
     readonly owningbusinessunitname: string,
     partitionid: string,
     ttlinseconds: number,
+}>
+
+export type fmc_spochangerequest = TableRow<{
+    // Primary Key Column
+    readonly fmc_spochangerequestid: string,
+    readonly createdbyname: string,
+    readonly createdbyyominame: string,
+    readonly createdonbehalfbyname: string,
+    readonly createdonbehalfbyyominame: string,
+    fmc_activekey: string,
+    fmc_correlationkey: string,
+    fmc_detectedat: Date,
+    fmc_dispatchedat: Date,
+    fmc_dispatchsource: string,
+    fmc_dueat: Date,
+    fmc_errormessage: string,
+    fmc_expectedetag: string,
+    fmc_filename: string,
+    fmc_flowrunid: string,
+    fmc_itemid: string,
+    fmc_libraryid: string,
+    fmc_name: string,
+    fmc_sharepointidentifier: string,
+    fmc_sharepointpath: string,
+    fmc_sourcekey: string,
+    fmc_status: fmc_spochangerequest_fmc_status,
+    readonly modifiedbyname: string,
+    readonly modifiedbyyominame: string,
+    readonly modifiedonbehalfbyname: string,
+    readonly modifiedonbehalfbyyominame: string,
+    // Foreign Key Column
+    readonly _organizationid_value: `/organization(${string})`,
+    readonly organizationidname: string,
+    statecode: fmc_spochangerequest_statecode,
+    statuscode: fmc_spochangerequest_statuscode,
 }>
 
 export type fmc_spofile = TableRow<{
@@ -285,6 +326,7 @@ const enum fmc_bmsbuilding_statuscode {
 }
 const enum fmc_bmsequipment_fmc_equipmenttype {
 "Water Meter" = 789100000,
+"Electric Meter" = 789100003,
 "Temperature Sensor" = 789100001,
 "Test Rig" = 789100002,
 }
@@ -301,6 +343,22 @@ const enum fmc_bmspoint_statecode {
 "Inactive" = 1,
 }
 const enum fmc_bmspoint_statuscode {
+"Active" = 1,
+"Inactive" = 2,
+}
+const enum fmc_spochangerequest_fmc_status {
+"Pending" = 789112000,
+"Dispatching" = 789112001,
+"Dispatched" = 789112002,
+"Superseded" = 789112003,
+"Failed" = 789112004,
+"Imported" = 789112005,
+}
+const enum fmc_spochangerequest_statecode {
+"Active" = 0,
+"Inactive" = 1,
+}
+const enum fmc_spochangerequest_statuscode {
 "Active" = 1,
 "Inactive" = 2,
 }

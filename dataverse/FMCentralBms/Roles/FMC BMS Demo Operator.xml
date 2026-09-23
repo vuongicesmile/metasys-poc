@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Role id="{a00ad2b9-86ae-f111-aaad-00224819a344}" name="FMC BMS Demo Operator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <IsCustomizable>1</IsCustomizable>
   <IsAutoAssigned>0</IsAutoAssigned>
@@ -11,6 +11,7 @@
     <RolePrivilege name="prvAppendTofmc_bmspoint" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmsequipment" level="Global" />
+    <RolePrivilege name="prvCreatefmc_changelog" level="Global" />
     <RolePrivilege name="prvCreatefmc_syncrequest" level="Global" />
     <RolePrivilege name="prvCreateSharePointData" level="Global" />
     <RolePrivilege name="prvReadAppModule" level="Global" />
@@ -19,6 +20,8 @@
     <RolePrivilege name="prvReadfmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvReadfmc_bmspoint" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsreading" level="Global" />
+    <RolePrivilege name="prvReadfmc_changelog" level="Global" />
+    <RolePrivilege name="prvReadfmc_spochangerequest" level="Global" />
     <RolePrivilege name="prvReadfmc_spofile" level="Global" />
     <RolePrivilege name="prvReadfmc_spoimportrow" level="Global" />
     <RolePrivilege name="prvReadfmc_syncrequest" level="Global" />
@@ -26,6 +29,7 @@
     <RolePrivilege name="prvReadSharePointDocument" level="Global" />
     <RolePrivilege name="prvWritefmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvWritefmc_bmsequipment" level="Global" />
+    <RolePrivilege name="prvWritefmc_spochangerequest" level="Global" />
     <RolePrivilege name="prvWriteSharePointData" level="Global" />
   </RolePrivileges>
 </Role>

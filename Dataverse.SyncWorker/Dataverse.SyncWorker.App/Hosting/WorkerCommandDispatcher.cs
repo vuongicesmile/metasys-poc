@@ -87,6 +87,21 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             await services.GetRequiredService<DataverseProvisioner>().VerifySpoIngestion();
             return true;
         }
+        if (args.Contains("--spo-change-status"))
+        {
+            await services.GetRequiredService<DataverseProvisioner>().PrintSpoChangeStatus();
+            return true;
+        }
+        if (args.Contains("--provision-spo-changes"))
+        {
+            await services.GetRequiredService<DataverseProvisioner>().ProvisionSpoChanges();
+            return true;
+        }
+        if (args.Contains("--verify-spo-changes"))
+        {
+            await services.GetRequiredService<DataverseProvisioner>().VerifySpoChanges();
+            return true;
+        }
         if (args.Contains("--provision-building-code"))
         {
             await services.GetRequiredService<DataverseProvisioner>().ProvisionBuildingCode();

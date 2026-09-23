@@ -34,9 +34,18 @@ namespace FMCentralBms.Plugins
             context.OutputParameters["RequestId"] = requestId;
             context.OutputParameters["Accepted"] = true;
             context.OutputParameters["Message"] = AcceptedMessage;
+            AddOutputs(context);
 
             if (trace != null)
                 trace.Trace("{0} ACCEPTED RequestId={1}", GetType().Name, requestId);
+        }
+
+        /// <summary>
+        /// Lets an event retain optional scope data for its Power Automate
+        /// subscriber without changing the common acknowledgement contract.
+        /// </summary>
+        protected virtual void AddOutputs(IPluginExecutionContext context)
+        {
         }
     }
 }

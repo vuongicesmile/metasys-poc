@@ -1,0 +1,19 @@
+<customapi uniquename="fmc_DetectSpoChange">
+  <allowedcustomprocessingsteptype>1</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Creates or updates one debounced SharePoint file-change request.">
+    <label description="Creates or updates one debounced SharePoint file-change request." languagecode="1033" />
+  </description>
+  <displayname default="Detect SharePoint File Change">
+    <label description="Detect SharePoint File Change" languagecode="1033" />
+  </displayname>
+  <executeprivilegename>prvCreatefmc_spochangerequest</executeprivilegename>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>fmc_DetectSpoChange</name>
+  <plugintypeid>
+    <plugintypeexportkey>55ee3426-01b7-f111-aaae-00224819a344</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>1</workflowsdkstepenabled>
+</customapi>

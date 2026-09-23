@@ -1,0 +1,12 @@
+kind: TaskDialog
+modelDisplayName: Power Apps MCP Server
+modelDescription: Power Apps MCP Server
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: fmc_BmsOperationsAssistant.shared_powertools.4aee828c9d7d4c25b3ff70b9e39b0667
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: InvokeMCP

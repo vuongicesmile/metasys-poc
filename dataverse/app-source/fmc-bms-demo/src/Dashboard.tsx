@@ -8,7 +8,10 @@ import { getSignedInUserName, openAppItem } from "./services/navigationService";
 import { useStyles } from "./styles/dashboardStyles";
 import { LanguageContext, useLanguagePreference } from "./hooks/useLanguage";
 import { useDashboard } from "./hooks/useDashboard";
+import { useSpoChanges } from "./hooks/useSpoChanges";
+import { canClaimSpoChanges } from "./services/spoChangeService";
 import { KpiCard, PipelineStep, EmptyList } from "./components/DashboardCards";
+import { SpoChangeBanner } from "./components/SpoChangeBanner";
 import {
     Badge,
     Button,
@@ -56,6 +59,8 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
     const formatNumber = (value?: number, digits = 2) => localizedNumber(value, language, digits);
     const userName = getSignedInUserName(language);
     const { state, refresh, dataReady } = useDashboard(dataApi);
+    const spoChanges = useSpoChanges(dataApi);
+    const canClaimChanges = canClaimSpoChanges();
     const [search, setSearch] = useState("");
     const [navigationError, setNavigationError] = useState<string | null>(null);
     const pageRef = useRef<HTMLElement>(null);
@@ -321,6 +326,18 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
                         <Text className={styles.profileHint}>{t("Để đăng xuất, mở menu hồ sơ Power Apps ở góc trên bên phải rồi chọn “Đăng xuất”.")}</Text>
                     </aside>
                 </header>
+
+                <SpoChangeBanner
+                    items={spoChanges.items}
+                    now={spoChanges.now}
+                    claimingId={spoChanges.claimingId}
+                    error={spoChanges.error}
+                    language={language}
+                    canClaim={canClaimChanges}
+                    styles={styles}
+                    onClaim={(request) => void spoChanges.claim(request)}
+                    onViewAll={() => void navigate({ pageType: "entitylist", entityName: "fmc_spochangerequest" })}
+                />
 
                 <section className={styles.section} aria-labelledby="kpi-heading">
                     <div className={styles.sectionHeader}>

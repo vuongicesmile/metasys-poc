@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="DueAt">
+  <displayname default="Auto Sync Due At">
+    <label description="Auto Sync Due At" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>DueAt</name>
+  <type>1</type>
+</customapiresponseproperty>

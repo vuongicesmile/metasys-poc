@@ -1,0 +1,5 @@
+<botcomponent_connectionreferenceset>
+  <botcomponent_connectionreference botcomponentid.schemaname="fmc_BmsOperationsAssistant.action.MicrosoftPowerApps-PowerAppsMCPServer" connectionreferenceid.connectionreferencelogicalname="fmc_BmsOperationsAssistant.shared_powertools.4aee828c9d7d4c25b3ff70b9e39b0667">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_connectionreference>
+</botcomponent_connectionreferenceset>

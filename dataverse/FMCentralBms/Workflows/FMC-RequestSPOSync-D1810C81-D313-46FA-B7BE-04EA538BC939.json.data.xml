@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Workflow WorkflowId="{d1810c81-d313-46fa-b7be-04ea538bc939}" Name="FMC - Request SPO Sync" Description="Scans FMC-Inbox and archives only new or updated files by stable source key plus ETag." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <JsonFileName>/Workflows/FMC-RequestSPOSync-D1810C81-D313-46FA-B7BE-04EA538BC939.json</JsonFileName>
+  <Type>1</Type>
+  <Subprocess>0</Subprocess>
+  <Category>5</Category>
+  <Mode>0</Mode>
+  <Scope>4</Scope>
+  <OnDemand>0</OnDemand>
+  <TriggerOnCreate>0</TriggerOnCreate>
+  <TriggerOnDelete>0</TriggerOnDelete>
+  <AsyncAutodelete>0</AsyncAutodelete>
+  <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+  <StateCode>1</StateCode>
+  <StatusCode>2</StatusCode>
+  <RunAs>1</RunAs>
+  <IsTransacted>1</IsTransacted>
+  <IntroducedVersion>1.0.2.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <BusinessProcessType>0</BusinessProcessType>
+  <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+  <ModernFlowType>0</ModernFlowType>
+  <PrimaryEntity>none</PrimaryEntity>
+  <LocalizedNames>
+    <LocalizedName languagecode="1033" description="FMC - Request SPO Sync" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description languagecode="1033" description="Scans FMC-Inbox and archives only new or updated files by stable source key plus ETag." />
+  </Descriptions>
+</Workflow>

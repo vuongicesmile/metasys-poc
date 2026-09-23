@@ -1,0 +1,15 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - |-
+            Tôi là {System.Bot.Name}. Tôi có thể tra Building, Equipment, Point,
+            trạng thái SQL sync và SharePoint import. Hãy gửi mã bản ghi hoặc hỏi
+            ví dụ: "BLD016 có thiết bị nào?"
+        speak:
+          - I am {System.Bot.Name}. I can help check BMS records and synchronization status.

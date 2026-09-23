@@ -1,0 +1,25 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Greeting
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - Good afternoon
+      - Good morning
+      - Hello
+      - Hey
+      - Hi
+
+  actions:
+    - kind: SendActivity
+      id: sendMessage_abmysR
+      activity:
+        text:
+          - Xin chào. Bạn có thể hỏi về Building, Equipment, Point, SQL sync hoặc SharePoint import.
+        speak:
+          - Hello. I can help with BMS records and synchronization status.
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_01At22

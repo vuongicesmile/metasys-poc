@@ -95,15 +95,21 @@ def build(entity_set, catalog_id, category_id):
     item_name = item + "?['{FilenameWithExtension}']"
     item_path = item + "?['{FullPath}']"
     normalized_item_path = "concat('/', " + item_path + ")"
-    supported = (
+    supported_path = (
         "@and(equals(coalesce(" + is_folder + ", false), false),"
         "endsWith(toLower(" + item_name + "), '.xlsx'),"
         + "or(startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/01-Master/Building/'))),"
         "startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/01-Master/Equipment/'))),"
+        "startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/01-Master/ElectricMeter/'))),"
         "startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/01-Master/WaterMeter/'))),"
         "startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/02-Telemetry/Electricity/'))),"
         "startsWith(toLower(" + normalized_item_path + "), toLower(concat(parameters('SpoInboxPath'), '/02-Telemetry/Water/')))))"
     )
+    # A scoped request is created only by the claim flow. It still lists the
+    # library for connector compatibility, but archives exactly the SourceKey
+    # and ETag that won the Dataverse claim; legacy callers retain the full scan.
+    has_scope = "not(empty(triggerBody()?['SourceKey']))"
+    supported = "@or(and(" + has_scope + ",equals(" + source_key[1:] + ",triggerBody()?['SourceKey'])),and(not(" + has_scope + ")," + supported_path[1:] + "))"
 
     create_receipt = action(
         DV,
@@ -154,7 +160,7 @@ def build(entity_set, catalog_id, category_id):
     archive_changed = {
         "type": "If",
         "runAfter": after("Resolve_receipt"),
-        "expression": {"not": {"equals": ["@variables('ArchivedETag')", etag]}},
+        "expression": "@and(not(equals(variables('ArchivedETag'), body('Metadata_before')?['ETag'])),or(empty(triggerBody()?['ExpectedETag']),equals(body('Metadata_before')?['ETag'], triggerBody()?['ExpectedETag'])))",
         "actions": {
             "Require_valid_metadata": {
                 "type": "If",

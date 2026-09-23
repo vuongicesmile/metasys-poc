@@ -61,7 +61,9 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         assert.ok((await page.locator('main').innerText()).includes('1,234.56'));
         assert.ok((await page.locator('main').innerText()).includes('9/12/26'));
         const count = await page.evaluate(() => window.queries);
-        assert.equal(count, 8);
+        // Dashboard snapshot uses eight bounded reads; the independent SPO
+        // debounce banner adds one small, visibility-aware queue read.
+        assert.equal(count, 9);
         const scrollButton = page.getByRole('button', { name: 'Scroll to bottom' });
         const beforeScroll = await scrollButton.boundingBox();
         assert.ok(beforeScroll, 'Scroll button must be visible');

@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="LibraryId">
+  <displayname default="SharePoint Library ID">
+    <label description="SharePoint Library ID" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>LibraryId</name>
+  <type>10</type>
+</customapirequestparameter>

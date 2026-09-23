@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="ExpectedETag">
+  <displayname default="Expected ETag">
+    <label description="Expected ETag" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>ExpectedETag</name>
+  <type>10</type>
+</customapiresponseproperty>

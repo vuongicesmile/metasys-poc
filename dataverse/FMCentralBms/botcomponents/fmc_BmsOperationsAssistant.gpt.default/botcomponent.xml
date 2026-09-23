@@ -1,0 +1,10 @@
+<botcomponent schemaname="fmc_BmsOperationsAssistant.gpt.default">
+  <componenttype>15</componenttype>
+  <iscustomizable>0</iscustomizable>
+  <name>BMS Operations Assistant</name>
+  <parentbotid>
+    <schemaname>fmc_BmsOperationsAssistant</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

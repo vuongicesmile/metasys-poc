@@ -26,6 +26,10 @@ public sealed class SpoDataverseInboxProcessor(
     private const int Processing = 789111001;
     private const int Imported = 789111002;
     private const int Failed = 789111003;
+    private const int ChangeDispatched = 789112002;
+    private const int ChangeFailed = 789112004;
+    private const int ChangeImported = 789112005;
+    private const string ChangeTable = "fmc_spochangerequest";
     private const int ConcurrencyVersionMismatch = -2147088254;
     private const int BlockSize = 4 * 1024 * 1024;
 
@@ -72,7 +76,7 @@ public sealed class SpoDataverseInboxProcessor(
         var query = new QueryExpression(FileTable)
         {
             ColumnSet = new ColumnSet(
-                "fmc_filename", "fmc_sharepointpath", "fmc_etag", "fmc_importedetag",
+                "fmc_filename", "fmc_sharepointpath", "fmc_sourcekey", "fmc_etag", "fmc_importedetag",
                 "fmc_filesize", "fmc_importstatus", "fmc_receivedat", "modifiedon", "versionnumber"),
             TopCount = 100
         };
@@ -104,6 +108,7 @@ public sealed class SpoDataverseInboxProcessor(
         // Lấy thông tin nhận diện trước để mọi nhánh kết quả đều có đủ receipt.
         var fileName = row.GetAttributeValue<string>("fmc_filename") ?? "(unnamed)";
         var sourcePath = row.GetAttributeValue<string>("fmc_sharepointpath") ?? "";
+        var sourceKey = row.GetAttributeValue<string>("fmc_sourcekey") ?? "";
         var etag = row.GetAttributeValue<string>("fmc_etag") ?? "";
 
         if (source is null)
@@ -143,6 +148,7 @@ public sealed class SpoDataverseInboxProcessor(
                     row.Id,
                     fileName,
                     sourcePath,
+                    sourceKey,
                     etag,
                     string.IsNullOrWhiteSpace(detail)
                         ? $"Import ended with status {result.Status}."
@@ -159,6 +165,7 @@ public sealed class SpoDataverseInboxProcessor(
                 ["fmc_processedat"] = utcNow,
                 ["fmc_errormessage"] = null
             }, cancellationToken);
+            await MarkChangeRequests(sourceKey, etag, ChangeImported, null, cancellationToken);
             return new(
                 row.Id,
                 fileName,
@@ -186,6 +193,7 @@ public sealed class SpoDataverseInboxProcessor(
                 row.Id,
                 fileName,
                 sourcePath,
+                sourceKey,
                 etag,
                 ex.Message,
                 cancellationToken);
@@ -258,6 +266,7 @@ public sealed class SpoDataverseInboxProcessor(
             row.Id,
             fileName,
             sourcePath,
+            row.GetAttributeValue<string>("fmc_sourcekey") ?? "",
             etag,
             error,
             cancellationToken);
@@ -267,6 +276,7 @@ public sealed class SpoDataverseInboxProcessor(
         Guid fileId,
         string fileName,
         string sourcePath,
+        string sourceKey,
         string etag,
         string error,
         CancellationToken cancellationToken)
@@ -279,7 +289,32 @@ public sealed class SpoDataverseInboxProcessor(
             ["fmc_processedat"] = DateTime.UtcNow,
             ["fmc_errormessage"] = Limit(error)
         }, cancellationToken);
+        await MarkChangeRequests(sourceKey, etag, ChangeFailed, error, cancellationToken);
         return new(fileId, fileName, sourcePath, etag, "Failed", Error: error);
+    }
+
+    private async Task MarkChangeRequests(string sourceKey, string etag, int status, string? error,
+        CancellationToken cancellationToken)
+    {
+        // A queue record is complete only after this worker has imported the
+        // exact archived ETag. A newer request remains Pending/Dispatched.
+        if (string.IsNullOrWhiteSpace(sourceKey) || string.IsNullOrWhiteSpace(etag)) return;
+        var query = new QueryExpression(ChangeTable)
+        {
+            ColumnSet = new ColumnSet("fmc_spochangerequestid"),
+            TopCount = 10
+        };
+        query.Criteria.AddCondition("fmc_sourcekey", ConditionOperator.Equal, sourceKey);
+        query.Criteria.AddCondition("fmc_expectedetag", ConditionOperator.Equal, etag);
+        query.Criteria.AddCondition("fmc_status", ConditionOperator.Equal, ChangeDispatched);
+        foreach (var request in (await client.RetrieveMultipleAsync(query, cancellationToken)).Entities)
+        {
+            await client.UpdateAsync(new Entity(ChangeTable, request.Id)
+            {
+                ["fmc_status"] = new OptionSetValue(status),
+                ["fmc_errormessage"] = error is null ? null : Limit(error)
+            }, cancellationToken);
+        }
     }
 
     private SpoSourceDefinition? TryResolve(string? sourcePath)

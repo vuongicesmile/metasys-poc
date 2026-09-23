@@ -1,24 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<PluginAssembly FullName="FMCentralBms.Plugins, Version=1.0.0.5, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginAssemblyId="a5233bd0-bbac-f111-aaad-00224819a344" CustomizationLevel="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="utf-8"?>
+<PluginAssembly FullName="FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginAssemblyId="a5233bd0-bbac-f111-aaad-00224819a344" CustomizationLevel="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Description>FMCentralBms validation and sync-command plug-ins.</Description>
   <IsolationMode>2</IsolationMode>
   <SourceType>0</SourceType>
   <IntroducedVersion>1.0</IntroducedVersion>
   <FileName>/PluginAssemblies/FMCentralBmsPlugins-A5233BD0-BBAC-F111-AAAD-00224819A344/FMCentralBmsPlugins.dll</FileName>
   <PluginTypes>
-    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.QueueSyncNotification, FMCentralBms.Plugins, Version=1.0.0.5, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="11f22fbf-73b1-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.QueueSyncNotification">
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.ClaimSpoChange, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="57ee3426-01b7-f111-aaae-00224819a344" Name="FMCentralBms.Plugins.ClaimSpoChange">
+      <FriendlyName>Claim SPO Change</FriendlyName>
+    </PluginType>
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.DetectSpoChange, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="55ee3426-01b7-f111-aaae-00224819a344" Name="FMCentralBms.Plugins.DetectSpoChange">
+      <FriendlyName>Detect SPO Change</FriendlyName>
+    </PluginType>
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.QueueSyncNotification, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="11f22fbf-73b1-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.QueueSyncNotification">
       <FriendlyName>Queue Sync Notification</FriendlyName>
     </PluginType>
-    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequestBmsSync, FMCentralBms.Plugins, Version=1.0.0.5, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="44a65cba-b0ad-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequestBmsSync">
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RecordChangeLog, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="f1dd7391-f1b6-f111-aaae-00224819a344" Name="FMCentralBms.Plugins.RecordChangeLog">
+      <FriendlyName>Record BMS Change Log</FriendlyName>
+    </PluginType>
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequestBmsSync, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="44a65cba-b0ad-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequestBmsSync">
       <FriendlyName>Request BMS Sync</FriendlyName>
     </PluginType>
-    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequestFullSync, FMCentralBms.Plugins, Version=1.0.0.5, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="fe50d30b-ddb0-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequestFullSync">
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequestFullSync, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="fe50d30b-ddb0-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequestFullSync">
       <FriendlyName>Request Full Sync</FriendlyName>
     </PluginType>
-    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequestSpoSync, FMCentralBms.Plugins, Version=1.0.0.5, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="1eb47255-adb0-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequestSpoSync">
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequestSpoSync, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="1eb47255-adb0-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequestSpoSync">
       <FriendlyName>Request SPO Sync</FriendlyName>
     </PluginType>
-    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequireEquipmentBuilding, FMCentralBms.Plugins, Version=1.0.0.5, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="00c79fe3-bbac-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequireEquipmentBuilding">
+    <PluginType AssemblyQualifiedName="FMCentralBms.Plugins.RequireEquipmentBuilding, FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" PluginTypeId="00c79fe3-bbac-f111-aaad-00224819a344" Name="FMCentralBms.Plugins.RequireEquipmentBuilding">
       <FriendlyName>Require Equipment Building</FriendlyName>
     </PluginType>
   </PluginTypes>

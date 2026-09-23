@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Name LocalizedName="SPO Import Row" OriginalName="SPO Import Row">fmc_spoimportrow</Name>
   <EntityInfo>
@@ -208,6 +208,7 @@
           <LogicalName>fmc_fileid</LogicalName>
           <RequiredLevel>required</RequiredLevel>
           <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
           <ValidForUpdateApi>1</ValidForUpdateApi>
           <ValidForReadApi>1</ValidForReadApi>
           <ValidForCreateApi>1</ValidForCreateApi>
@@ -863,9 +864,9 @@
           <IntroducedVersion>1.0.0.0</IntroducedVersion>
           <IsCustomizable>0</IsCustomizable>
           <EntityKeyAttributes>
+            <AttributeName>fmc_sourceetag</AttributeName>
             <AttributeName>fmc_fileid</AttributeName>
             <AttributeName>fmc_ordinal</AttributeName>
-            <AttributeName>fmc_sourceetag</AttributeName>
           </EntityKeyAttributes>
           <displaynames>
             <displayname description="SPO File Version Ordinal" languagecode="1033" />

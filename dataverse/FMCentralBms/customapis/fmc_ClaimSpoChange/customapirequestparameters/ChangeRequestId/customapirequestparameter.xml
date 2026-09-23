@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="ChangeRequestId">
+  <displayname default="Change Request ID">
+    <label description="Change Request ID" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>ChangeRequestId</name>
+  <type>12</type>
+</customapirequestparameter>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <systemform>
     <formid>{ee6941bd-20aa-4e47-9e89-2dae37f337bf}</formid>
@@ -70,6 +70,23 @@
                       </cell>
                     </row>
                   </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_spoingestion" id="{518441cc-23d4-8d6b-81b9-101ae7a4ada1}" showlabel="true" expanded="true">
+          <labels>
+            <label description="SPO File Ingestion" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_spoingestion_details" id="{f573d07d-912e-8a86-b048-cb7226e70400}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="SPO File Ingestion" languagecode="1033" />
+                  </labels>
+                  <rows />
                 </section>
               </sections>
             </column>

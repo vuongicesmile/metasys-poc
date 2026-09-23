@@ -1,0 +1,10 @@
+<botcomponent schemaname="fmc_BmsOperationsAssistant.action.MicrosoftPowerApps-PowerAppsMCPServer">
+  <componenttype>9</componenttype>
+  <iscustomizable>0</iscustomizable>
+  <name>Microsoft Power Apps - Power Apps MCP Server</name>
+  <parentbotid>
+    <schemaname>fmc_BmsOperationsAssistant</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

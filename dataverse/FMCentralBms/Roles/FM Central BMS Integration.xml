@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Role id="{46639136-95aa-f111-aaad-00224819a344}" name="FM Central BMS Integration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <IsCustomizable>1</IsCustomizable>
   <IsAutoAssigned>0</IsAutoAssigned>
@@ -13,6 +13,7 @@
     <RolePrivilege name="prvCreatefmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmspoint" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmsreading" level="Global" />
+    <RolePrivilege name="prvCreatefmc_changelog" level="Global" />
     <RolePrivilege name="prvCreatefmc_notification" level="Global" />
     <RolePrivilege name="prvCreatefmc_syncrequest" level="Global" />
     <RolePrivilege name="prvCreateSharePointData" level="Global" />
@@ -20,6 +21,7 @@
     <RolePrivilege name="prvReadfmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvReadfmc_bmspoint" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsreading" level="Global" />
+    <RolePrivilege name="prvReadfmc_changelog" level="Global" />
     <RolePrivilege name="prvReadfmc_notification" level="Global" />
     <RolePrivilege name="prvReadfmc_syncrequest" level="Global" />
     <RolePrivilege name="prvReadPluginAssembly" level="Global" />

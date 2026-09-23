@@ -12,6 +12,7 @@ public sealed record WorkerCommandLine(string[] CommandArgs, string[] HostArgs, 
         {
             "--provision", "--register-plugin", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once",
             "--spo-ingestion-status", "--provision-spo-ingestion", "--verify-spo-ingestion",
+            "--spo-change-status", "--provision-spo-changes", "--verify-spo-changes",
             "--deploy-change-log", "--change-log-status", "--provision-building-code"
         };
         if (args.Contains("--deploy-change-log") || args.Contains("--change-log-status"))

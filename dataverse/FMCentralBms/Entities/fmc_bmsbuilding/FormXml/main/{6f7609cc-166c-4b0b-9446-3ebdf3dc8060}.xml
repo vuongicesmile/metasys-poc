@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <systemform>
     <formid>{6f7609cc-166c-4b0b-9446-3ebdf3dc8060}</formid>
@@ -67,6 +67,41 @@
                             <RelationshipName>fmc_bmsbuilding_bmsequipment</RelationshipName>
                             <ChartGridMode>Grid</ChartGridMode>
                             <RecordsPerPage>10</RecordsPerPage>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_bmsrelations" id="{903ee82f-c664-805e-beca-01fc1506f812}" showlabel="true" expanded="true">
+          <labels>
+            <label description="BMS Details and Relationships" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_bmsrelation_details" id="{b7fcc691-b816-8fae-b914-e19c6ee7e1aa}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="BMS Details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{22402260-d837-8f63-9b72-ae3984a08083}" showlabel="true">
+                        <labels>
+                          <label description="BMS Equipment" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_bmsrelatedrecords" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+                          <parameters>
+                            <TargetEntityType>fmc_bmsequipment</TargetEntityType>
+                            <ViewId>{cde799a9-b744-48d4-a45f-acef4de36dab}</ViewId>
+                            <IsUserView>false</IsUserView>
+                            <RelationshipName>fmc_bmsbuilding_bmsequipment</RelationshipName>
+                            <RecordsPerPage>10</RecordsPerPage>
+                            <EnableQuickFind>false</EnableQuickFind>
                           </parameters>
                         </control>
                       </cell>

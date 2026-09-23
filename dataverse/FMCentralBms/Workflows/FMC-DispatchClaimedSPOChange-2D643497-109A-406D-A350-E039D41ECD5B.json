@@ -1,0 +1,183 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedsharepointonline"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "SpoSiteUrl": {
+          "type": "String",
+          "defaultValue": "https://titancorpvncom.sharepoint.com/sites/Powerplatform",
+          "metadata": {
+            "schemaName": "fmc_SpoSiteUrl"
+          }
+        },
+        "SpoLibraryId": {
+          "type": "String",
+          "defaultValue": "7d9282a4-c45d-4ef8-8719-18f78e71d0d0",
+          "metadata": {
+            "schemaName": "fmc_SpoLibraryId"
+          }
+        },
+        "SpoInboxPath": {
+          "type": "String",
+          "defaultValue": "/Shared Documents/FMC-Inbox",
+          "metadata": {
+            "schemaName": "fmc_SpoInboxPath"
+          }
+        },
+        "SpoSourceNamespace": {
+          "type": "String",
+          "defaultValue": "bms_spo_dev01",
+          "metadata": {
+            "schemaName": "fmc_SpoSourceNamespace"
+          }
+        }
+      },
+      "triggers": {
+        "When_SPO_change_claimed": {
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "BusinessEventsTrigger",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "catalog": "eef0e546-6cbf-49a7-acc3-0d6b1c3f940f",
+              "category": "31f00635-c05c-4de8-9619-f63fef619d9b",
+              "subscriptionRequest/entityname": "none",
+              "subscriptionRequest/sdkmessagename": "fmc_ClaimSpoChange"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Claim_won": {
+          "type": "If",
+          "runAfter": {},
+          "expression": {
+            "equals": [
+              "@triggerBody()?['OutputParameters']?['Accepted']",
+              true
+            ]
+          },
+          "actions": {
+            "Dispatch_scoped_sync": {
+              "type": "Scope",
+              "runAfter": {},
+              "actions": {
+                "Request_exact_file_sync": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {},
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "PerformUnboundAction"
+                    },
+                    "parameters": {
+                      "actionName": "fmc_RequestSpoSync",
+                      "item/ClientRequestId": "@string(triggerBody()?['OutputParameters']?['DispatchId'])",
+                      "item/SourceKey": "@triggerBody()?['OutputParameters']?['SourceKey']",
+                      "item/ExpectedETag": "@triggerBody()?['OutputParameters']?['ExpectedETag']",
+                      "item/SharePointIdentifier": "@triggerBody()?['OutputParameters']?['SharePointIdentifier']"
+                    }
+                  }
+                },
+                "Record_dispatch_run": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {
+                    "Request_exact_file_sync": [
+                      "Succeeded"
+                    ]
+                  },
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "UpdateOnlyRecord"
+                    },
+                    "parameters": {
+                      "entityName": "fmc_spochangerequests",
+                      "recordId": "@triggerBody()?['OutputParameters']?['RequestId']",
+                      "item/fmc_flowrunid": "@workflow()?['run']?['name']"
+                    }
+                  }
+                }
+              }
+            },
+            "Record_dispatch_failure": {
+              "type": "Scope",
+              "runAfter": {
+                "Dispatch_scoped_sync": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "actions": {
+                "Mark_failed": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {},
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "UpdateOnlyRecord"
+                    },
+                    "parameters": {
+                      "entityName": "fmc_spochangerequests",
+                      "recordId": "@triggerBody()?['OutputParameters']?['RequestId']",
+                      "item/fmc_status": 789112004,
+                      "item/fmc_errormessage": "SPO-DISPATCH: scoped archive event failed; inspect this flow run.",
+                      "item/fmc_flowrunid": "@workflow()?['run']?['name']"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Already_claimed": {
+                "type": "Compose",
+                "inputs": "Another manual or automatic dispatch won the claim.",
+                "runAfter": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
