@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "SharePoint Watcher": {
+      "commandName": "Project",
+      "workingDirectory": "$(MSBuildProjectDirectory)\\..\\..",
+      "commandLineArgs": "watch-dataverse --config config/spo-ingestion.json --appsettings Dataverse.SyncWorker/Dataverse.SyncWorker.App/appsettings.json --max 20 --poll-seconds 10",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

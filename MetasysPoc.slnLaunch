@@ -1,0 +1,23 @@
+[
+  {
+    "Name": "All Services (Debug)",
+    "Projects": [
+      {
+        "Path": "BMS.Fake\\BMS.Fake.App\\BMS.Fake.App.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BMS.Ingestion\\BMS.Ingestion.App\\BMS.Ingestion.App.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Dataverse.SyncWorker\\Dataverse.SyncWorker.App\\Dataverse.SyncWorker.App.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SPO.Ingestion\\SPO.Ingestion.Cli\\SPO.Ingestion.Cli.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
