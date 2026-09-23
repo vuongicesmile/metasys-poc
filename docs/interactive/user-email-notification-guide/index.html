@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7fc">
+  <meta name="description" content="Hướng dẫn trực quan tạo Dataverse notification outbox và Power Automate email flow cho FMCentral BMS.">
+  <title>User Email Notifications · FMCentral BMS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%236b4eff'/%3E%3Cpath d='M9 13h22v15H9z' fill='none' stroke='white' stroke-width='2.5'/%3E%3Cpath d='m10 14 10 8 10-8' fill='none' stroke='white' stroke-width='2.5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="content.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#article">Đến nội dung hướng dẫn</a>
+  <header class="topbar">
+    <button class="icon-btn mobile-menu" id="menu-toggle" aria-label="Mở mục lục" aria-expanded="false">☰</button>
+    <a class="brand" href="#buoc-1" aria-label="FMCentral BMS · Bước đầu tiên">
+      <span class="brand-symbol" aria-hidden="true">✉</span>
+      <span>FMCentral<span class="brand-sub">IMPLEMENTATION GUIDE</span></span>
+    </a>
+    <div class="header-divider"></div>
+    <span class="header-section">Dataverse User Email Notifications</span>
+    <div class="top-actions">
+      <span class="version-chip">Dataverse · Plug-in · Power Automate</span>
+      <button class="icon-btn" id="theme-toggle" aria-label="Chuyển giao diện tối">◐</button>
+      <a class="button outline small" href="../../runbooks/user-email-notifications.vi.md">Đọc Markdown ↗</a>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar" aria-label="Mục lục">
+    <div class="sidebar-heading">EMAIL NOTIFICATION <span>08</span></div>
+    <label class="search-box">
+      <span aria-hidden="true">⌕</span>
+      <input id="search" type="search" placeholder="Tìm trigger, choice, Outlook…" aria-label="Tìm trong hướng dẫn">
+      <kbd>/</kbd>
+    </label>
+    <nav id="navigation" aria-label="Các bước triển khai"></nav>
+    <p id="no-results" hidden>Không tìm thấy bước phù hợp.</p>
+    <div class="sidebar-footer">
+      <span class="tiny-label">TARGET POC</span>
+      <strong>FMCentralBms</strong>
+      <span>Developer environment · fmc prefix</span>
+      <a class="text-button" href="../../plans/user-email-notifications.vi.md">Xem plan & receipt ↗</a>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="breadcrumb"><span>Hướng dẫn</span><span aria-hidden="true">/</span><span id="breadcrumb-current">Tổng quan</span></div>
+    <div class="reading-progress"><div id="reading-progress"></div></div>
+    <div class="lesson-grid">
+      <section class="lesson">
+        <div class="eyebrow"><span class="green-dot"></span><span id="lesson-category">KIẾN TRÚC</span><span class="chapter-count" id="chapter-count">BƯỚC 01 / 08</span></div>
+        <h1 id="lesson-title">Email có receipt,<br>không rollback sync.</h1>
+        <p class="lesson-lead" id="lesson-lead"></p>
+        <div id="lesson-intro"></div>
+        <article id="article" class="prose" aria-label="Nội dung chi tiết"></article>
+        <div class="lesson-pagination">
+          <button class="pagination-button" id="previous"><span>← Bước trước</span><strong id="previous-title"></strong></button>
+          <button class="pagination-button next" id="next"><span>Bước tiếp theo →</span><strong id="next-title"></strong></button>
+        </div>
+        <footer class="content-footer">Nguồn: metasys-poc <span>·</span> Tiếng Việt <span>·</span> cập nhật 22.09.2026</footer>
+      </section>
+
+      <aside class="inspector" aria-label="Sơ đồ, schema và checklist">
+        <div class="inspector-heading">
+          <span class="lab-icon" aria-hidden="true">✉</span>
+          <div><strong>Nhìn luồng trước khi làm</strong><span>Đúng contract đang triển khai</span></div>
+          <span class="local-tag">LOCAL GUIDE</span>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Công cụ hỗ trợ">
+          <button role="tab" id="tab-flow" aria-controls="panel-flow" aria-selected="true" data-tab="flow">Flow map</button>
+          <button role="tab" id="tab-schema" aria-controls="panel-schema" aria-selected="false" data-tab="schema">Schema</button>
+          <button role="tab" id="tab-checklist" aria-controls="panel-checklist" aria-selected="false" data-tab="checklist">Checklist</button>
+        </div>
+
+        <section id="panel-flow" role="tabpanel" aria-labelledby="tab-flow">
+          <div class="flow-stack" id="flow-stack" aria-label="Luồng gửi email"></div>
+          <div class="line-explanation" id="flow-detail" aria-live="polite"></div>
+        </section>
+
+        <section id="panel-schema" role="tabpanel" aria-labelledby="tab-schema" hidden>
+          <label class="file-select-label" for="schema-search">TÌM COLUMN</label>
+          <input id="schema-search" type="search" placeholder="Ví dụ: status, correlation, sent…">
+          <div class="schema-list" id="schema-list"></div>
+          <p class="lab-footnote" id="schema-count"></p>
+        </section>
+
+        <section id="panel-checklist" role="tabpanel" aria-labelledby="tab-checklist" hidden>
+          <div class="check-progress"><div><strong id="check-count">0 / 8</strong><span> bước hoàn thành</span></div><div class="progress-track"><div id="check-progress-bar"></div></div></div>
+          <div id="checklist" class="checklist"></div>
+          <button class="button outline full" id="reset-checklist">Làm lại checklist</button>
+          <p class="lab-footnote">Tiến độ chỉ lưu trong browser này; không ghi Dataverse.</p>
+        </section>
+        <div class="inspector-footer"><span aria-hidden="true">↳</span> UI local · không gọi cloud · không lưu credential</div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p>Hãy bật JavaScript hoặc đọc docs/runbooks/user-email-notifications.vi.md.</p></noscript>
+</body>
+</html>

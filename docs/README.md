@@ -6,10 +6,14 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
 | Runbook | [Change Log bằng plugin](runbooks/change-log-plugin.vi.md) | Ghi vết Create/Update/Delete Building và Equipment; source chuẩn bị, chưa deploy do thiếu khóa ký |
+| Plan | [Agents trong Power Apps BMS](plans/power-apps-bms-agents.vi.md) | Assistant tra dữ liệu/chẩn đoán sync, gọi Custom API, roadmap Agent feed và tích hợp PCF; Agent MVP đã publish, tools/host còn chờ |
+| Runbook | [BMS Operations Assistant](runbooks/power-apps-bms-agents.vi.md) | Deploy, test guardrail Agent, đóng gói source và điều kiện thêm Agent Flow tools |
+| Reference | [BMS Operations Assistant](reference/bms-operations-assistant.vi.md) | Tool contract, guardrail và evaluation cases của Agent source |
 | Reference | [Persistence boundaries và DI](reference/persistence-boundaries.vi.md) | Unit of Work, scoped context và transaction boundary của các service |
 | Plan | [PCF components cho FMC BMS Demo](plans/pcf-components-demo.vi.md) | `BmsPointGrid` 1.0.1 đã deploy và bind Current Points; kiểm tra UI và Equipment subgrid còn chờ |
 | Plan | [Notification người dùng qua email](plans/user-email-notifications.vi.md) | Yêu cầu PDF, notification outbox, plug-in producer, Power Automate dispatcher và roadmap approval/escalation |
 | Runbook | [Deploy và test user email notification](runbooks/user-email-notifications.vi.md) | Provision schema/plug-in, cấu hình Outlook connection reference, deploy flow và đọc delivery receipt |
+| Interactive guide | [User email notification guide](interactive/user-email-notification-guide/index.html) | UI 8 bước: flow map, schema search, expression copy nhanh và checklist triển khai Dataverse/Power Automate |
 | Runbook | [Release Dataverse bằng Git tag](runbooks/tag-release-dataverse.vi.md) | Push tag, tự build/test/deploy qua runner local, receipt, retry và rollback |
 | Reference | [Kiến trúc service và hướng dẫn mở rộng](reference/service-architecture.vi.md) | Cấu trúc backend/dashboard, dependency injection, thêm adapter, build và test |
 | Reference | [BMS Ingestion — cách sử dụng và bố trí code](reference/bms-ingestion.vi.md) | Chạy BMS ingestion, endpoint, DTO/interface, EF Core mapping và cách mở rộng |

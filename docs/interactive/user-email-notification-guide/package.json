@@ -1,0 +1,14 @@
+{
+  "name": "fmc-user-email-notification-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test verify.mjs",
+    "test:browser": "node verify-browser.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
