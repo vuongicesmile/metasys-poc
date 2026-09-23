@@ -1,6 +1,6 @@
 # Plan áp dụng Agents vào Power Apps BMS
 
-Ngày khảo sát: 2026-09-22. Trạng thái: **P1 Agent MVP đã publish; tool flows và Power Apps host chưa triển khai**.
+Ngày khảo sát: 2026-09-22. Cập nhật 2026-09-23: **P1 Agent MVP và thẻ mở chat ở đầu Home đã publish; M365 host/default-agent binding và tool flows chưa triển khai hoặc nghiệm thu**.
 
 Cập nhật implementation 2026-09-22: `BMS Operations Assistant`
 (`fmc_BmsOperationsAssistant`) đã được tạo và publish trên Developer

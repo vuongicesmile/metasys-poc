@@ -1,12 +1,23 @@
 # BMS Operations Assistant - deploy va test
 
-Trang thai cap nhat: 2026-09-22.
+Trang thai cap nhat: 2026-09-23.
 
 Runbook nay ghi nhan phan da trien khai cua P1 trong
 [plan Agents](../plans/power-apps-bms-agents.vi.md). Day la Copilot Studio
 Agent co guardrail BMS va system topics; chua co Agent Flow tool doc/ghi, va
 chua duoc bind vao model-driven app. Khong duoc gioi thieu no nhu mot nut chat
 trong BMS Operations Center cho den khi P0 host duoc xac minh trong maker UI.
+
+Source Home hien co the **BMS Operations Assistant** ngay sau hero, truoc KPI.
+The nay ghi ro Agent chua duoc ket noi voi app va co nut **Mo khung chat**.
+Nut nay chi goi
+`Xrm.Copilot.isM365CopilotEnabled` va `openM365CopilotPanel` cua model-driven
+host; no hien loi ro rang neu host/license chua san sang. Source da qua build,
+UI tests, PAC transpile va **da publish len Home cua FMC BMS Demo**; chua bind
+`BMS Operations Assistant` lam default agent. Nut mo M365 Copilot khong tu dong
+chuyen Copilot Studio bot ID thanh M365 agent ID; khong duoc goi day la BMS
+chat hoan chinh. [Xrm.Copilot API](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/xrm-copilot),
+[cach gan default agent](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/customize-microsoft-365-copilot-chat).
 
 ## 1. Trang thai da deploy
 
@@ -21,11 +32,51 @@ trong BMS Operations Center cho den khi P0 host duoc xac minh trong maker UI.
 | Source version control | `dataverse/agent-source/BmsOperationsAssistant` |
 | Contract/evaluation | [BMS Operations Assistant reference](../reference/bms-operations-assistant.vi.md) |
 
+Home launcher receipt 2026-09-23: PAC upload va publish dung page
+`9d05b7f9-f4c4-4572-b6b8-0220b51812f3` trong app
+`d19f4897-d227-4df3-8361-988f97c53e89`; download readback khop source,
+`ValidateApp` tra `ValidationSuccess=True`. Solution `FMCentralBms` duoc export
+va unpack; 342 file khong co diff noi dung sau khi chuan hoa UTF-8 BOM/newline.
+Chua kiem tra runtime click, license hay default-agent binding.
+
+Home visibility fix 2026-09-23: dua the Agent tu Quick actions len ngay duoi
+hero, truoc SPO banner va KPI. UI test xac nhan heading va nut nam trong
+viewport khi mo Home; build va agent-host unit tests pass. PAC upload/publish
+lai cung page ID tren Developer; download readback sau publish khop source
+sau khi chuan hoa BOM/newline. Chua co browser dang nhap de kiem tra runtime
+voi tai khoan nguoi dung; viec publish khong thay the host/default-agent binding.
+
 PAC tao Agent trong solution rieng `fmc_BmsOperationsAssistant`. Export cua
 tenant hien tai khong co `RootComponents` cho Agent va `solutioncomponent`
 khong tra ve `componenttype`; vi vay khong duoc dung `pac solution
 add-solution-component` voi mot ma type tu doan de ep no vao `FMCentralBms`.
 `FMCentralBms` va cac bang/flow sync dang co khong bi sua trong deploy nay.
+
+## Home chat launcher: deploy va kiem thu
+
+1. Xac nhan tenant/user co M365 Copilot theo
+   [prerequisites cua Microsoft](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/add-microsoft-365-copilot)
+   va bat M365 Copilot cho **FMC BMS Demo** trong app designer. Khong bat cho toan
+   environment neu chi can app nay.
+2. Trong Copilot Studio, cau hinh kenh Microsoft 365/Teams cho Agent va gan no
+   lam default agent cua app theo designer hien hanh. Kiem tra ID/ten Agent trong
+   runtime; `b2eb19f5-fa00-425e-ab27-752110753a14` la Copilot Studio bot ID,
+   khong duoc tu coi la `gptId` cua M365 Copilot.
+3. Home page da duoc publish tren Developer. Khi sua source sau nay, dung release
+   path `pac model genpage upload` cua repo voi app/page ID tren, download
+   readback va kiem tra `ValidateApp`. Khong tao page moi.
+4. Mo Home, kiem tra the Agent nam ngay duoi hero, bam **Mo khung chat**. Pass: native Copilot side pane mo. Neu thay
+   thong bao "Copilot chat chua duoc bat...", kiem tra license/app feature va
+   `isM365CopilotEnabled` trong model-driven runtime. Neu pane mo nhung Agent
+   BMS khong active, kiem tra default-agent binding; nut Home khong tu chon
+   Agent khac quyen nguoi dung.
+5. Test cau hoi `BLD016 co thiet bi nao?`. Truoc khi read tools P1 duoc gan,
+   Agent phai noi chua xac minh live data, khong duoc bia Equipment/count.
+
+App assistant agent la mot host preview khac, duoc tao/gan qua Agents pane cua
+app designer; khong tu dong dung Agent doc lap hien tai. Neu chon host do thay
+M365 Copilot, can thiet ke binding rieng truoc khi tuy bien Home launcher.
+[Microsoft: App assistant agent](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/add-app-assistant-agent).
 
 ## 2. Test ngay trong Copilot Studio
 

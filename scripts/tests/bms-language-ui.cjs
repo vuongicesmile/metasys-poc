@@ -55,6 +55,12 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         const url = `http://127.0.0.1:${server.address().port}`;
         await page.goto(url);
         await page.getByRole('heading', { name: 'BMS Operations Center1' }).waitFor();
+        const agentHeading = page.getByRole('heading', { name: 'BMS Operations Assistant' });
+        await agentHeading.waitFor();
+        const agentBounds = await agentHeading.boundingBox();
+        assert.ok(agentBounds && agentBounds.y >= 0 && agentBounds.y < page.viewportSize().height, 'Agent card must be visible at the top of Home');
+        assert.ok(await page.getByText('The agent is not connected to this app yet.', { exact: false }).isVisible());
+        assert.ok(await page.getByRole('button', { name: 'Open chat pane' }).isVisible());
         await page.getByText('Queued', { exact: true }).waitFor();
         assert.equal(await page.getByRole('combobox', { name: 'Language' }).inputValue(), 'en');
         assert.equal(await page.locator('main').getAttribute('lang'), 'en');

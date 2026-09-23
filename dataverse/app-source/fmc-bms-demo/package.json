@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node build.cjs",
     "check": "node build.cjs --check",
-    "test": "npm run check && node ../../../scripts/tests/bms-language-ui.cjs && node ../../../scripts/tests/bms-language-ui.cjs --source"
+    "test": "npm run check && node ../../../scripts/tests/bms-language-ui.cjs && node ../../../scripts/tests/bms-language-ui.cjs --source && node --test ../../../scripts/tests/bms-agent-chat.cjs"
   },
   "devDependencies": {
     "@fluentui/react-components": "9.74.7",

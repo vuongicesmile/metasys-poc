@@ -5,6 +5,7 @@ import { localizedDate, localizedNumber, translate, statusLabel } from "./servic
 import { LATEST_LIMIT } from "./services/dashboardService";
 import { getFormattedValue, normalizeSearch, matchesSearch } from "./services/presentation";
 import { getSignedInUserName, openAppItem } from "./services/navigationService";
+import { openAgentChat } from "./services/agentChatService";
 import { useStyles } from "./styles/dashboardStyles";
 import { LanguageContext, useLanguagePreference } from "./hooks/useLanguage";
 import { useDashboard } from "./hooks/useDashboard";
@@ -35,6 +36,7 @@ import {
     ArrowClockwiseRegular,
     ArrowSyncRegular,
     BuildingRegular,
+    ChatRegular,
     CheckmarkCircleRegular,
     DatabaseRegular,
     DesktopRegular,
@@ -63,6 +65,8 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
     const canClaimChanges = canClaimSpoChanges();
     const [search, setSearch] = useState("");
     const [navigationError, setNavigationError] = useState<string | null>(null);
+    const [agentError, setAgentError] = useState<string | null>(null);
+    const [agentOpening, setAgentOpening] = useState(false);
     const pageRef = useRef<HTMLElement>(null);
 
     const scrollToBottom = () => {
@@ -81,6 +85,20 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
             await openAppItem(input);
         } catch {
             setNavigationError("Không thể mở mục đã chọn trong Power Apps. Vui lòng thử lại.");
+        }
+    };
+
+    const openChat = async () => {
+        setAgentError(null);
+        setAgentOpening(true);
+        try {
+            if ((await openAgentChat()) === "unavailable") {
+                setAgentError("Copilot chat chưa được bật hoặc chưa khả dụng cho tài khoản này trong Power Apps.");
+            }
+        } catch {
+            setAgentError("Không thể mở Copilot chat. Hãy thử lại hoặc kiểm tra cấu hình Agent trong app.");
+        } finally {
+            setAgentOpening(false);
         }
     };
 
@@ -326,6 +344,19 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
                         <Text className={styles.profileHint}>{t("Để đăng xuất, mở menu hồ sơ Power Apps ở góc trên bên phải rồi chọn “Đăng xuất”.")}</Text>
                     </aside>
                 </header>
+
+                <section className={styles.agentCard} aria-labelledby="agent-heading">
+                    <div className={styles.agentIcon}><ChatRegular aria-hidden="true" /></div>
+                    <div className={styles.agentCopy}>
+                        <Text className={styles.agentEyebrow}>{t("Trợ lý AI")}</Text>
+                        <h2 id="agent-heading" className={styles.agentTitle}>BMS Operations Assistant</h2>
+                        <Text className={styles.agentDescription}>{t("Agent chưa được kết nối với ứng dụng. Nếu Microsoft 365 Copilot đã bật, bạn có thể mở khung chat của Power Apps.")}</Text>
+                        {agentError && <Text className={styles.agentError} role="alert">{t(agentError)}</Text>}
+                    </div>
+                    <Button className={styles.agentButton} appearance="primary" icon={<ChatRegular />} onClick={() => void openChat()} disabled={agentOpening}>
+                        {agentOpening ? t("Đang mở Copilot chat") : t("Mở khung chat")}
+                    </Button>
+                </section>
 
                 <SpoChangeBanner
                     items={spoChanges.items}
