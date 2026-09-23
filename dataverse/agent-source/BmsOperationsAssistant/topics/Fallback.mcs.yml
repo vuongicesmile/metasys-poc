@@ -1,0 +1,25 @@
+mcs.metadata:
+  componentName: Fallback
+  description: This system topic triggers when the user's utterance does not match any existing topics.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnUnknownIntent
+  id: main
+  actions:
+    - kind: ConditionGroup
+      id: conditionGroup_LktzXw
+      conditions:
+        - id: conditionItem_tlGIVo
+          condition: =System.FallbackCount < 3
+          actions:
+            - kind: SendActivity
+              id: sendMessage_QZreqo
+              activity: |-
+                Tôi chưa xác định được bản ghi hoặc loại thao tác. Hãy nêu Building code,
+                Equipment code, Point object ID, sync request ID hoặc SharePoint path.
+                Ví dụ: "Kiểm tra SQL sync request 00000000-0000-0000-0000-000000000000".
+
+      elseActions:
+        - kind: BeginDialog
+          id: 5aXj5M
+          dialog: fmc_BmsOperationsAssistant.topic.Escalate

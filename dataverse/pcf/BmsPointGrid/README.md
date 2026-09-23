@@ -27,6 +27,12 @@ Luồng dữ liệu là `fmc_bmspoint` view/subgrid → `PcfPointDataSetAdapter`
 
 Giá trị `null` không thành `0`; SQL ID không được dùng làm number. `staleAfterMinutes` mặc định 30 nếu không cấu hình, chỉ đổi nhãn `Mới/Cũ/Chưa rõ`, không tạo alarm và không ghi ngược Dataverse.
 
+## BMS Operations Assistant Web Chat
+
+Version `1.0.2` adds a **BMS Assistant** button to this Point grid. The button opens an iframe panel from a Copilot Studio Web Chat URL supplied by the optional `agentWebChatUrl` input. Only HTTPS Microsoft-hosted URLs are accepted; the component does not accept raw HTML or scripts.
+
+The control is deployed to the existing `Active BMS Points` view in the Developer environment. Until `agentWebChatUrl` is configured in the view's PCF control parameters, the panel shows a setup message and does not connect to the agent. Get the real URL/embed source from Copilot Studio **Channels → Web app**; do not guess or commit auth tokens. Web Chat embed code requires the agent's **No authentication** mode, which makes the link usable by anyone who has it. This agent currently uses an Invoker-mode Power Apps MCP connection, so anonymous chat must not be assumed to have live Dataverse permissions or data access.
+
 ## Build local
 
 Chạy từ thư mục này:

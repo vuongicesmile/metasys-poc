@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="FMC.Bms" constructor="BmsPointGrid" version="1.0.1" display-name-key="BmsPointGrid_DisplayName" description-key="BmsPointGrid_Description" control-type="virtual">
+  <control namespace="FMC.Bms" constructor="BmsPointGrid" version="1.0.2" display-name-key="BmsPointGrid_DisplayName" description-key="BmsPointGrid_Description" control-type="virtual">
     <!-- Control chỉ dùng dataset do Power Apps cấp; không gọi service bên ngoài. -->
     <external-service-usage enabled="false">
     </external-service-usage>
@@ -16,6 +16,7 @@
     </data-set>
     <!-- Ngưỡng chỉ quyết định nhãn stale trên UI; không thay đổi dữ liệu Point. -->
     <property name="staleAfterMinutes" display-name-key="StaleAfterMinutes_DisplayName" description-key="StaleAfterMinutes_Description" of-type="Whole.None" usage="input" required="false" />
+    <property name="agentWebChatUrl" display-name-key="AgentWebChatUrl_DisplayName" description-key="AgentWebChatUrl_Description" of-type="SingleLine.Text" usage="input" required="false" />
     <resources>
       <code path="index.ts" order="1"/>
       <platform-library name="React" version="16.14.0" />

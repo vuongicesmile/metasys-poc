@@ -15,6 +15,9 @@ export interface PointGridText {
     readonly freshness: Record<"fresh" | "stale" | "unknown", string>;
     readonly total: (count: number) => string;
     readonly rowAction: (name: string) => string;
+    readonly assistant: string;
+    readonly closeAssistant: string;
+    readonly assistantNotConfigured: string;
 }
 
 const EN: PointGridText = {
@@ -32,7 +35,10 @@ const EN: PointGridText = {
     source: "Source",
     freshness: { fresh: "Current", stale: "Stale", unknown: "Unknown" },
     total: (count) => `${count} point(s)`,
-    rowAction: (name) => `Open ${name}`
+    rowAction: (name) => `Open ${name}`,
+    assistant: "BMS Assistant",
+    closeAssistant: "Close assistant",
+    assistantNotConfigured: "Configure the Copilot Studio Web Chat embed URL in this PCF control."
 };
 
 const VI: PointGridText = {
@@ -50,7 +56,10 @@ const VI: PointGridText = {
     source: "Nguồn",
     freshness: { fresh: "Mới", stale: "Cũ", unknown: "Chưa rõ" },
     total: (count) => `${count} Point`,
-    rowAction: (name) => `Mở ${name}`
+    rowAction: (name) => `Mở ${name}`,
+    assistant: "Trợ lý BMS",
+    closeAssistant: "Đóng trợ lý",
+    assistantNotConfigured: "Hãy cấu hình URL Web Chat của Copilot Studio trong PCF control này."
 };
 
 /** Model-driven app trả LCID 1066 cho Vietnamese; các ngôn ngữ khác fallback English. */

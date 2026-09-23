@@ -17,4 +17,6 @@
   <data name="SourceSystem_Description" xml:space="preserve"><value>Source system that supplied the Point.</value></data>
   <data name="StaleAfterMinutes_DisplayName" xml:space="preserve"><value>Stale after minutes</value></data>
   <data name="StaleAfterMinutes_Description" xml:space="preserve"><value>Minutes before the UI labels a reading as stale; this does not change data.</value></data>
+  <data name="AgentWebChatUrl_DisplayName" xml:space="preserve"><value>BMS Assistant Web Chat URL</value></data>
+  <data name="AgentWebChatUrl_Description" xml:space="preserve"><value>Public HTTPS Web Chat embed URL from Copilot Studio. Anyone with the URL can access the agent.</value></data>
 </root>

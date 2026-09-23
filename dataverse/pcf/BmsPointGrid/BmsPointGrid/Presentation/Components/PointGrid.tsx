@@ -12,11 +12,14 @@ export interface PointGridProps {
     readonly onNextPage: () => void;
     readonly onPreviousPage: () => void;
     readonly onOpenPoint: (id: string) => Promise<void>;
+    readonly agentWebChatUrl?: string;
 }
 
 /** Presentation chỉ render DTO và gọi callback; không đọc context hoặc dataset trực tiếp. */
 export function PointGrid(props: PointGridProps): React.ReactElement {
     const [actionError, setActionError] = React.useState<string | undefined>();
+    const [assistantOpen, setAssistantOpen] = React.useState(false);
+    const safeAgentWebChatUrl = getSafeAgentWebChatUrl(props.agentWebChatUrl);
 
     const openPoint = async (id: string): Promise<void> => {
         setActionError(undefined);
@@ -35,8 +38,17 @@ export function PointGrid(props: PointGridProps): React.ReactElement {
                 <h2 className="fmc-point-grid__title">{props.text.title}</h2>
                 {props.model.totalResultCount !== undefined && <span className="fmc-point-grid__count">{props.text.total(props.model.totalResultCount)}</span>}
             </div>
-            <Button appearance="secondary" onClick={props.onRefresh} disabled={props.model.isLoading}>{props.text.refresh}</Button>
+            <div className="fmc-point-grid__header-actions">
+                <Button appearance="secondary" onClick={() => setAssistantOpen((open) => !open)} aria-expanded={assistantOpen}>
+                    {assistantOpen ? props.text.closeAssistant : props.text.assistant}
+                </Button>
+                <Button appearance="secondary" onClick={props.onRefresh} disabled={props.model.isLoading}>{props.text.refresh}</Button>
+            </div>
         </header>
+
+        {assistantOpen && <section className="fmc-point-grid__assistant" aria-label={props.text.assistant}>
+            {safeAgentWebChatUrl ? <iframe className="fmc-point-grid__assistant-frame" src={safeAgentWebChatUrl} title={props.text.assistant} referrerPolicy="no-referrer" allow="microphone" /> : <p role="status">{props.text.assistantNotConfigured}</p>}
+        </section>}
 
         {actionError && <div className="fmc-point-grid__state fmc-point-grid__state--error" role="alert">{actionError}</div>}
         {!hasRows ? <GridState
@@ -71,6 +83,19 @@ export function PointGrid(props: PointGridProps): React.ReactElement {
             <Button appearance="secondary" onClick={props.onNextPage} disabled={props.model.isLoading || !props.model.hasNextPage}>{props.text.next}</Button>
         </footer>
     </section>;
+}
+
+/** Only allow an HTTPS Microsoft Copilot host; never treat control metadata as executable HTML. */
+function getSafeAgentWebChatUrl(value: string | null | undefined): string | undefined {
+    if (!value?.trim()) return undefined;
+    try {
+        const url = new URL(value.trim());
+        const host = url.hostname.toLowerCase();
+        const isMicrosoftHost = host === "microsoft.com" || host.endsWith(".microsoft.com") || host === "powerva.microsoft.com" || host.endsWith(".powerva.microsoft.com");
+        return url.protocol === "https:" && isMicrosoftHost ? url.toString() : undefined;
+    } catch {
+        return undefined;
+    }
 }
 
 /** Format chỉ để đọc trên browser; Date gốc vẫn được giữ UTC trong DTO. */

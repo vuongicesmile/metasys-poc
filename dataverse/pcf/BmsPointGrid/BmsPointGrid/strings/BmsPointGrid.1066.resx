@@ -17,4 +17,6 @@
   <data name="SourceSystem_Description" xml:space="preserve"><value>Hệ thống nguồn cung cấp Point.</value></data>
   <data name="StaleAfterMinutes_DisplayName" xml:space="preserve"><value>Số phút dữ liệu cũ</value></data>
   <data name="StaleAfterMinutes_Description" xml:space="preserve"><value>Số phút trước khi UI gắn nhãn dữ liệu cũ; không thay đổi dữ liệu.</value></data>
+  <data name="AgentWebChatUrl_DisplayName" xml:space="preserve"><value>URL Web Chat của Trợ lý BMS</value></data>
+  <data name="AgentWebChatUrl_Description" xml:space="preserve"><value>URL HTTPS công khai từ Copilot Studio; ai có URL này đều có thể truy cập agent.</value></data>
 </root>

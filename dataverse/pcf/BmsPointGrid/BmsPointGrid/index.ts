@@ -54,6 +54,7 @@ export class BmsPointGrid implements ComponentFramework.ReactControl<IInputs, IO
         return React.createElement(PointGrid, {
             model: viewModel,
             text: getText(context.userSettings.languageId),
+            agentWebChatUrl: context.parameters.agentWebChatUrl.raw ?? undefined,
             onRefresh: () => this.pointDataSource.refresh(),
             onNextPage: () => this.pointDataSource.loadNextPage(),
             onPreviousPage: () => this.pointDataSource.loadPreviousPage(),
