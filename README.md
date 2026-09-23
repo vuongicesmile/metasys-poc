@@ -56,8 +56,10 @@ Automate. The worker claims queued requests and drains their SQL cutoff; keep
 its window open and use Ctrl+C to stop until a production service identity is installed.
 See the [repeatable setup and operating steps (Vietnamese)](docs/runbooks/sql-to-dataverse-runbook.vi.md).
 Running `dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App` also starts the command worker.
-For this Developer environment it reuses the authenticated Azure CLI bundled by
-`rmit-fm-data`; no secret is copied into this repository. The Dataverse schema
+For this Developer environment it uses an authenticated Azure CLI and the
+checked-in portable token helper; no access token is copied into this repository.
+See the [home-machine plug-in/sync runbook](docs/runbooks/home-dataverse-plugin-sync.vi.md).
+The Dataverse schema
 has been provisioned, the initial SQL backlog has been delivered, and live rows
 were reconciled. See [Dataverse deployment](docs/reference/dataverse-deployment.md) for commands,
 production identity guidance, and tests.

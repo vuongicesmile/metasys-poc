@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using SPO.Ingestion.App.Hosting;
 using SPO.Ingestion.Business.Abstractions;
@@ -161,11 +162,26 @@ Environment.ExitCode = exit;
 
 static SyncOptions LoadDataverseOptions(string path)
 {
-    // Chỉ đọc section Dataverse từ appsettings của SyncWorker và validate trước khi kết nối.
+    // Apply the same ignored per-machine override as the SQL worker. The SPO
+    // consumer still uses the checked-in target organization and source IDs.
     using var document = JsonDocument.Parse(File.ReadAllText(path));
     if (!document.RootElement.TryGetProperty("Dataverse", out var section))
         throw new InvalidOperationException($"Dataverse section is missing in '{path}'.");
-    var options = JsonSerializer.Deserialize<SyncOptions>(section.GetRawText(), SpoConfiguration.Json)
+    var merged = JsonNode.Parse(section.GetRawText())?.AsObject()
+        ?? throw new InvalidOperationException($"Dataverse section is invalid in '{path}'.");
+    var localPath = Path.Combine(Path.GetDirectoryName(path)!, "appsettings.Local.json");
+    if (File.Exists(localPath))
+    {
+        using var local = JsonDocument.Parse(File.ReadAllText(localPath));
+        if (local.RootElement.TryGetProperty("Dataverse", out var localSection))
+        {
+            var overrides = JsonNode.Parse(localSection.GetRawText())?.AsObject()
+                ?? throw new InvalidOperationException($"Dataverse section is invalid in '{localPath}'.");
+            foreach (var entry in overrides)
+                merged[entry.Key] = entry.Value?.DeepClone();
+        }
+    }
+    var options = JsonSerializer.Deserialize<SyncOptions>(merged.ToJsonString(), SpoConfiguration.Json)
         ?? throw new InvalidOperationException($"Dataverse section is invalid in '{path}'.");
     options.Validate();
     return options;

@@ -47,22 +47,19 @@ object_id. partitionid is the SHA256 hex of object_id. Preserve the exact
 implementation. Current history TTL defaults to 2,592,000 seconds, calculated
 from reading time; a change does not automatically rewrite existing records.
 
-## Windows and shared developer authentication
+## Windows developer authentication
 
-The source workspace is /home/tt/data-platform-project/rmit-fm-data in WSL
-Ubuntu-22.04. Windows accesses it at
-`\\wsl.localhost\Ubuntu-22.04\home\tt\data-platform-project\rmit-fm-data`.
-
-The configured DeveloperTokenPython is the Windows Python bundled under that
-workspace's .tools/azure-cli/Scripts/python.exe. The local helper
+The checked-in `DeveloperTokenPython` is `python` on PATH and
+`DeveloperTokenScript` is resolved relative to the checkout. The local helper
 [scripts/get-dataverse-token.py](../../../../scripts/get-dataverse-token.py)
-invokes Azure CLI to obtain a token. Do not display its normal stdout.
+invokes the installed Azure CLI (or an existing `azure.cli` Python environment)
+to obtain a token. An ignored `appsettings.Local.json` can override paths or
+SQL Server per machine. Do not display the helper's normal stdout.
 
 A token-only probe, when diagnosing authentication:
 
 ```powershell
-$syncConfig = Get-Content -LiteralPath .\Dataverse.SyncWorker\Dataverse.SyncWorker.App\appsettings.json -Raw | ConvertFrom-Json
-& $syncConfig.Dataverse.DeveloperTokenPython $syncConfig.Dataverse.DeveloperTokenScript --probe
+python .\scripts\get-dataverse-token.py --probe
 ```
 
 The probe outputs only a status/length marker. It does not prove Dataverse

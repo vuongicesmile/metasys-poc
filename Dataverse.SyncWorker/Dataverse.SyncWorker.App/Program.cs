@@ -12,6 +12,18 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = AppContext.BaseDirectory
 });
 
+// A per-machine override stays outside Git. Standard dotnet run output is
+// bin/<configuration>/<framework>; published services keep using their normal
+// environment/certificate configuration when this source file is absent.
+var projectDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+var localSettings = Path.Combine(projectDirectory, "appsettings.Local.json");
+if (File.Exists(localSettings))
+{
+    builder.Configuration.AddJsonFile(localSettings, optional: false, reloadOnChange: false);
+    builder.Configuration.AddEnvironmentVariables();
+    builder.Configuration.AddCommandLine(commandLine.HostArgs);
+}
+
 // Cho phép cài process này thành Windows Service với tên ổn định.
 builder.Host.UseWindowsService(options => options.ServiceName = "FMCentralDataverseSync");
 

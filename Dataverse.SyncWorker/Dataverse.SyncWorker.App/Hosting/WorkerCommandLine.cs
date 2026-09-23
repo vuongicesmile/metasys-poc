@@ -10,7 +10,7 @@ public sealed record WorkerCommandLine(string[] CommandArgs, string[] HostArgs, 
         args = remainingArgs;
         var commands = new[]
         {
-            "--provision", "--register-plugin", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once",
+            "--provision", "--register-plugin", "--plugin-status", "--run-once", "--self-test", "--verify", "--enqueue", "--process-command-once",
             "--spo-ingestion-status", "--provision-spo-ingestion", "--verify-spo-ingestion",
             "--spo-change-status", "--provision-spo-changes", "--verify-spo-changes",
             "--deploy-change-log", "--change-log-status", "--provision-building-code"

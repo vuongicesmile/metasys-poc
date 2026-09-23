@@ -77,7 +77,7 @@ public sealed class DataverseConnection(SyncOptions options) : IDisposable
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-            start.ArgumentList.Add(options.DeveloperTokenScript);
+            start.ArgumentList.Add(ResolveTokenScript(options.DeveloperTokenScript));
             using var process = Process.Start(start) ?? throw new InvalidOperationException("Could not start the Dataverse developer token helper.");
             var stdout = process.StandardOutput.ReadToEndAsync();
             var stderr = process.StandardError.ReadToEndAsync();
@@ -85,12 +85,33 @@ public sealed class DataverseConnection(SyncOptions options) : IDisposable
             var token = (await stdout).Trim();
             _ = await stderr;
             if (process.ExitCode != 0 || token.Count(c => c == '.') != 2)
-                throw new InvalidOperationException("Dataverse developer token acquisition failed. Re-authenticate the rmit-fm-data Azure CLI session.");
+                throw new InvalidOperationException("Dataverse developer token acquisition failed. Sign in to Azure CLI for the configured tenant and verify the local token helper.");
             _developerToken = token;
             _developerTokenValidUntil = ReadExpiry(token);
             return token;
         }
         finally { _tokenGate.Release(); }
+    }
+
+    private static string ResolveTokenScript(string configuredPath)
+    {
+        if (Path.IsPathFullyQualified(configuredPath))
+        {
+            if (File.Exists(configuredPath)) return configuredPath;
+            throw new FileNotFoundException("Dataverse token helper was not found.", configuredPath);
+        }
+
+        // A checkout can run from the repository root, Visual Studio, or a
+        // project's bin/<configuration>/<framework> directory.
+        foreach (var start in new[] { Environment.CurrentDirectory, System.AppContext.BaseDirectory })
+        {
+            for (var directory = new DirectoryInfo(start); directory is not null; directory = directory.Parent)
+            {
+                var candidate = Path.Combine(directory.FullName, configuredPath);
+                if (File.Exists(candidate)) return candidate;
+            }
+        }
+        throw new FileNotFoundException("Dataverse token helper was not found relative to this checkout.", configuredPath);
     }
 
     private static DateTimeOffset ReadExpiry(string token)

@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using DataverseSyncWorker.Models;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -29,10 +30,40 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
     private const string NotificationPluginTypeName = "FMCentralBms.Plugins.QueueSyncNotification";
     private const string Table = "fmc_bmsequipment";
     private const string Solution = DataverseProvisioner.Solution;
+    private const string Publisher = "FMCentralBmsPublisher";
 
     // Dataverse solution component type codes for plug-in type, assembly and step.
     private const int PluginAssemblyComponent = 91;
     private const int StepComponent = 92;
+
+    public async Task PrintPluginStatus()
+    {
+        var client = connection.Get();
+        var solutionId = await FindSolutionId(client);
+        var query = new QueryExpression("pluginassembly")
+        {
+            ColumnSet = new ColumnSet("name", "version", "publickeytoken")
+        };
+        query.Criteria.AddCondition("name", ConditionOperator.Equal, AssemblyName);
+        var matches = (await client.RetrieveMultipleAsync(query)).Entities;
+        if (matches.Count > 1)
+            throw new InvalidOperationException($"Found multiple Dataverse assemblies named '{AssemblyName}'.");
+        var assembly = matches.SingleOrDefault();
+        Console.WriteLine(JsonSerializer.Serialize(new
+        {
+            Environment = options.Url,
+            Organization = options.ExpectedOrganizationId,
+            Solution,
+            Publisher,
+            SolutionId = solutionId,
+            Assembly = assembly is null ? null : new
+            {
+                assembly.Id,
+                Version = assembly.GetAttributeValue<string>("version"),
+                PublicKeyToken = assembly.GetAttributeValue<string>("publickeytoken")
+            }
+        }));
+    }
 
     public async Task Register(string assemblyPath)
     {
@@ -43,6 +74,7 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
         var localVersion = System.Reflection.AssemblyName.GetAssemblyName(fullPath).Version?.ToString()
             ?? throw new InvalidOperationException("Plug-in assembly has no version.");
         var client = connection.Get();
+        var solutionId = await FindSolutionId(client);
         var assembly = await EnsureAssembly(client, fullPath, localVersion);
         var validationPluginType = await EnsurePluginType(client, assembly.Id,
             ValidationPluginTypeName, "Require Equipment Building");
@@ -58,8 +90,6 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
             FullRequestPluginTypeName, "Request Full Sync");
         var notificationPluginType = await EnsurePluginType(client, assembly.Id,
             NotificationPluginTypeName, "Queue Sync Notification");
-        var solutionId = await FindSolutionId(client);
-
         await AddToSolution(client, solutionId, assembly.Id, PluginAssemblyComponent,
             $"assembly {AssemblyName}", addRequiredComponents: false);
 
@@ -564,12 +594,17 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
 
     private static async Task<Guid> FindSolutionId(ServiceClient client)
     {
-        var query = new QueryExpression("solution") { ColumnSet = new ColumnSet(false) };
+        var query = new QueryExpression("solution") { ColumnSet = new ColumnSet("publisherid") };
         query.Criteria.AddCondition("uniquename", ConditionOperator.Equal, Solution);
         var matches = (await client.RetrieveMultipleAsync(query)).Entities;
-        return matches.Count == 1
-            ? matches[0].Id
-            : throw new InvalidOperationException($"Expected one solution '{Solution}', found {matches.Count}.");
+        if (matches.Count != 1)
+            throw new InvalidOperationException($"Expected one solution '{Solution}', found {matches.Count}.");
+        var publisher = matches[0].GetAttributeValue<EntityReference>("publisherid")
+            ?? throw new InvalidOperationException($"Solution '{Solution}' has no publisher.");
+        var publisherRecord = await client.RetrieveAsync("publisher", publisher.Id, new ColumnSet("uniquename"));
+        if (publisherRecord.GetAttributeValue<string>("uniquename") != Publisher)
+            throw new InvalidOperationException($"Solution '{Solution}' has an unexpected publisher.");
+        return matches[0].Id;
     }
 
     private static async Task AddToSolution(

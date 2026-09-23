@@ -115,6 +115,11 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             await services.GetRequiredService<DataversePluginProvisioner>().Register(pluginPath);
             return true;
         }
+        if (args.Contains("--plugin-status"))
+        {
+            await services.GetRequiredService<DataversePluginProvisioner>().PrintPluginStatus();
+            return true;
+        }
         if (args.Contains("--verify")) { await Verification.Reconcile(services); return true; }
         if (args.Contains("--enqueue"))
         {

@@ -16,6 +16,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | Runbook | [Deploy và test user email notification](runbooks/user-email-notifications.vi.md) | Provision schema/plug-in, cấu hình Outlook connection reference, deploy flow và đọc delivery receipt |
 | Interactive guide | [User email notification guide](interactive/user-email-notification-guide/index.html) | UI 8 bước: flow map, schema search, expression copy nhanh và checklist triển khai Dataverse/Power Automate |
 | Runbook | [Release Dataverse bằng Git tag](runbooks/tag-release-dataverse.vi.md) | Push tag, tự build/test/deploy qua runner local, receipt, retry và rollback |
+| Runbook | [Publish plug-in và sync từ máy nhà](runbooks/home-dataverse-plugin-sync.vi.md) | Cấu hình per-machine, signing key gốc, xác thực, preflight/publish plug-in và chạy sync an toàn |
 | Reference | [Kiến trúc service và hướng dẫn mở rộng](reference/service-architecture.vi.md) | Cấu trúc backend/dashboard, dependency injection, thêm adapter, build và test |
 | Reference | [BMS Ingestion — cách sử dụng và bố trí code](reference/bms-ingestion.vi.md) | Chạy BMS ingestion, endpoint, DTO/interface, EF Core mapping và cách mở rộng |
 | Reference | [BMS Fake — cách sử dụng và bố trí code](reference/bms-fake.vi.md) | Chạy simulator, database riêng bằng EF Core, DTO, subscription, SSE và cách mở rộng |

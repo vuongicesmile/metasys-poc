@@ -146,9 +146,10 @@ def validate(plan, out):
     if plan["webResources"] or plan["dashboard"]:
         command("node", "--test", "scripts/tests/Test-BmsEventDemoLanguage.mjs", "scripts/tests/Test-EquipmentPluginTest.mjs")
     if plan["plugin"]:
-        key = os.environ.get("FMC_PLUGIN_SIGNING_KEY")
-        if not key or not Path(key).is_file():
-            raise ValueError("Plugin changed: set FMC_PLUGIN_SIGNING_KEY to the existing .snk; no cloud writes made")
+        key = Path(os.environ.get("FMC_PLUGIN_SIGNING_KEY") or
+                   ROOT / "Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.snk")
+        if not key.is_file():
+            raise ValueError("Plugin changed: the original signing key is missing; no cloud writes made")
         command("dotnet", "build", "Dataverse.Plugin/FMCentralBms.Plugins/FMCentralBms.Plugins.csproj", "-c", "Release",
                 f"-p:AssemblyOriginatorKeyFile={key}")
         dll = ROOT / "Dataverse.Plugin/FMCentralBms.Plugins/bin/Release/net48/FMCentralBms.Plugins.dll"

@@ -10,5 +10,6 @@
 # MSBuild Binary and Structured Log
 *.binlog
 
-# Keep the assembly signing key local; transfer it through a secure channel.
+# Only the existing FMCentralBms signing key is shared for this public POC.
 *.snk
+!FMCentralBms.Plugins.snk

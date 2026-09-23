@@ -79,17 +79,6 @@ jobs:
             Copy-Item -LiteralPath $receipts[0].FullName -Destination (Join-Path $state 'last-success.json')
           }
           "FMC_RELEASE_STATE=$state" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Restore plugin signing key
-        env:
-          FMC_PLUGIN_SIGNING_KEY_B64: ${{ secrets.FMC_PLUGIN_SIGNING_KEY_B64 }}
-        run: |
-          if (-not $env:FMC_PLUGIN_SIGNING_KEY_B64) {
-            Write-Host 'Plugin signing key is not configured; releases without plugin changes can continue.'
-            exit 0
-          }
-          $key = Join-Path $env:RUNNER_TEMP 'FMCentralBms.Plugins.snk'
-          [IO.File]::WriteAllBytes($key, [Convert]::FromBase64String($env:FMC_PLUGIN_SIGNING_KEY_B64))
-          "FMC_PLUGIN_SIGNING_KEY=$key" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Test release planner
         run: |
           python -m unittest discover -s scripts/tests -p test_release.py -v

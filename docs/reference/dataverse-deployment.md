@@ -68,7 +68,7 @@ Point → Equipment → Building joins, and 25 retained history samples. Ingesti
 continued after that cutoff, so later rows correctly remained pending for the
 next request.
 
-Local development reuses the signed-in Azure CLI bundled by `rmit-fm-data` via
+Local development uses the signed-in Azure CLI via the portable
 `scripts/get-dataverse-token.py`. No access token or refresh token is stored in
 this repository. Run the worker directly:
 

@@ -66,8 +66,8 @@ Test-Path .\Dataverse.Plugin\FMCentralBms.Plugins\FMCentralBms.Plugins.snk
 pac org who --environment https://org06cbc9ec.crm5.dynamics.com/
 ```
 
-Hai `Test-Path` phải trả `True`. Khóa `.snk` được giữ ở local; nếu clone trên
-máy khác, xem [hướng dẫn signing key](../../Dataverse.Plugin/FMCentralBms.Plugins/README.md).
+Hai `Test-Path` phải trả `True`. Khóa `.snk` gốc đã được check in vào public repo;
+nếu clone trên máy khác, xem [hướng dẫn signing key](../../Dataverse.Plugin/FMCentralBms.Plugins/README.md).
 Giữ nguyên key và assembly name để update đúng assembly đã triển khai.
 
 Đối chiếu organization ID `ab191700-b99e-f111-aaa0-000d3a80bb96`, environment
@@ -220,7 +220,7 @@ D:\metasys-poc\Dataverse.Plugin\FMCentralBms.Plugins\bin\Release\net48\FMCentral
 | `PreventEquipmentCodeChange.cs` | Source bạn vừa viết; giữ trong project |
 | `RequireEquipmentBuilding.cs` | Giữ lại để rule Building cũ vẫn có trong DLL |
 | `FMCentralBms.Plugins.dll` trong `bin/Release/net48` | Chọn file này để Update Assembly |
-| `.snk` | Dùng local khi ký DLL; không upload hay commit key |
+| `.snk` | Key gốc đã có trong repo để ký DLL cùng identity; không upload file key vào Dataverse |
 | `Microsoft.Xrm.Sdk.dll` và các DLL SDK | Không chọn làm plugin assembly |
 | DLL trong `dataverse/FMCentralBms/PluginAssemblies` | Bản export cũ, chưa tự cập nhật sau khi bạn build |
 

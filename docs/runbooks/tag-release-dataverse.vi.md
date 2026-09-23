@@ -39,7 +39,7 @@ Chạy từ root repo:
    npm --prefix dataverse/app-source/fmc-bms-demo run build
    ```
 
-2. Review và commit thay đổi trên `main`. Không đưa credential, `.snk`, `.env` hoặc runtime configuration riêng vào Git.
+2. Review và commit thay đổi trên `main`. Không đưa credential, `.env` hoặc runtime configuration riêng vào Git. Riêng `FMCentralBms.Plugins.snk` đã được project owner chấp nhận lưu trong public repo để build cùng assembly identity.
 
 3. Tạo release:
 
@@ -74,7 +74,7 @@ Thiết lập một lần:
 2. Tạo application user trong environment Developer, gán deployment role phù hợp để import/publish toàn bộ solution.
 3. Thêm federated credential với issuer `https://token.actions.githubusercontent.com`, audience `api://AzureADTokenExchange` và subject `repo:vuongicesmile/metasys-poc:environment:dataverse-dev`.
 4. Cấu hình variables `POWER_PLATFORM_CLIENT_ID` và `POWER_PLATFORM_TENANT_ID` trong GitHub environment `dataverse-dev`.
-5. Lưu khóa ký plugin dạng Base64 trong environment secret `FMC_PLUGIN_SIGNING_KEY_B64`. Release không đổi plugin vẫn chạy khi secret này chưa có; release có đổi plugin sẽ dừng trước cloud write nếu thiếu khóa.
+5. Khóa ký plugin gốc đã có trong public repo theo quyết định của project owner; không cần environment secret `FMC_PLUGIN_SIGNING_KEY_B64`. Vẫn giữ các credential triển khai trong GitHub environment, không commit token/client secret.
 
 Workflow cần `id-token: write` để GitHub phát token ngắn hạn. `pac auth create --githubFederated` đổi token đó lấy quyền của application user; `pac org who` và organization guard trong `release.py` chặn deployment nếu identity trỏ sai environment.
 
