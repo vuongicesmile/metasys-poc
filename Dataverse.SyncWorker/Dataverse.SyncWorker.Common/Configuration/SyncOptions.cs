@@ -1,4 +1,4 @@
-namespace DataverseSyncWorker.Models;
+namespace Dataverse.SyncWorker.Common.Configuration;
 
 public sealed class SyncOptions
 {
@@ -14,6 +14,8 @@ public sealed class SyncOptions
     public string SourceId { get; set; } = "FMC";
     public bool Enabled { get; set; } = true;
     public bool HistoryEnabled { get; set; } = true;
+    public bool SnapshotSyncEnabled { get; set; }
+    public long SnapshotStartSqlId { get; set; }
     public int HistoryTtlSeconds { get; set; } = 2592000;
     public int BatchSize { get; set; } = 100;
     public int PollIntervalSeconds { get; set; } = 10;
@@ -38,6 +40,9 @@ public sealed class SyncOptions
             throw new InvalidOperationException("Dataverse:Url must use HTTPS.");
         if (BatchSize is < 1 or > 100 || PollIntervalSeconds < 1 || HistoryTtlSeconds < 1)
             throw new InvalidOperationException("BatchSize must be 1..100; intervals and TTL must be positive.");
+        if (SnapshotStartSqlId < 0 || (SnapshotSyncEnabled && SnapshotStartSqlId == 0) ||
+            (SnapshotSyncEnabled && HistoryEnabled))
+            throw new InvalidOperationException("Snapshot sync requires a positive cutover SQL ID and disabled elastic history.");
         if (ExecutionMode is not ("Continuous" or "CommandDriven"))
             throw new InvalidOperationException("ExecutionMode must be Continuous or CommandDriven.");
         if (CommandPollIntervalSeconds < 1 || CommandMaxDurationMinutes < 1 || CommandLeaseSeconds < 30)
@@ -70,7 +75,7 @@ public sealed record DeadLetter(long ReadingId, string Error, int Attempts, Date
 public sealed record RuntimeSnapshot(string State, DateTime? LastRunAt = null, BatchResult? LastBatch = null,
     string? Error = null, Guid? RequestId = null);
 public sealed record SyncStatusResponse(RuntimeSnapshot Runtime, SyncSummary Sql,
-    string DataverseUrl, bool HistoryEnabled);
+    string DataverseUrl, bool HistoryEnabled, bool SnapshotSyncEnabled, long SnapshotStartSqlId);
 
 public static class SyncRequestStatuses
 {

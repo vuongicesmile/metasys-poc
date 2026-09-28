@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Xml.Linq;
+using Dataverse.SyncWorker.Business.Services;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -7,7 +8,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public sealed partial class DataverseProvisioner
 {

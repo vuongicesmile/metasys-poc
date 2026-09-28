@@ -1,6 +1,6 @@
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 
-namespace DataverseSyncWorker.Abstractions;
+namespace Dataverse.SyncWorker.Business.Abstractions;
 
 /// <summary>
 /// Hợp đồng đọc trạng thái giao dữ liệu từ SQL.

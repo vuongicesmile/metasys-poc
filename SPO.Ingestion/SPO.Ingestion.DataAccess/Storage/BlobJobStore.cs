@@ -8,10 +8,10 @@ using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using SPO.Ingestion.Business.Abstractions;
-using SPO.Ingestion.Common;
+using SPO.Ingestion.Common.Configuration;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.DataAccess;
+namespace SPO.Ingestion.DataAccess.Storage;
 
 public sealed class BlobJobStore : ISpoJobStore
 {
@@ -77,7 +77,7 @@ public sealed class BlobJobStore : ISpoJobStore
     public async Task<Stream> OpenRaw(SpoJobManifest job, CancellationToken ct) =>
         await _raw.GetBlobClient(job.RawBlobName).OpenReadAsync(cancellationToken: ct);
 
-    public async Task<SPO.Ingestion.Business.Abstractions.JobLease?> TryLease(string jobId, CancellationToken ct)
+    public async Task<JobLease?> TryLease(string jobId, CancellationToken ct)
     {
         var lease = Manifest(jobId).GetBlobLeaseClient();
         try { await lease.AcquireAsync(TimeSpan.FromSeconds(60), cancellationToken: ct); }
@@ -91,7 +91,7 @@ public sealed class BlobJobStore : ISpoJobStore
         await Manifest(manifest.JobId).UploadAsync(BinaryData.FromObjectAsJson(manifest, SpoConfiguration.Json), overwrite: true, cancellationToken: ct);
     }
 
-    public async Task Save(SpoJobManifest manifest, SPO.Ingestion.Business.Abstractions.JobLease lease, CancellationToken ct)
+    public async Task Save(SpoJobManifest manifest, JobLease lease, CancellationToken ct)
     {
         manifest = manifest with { UpdatedAt = DateTimeOffset.UtcNow };
         await Manifest(manifest.JobId).UploadAsync(BinaryData.FromObjectAsJson(manifest, SpoConfiguration.Json),
@@ -120,7 +120,7 @@ public sealed class BlobJobStore : ISpoJobStore
     private BlobClient Manifest(string jobId) => _control.GetBlobClient($"manifests/{jobId}.json");
     private static string Hash(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
 
-    private sealed class BlobJobLease : IAsyncDisposable, SPO.Ingestion.Business.Abstractions.JobLease
+    private sealed class BlobJobLease : IAsyncDisposable, JobLease
     {
         private readonly BlobLeaseClient lease;
         private readonly CancellationTokenSource stop = new();

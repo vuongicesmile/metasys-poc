@@ -1,9 +1,9 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.DataAccess.Abstractions;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.DataAccess.Abstractions;
 using Microsoft.Data.SqlClient;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public sealed class SqlSyncBatchUnitOfWorkFactory(ISqlStore store) : ISyncBatchUnitOfWorkFactory
 {

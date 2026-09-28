@@ -1,9 +1,9 @@
-using DataverseSyncWorker.Models;
-using DataverseSyncWorker.Services;
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.DataAccess.Hosting;
+using Dataverse.SyncWorker.DataAccess.Hosting;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Business.Services;
 
-namespace DataverseSyncWorker.Hosting;
+namespace Dataverse.SyncWorker.App.Hosting;
 
 public static class ServiceCollectionExtensions
 {
@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CommandProcessor>();
         services.AddSingleton<ICommandProcessor>(sp => sp.GetRequiredService<CommandProcessor>());
         services.AddSingleton<RuntimeState>();
-        services.AddHostedService<SyncWorker>();
+        services.AddHostedService<Dataverse.SyncWorker.Business.Services.SyncWorker>();
         services.AddTransient<WorkerCommandDispatcher>();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

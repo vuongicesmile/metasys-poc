@@ -28,9 +28,11 @@ dependent change.
 
 ## Retention and cleanup
 
-BMS history currently uses an event-age elastic TTL. Raw SQL preserves full
-history. Audit retention, long-term archival, recycle-bin retention and elastic
-row TTL are separate behaviors; do not substitute one for another.
+The current Standard reading table contains the 2026-09-10 demo-day base and
+post-cutover SQL readings. It has no TTL; raw SQL preserves full history.
+The former elastic event-age TTL
+is historical. Audit retention, archival and recycle-bin retention remain
+separate behaviors; do not substitute one for another.
 
 Before changing retention, establish its effect on existing rows, future writes,
 capacity and recovery. Keep the mapper/configuration and deployment notes

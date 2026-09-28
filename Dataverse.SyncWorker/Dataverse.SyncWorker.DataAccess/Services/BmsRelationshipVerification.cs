@@ -1,12 +1,14 @@
 using System.Text.Json;
 using System.Xml.Linq;
-using DataverseSyncWorker.Contracts;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Business.Contracts;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Domain;
+using Dataverse.SyncWorker.Business.Services;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public static class BmsRelationshipVerification
 {

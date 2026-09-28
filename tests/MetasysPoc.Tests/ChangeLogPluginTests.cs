@@ -1,8 +1,8 @@
 using System.Text.Json;
 using FMCentralBms.Plugins;
 using Microsoft.Xrm.Sdk;
-using DataverseSyncWorker.Hosting;
-using DataverseSyncWorker.Services;
+using Dataverse.SyncWorker.DataAccess.Services;
+using Dataverse.SyncWorker.App.Hosting;
 
 namespace MetasysPoc.Tests;
 

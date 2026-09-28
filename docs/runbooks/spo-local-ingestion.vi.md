@@ -4,7 +4,9 @@
 
 Đây là đường chạy demo khi chưa có Azure subscription. Local CLI đọc bản copy
 các file đã lấy từ SharePoint, dùng cùng parser/mapper/writer của logic cloud và
-ghi trực tiếp vào các Bronze table hiện có trong Dataverse.
+ghi trực tiếp vào các Bronze table hiện có trong Dataverse. Từ 24/09/2026,
+`historyEnabled=false`: telemetry SPO chỉ cập nhật current Point. Bảng Standard
+`fmc_bmsreadingsnapshot` nhận reading mới từ worker SQL COV, không từ SPO.
 
 Không dùng flow archive cũ `FMC - Copy SPO Demo File (Manual)`. Flow cũ chỉ ghi
 binary vào `fmc_spofile`; local runner này ghi dữ liệu nghiệp vụ vào:
@@ -12,8 +14,8 @@ binary vào `fmc_spofile`; local runner này ghi dữ liệu nghiệp vụ vào:
 - `building.xlsx` -> `fmc_bmsbuilding`
 - `electric_meter.xlsx` -> `fmc_bmsequipment` với Equipment Type `Electric Meter`
 - `water_meter.xlsx` -> `fmc_bmsequipment`
-- `electricity_reading_hourly.xlsx` -> `fmc_bmspoint` + `fmc_bmsreading`
-- `water_reading_hourly.xlsx` -> `fmc_bmspoint` + `fmc_bmsreading`
+- `electricity_reading_hourly.xlsx` -> `fmc_bmspoint`
+- `water_reading_hourly.xlsx` -> `fmc_bmspoint`
 
 ## Điều kiện
 
@@ -66,8 +68,7 @@ dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- 
 2. Parse và validate toàn file trước; lỗi Choice/required/ownership thì không
    ghi partial file.
 3. Building/Equipment dùng business key và upsert idempotent.
-4. Reading chỉ ghi event mới nhất vào Point; history dùng GUID/partition ổn định
-   và `UpsertMultiple` theo batch.
+4. Reading chỉ ghi event mới nhất vào Point; không ghi history mới.
 5. Chạy lại cùng file không tạo duplicate; receipt phân biệt Delivered,
    SkippedOlderCurrent và duplicate.
 
@@ -82,14 +83,13 @@ dotnet run --project .\SPO.Ingestion\SPO.Ingestion.Cli -c Release --no-build -- 
   `<electric_meter_id>/demand_kw`. Cả hai Point bắt buộc lookup về Electric Meter.
 - Phải ingest `spo-electric-meter` trước `spo-electricity-reading`; nếu thiếu meter,
   writer trả `WaitingDependency` thay vì tạo Point mồ côi.
-- `--current-only` chỉ materialize trạng thái mới nhất của từng Point và không replay
-  `fmc_bmsreading`. Dùng mode này khi cần dựng lại current state sau cleanup; bỏ flag
-  khi cần ingest đầy đủ history theo TTL.
+- `--current-only` chỉ materialize trạng thái mới nhất của từng Point. Cấu hình
+  mặc định cũng không ghi history; không bỏ flag để thử ghi vào elastic table cũ.
 
 ## Kiểm tra sau khi chạy
 
 - Mở model-driven app, xem `BMS Buildings`, `BMS Equipment`, `BMS Points`.
-- Với readings, kiểm tra Point trước rồi kiểm tra `BMS Readings`.
+- Với readings SPO mới, kiểm tra `BMS Points`; bảng snapshot không thay đổi.
 - Đọc file receipt mới nhất trong `.artifacts/spo-local/` để biết số row đã
   delivered/skipped và GUID Dataverse.
 - `equipment.xlsx` hiện có nhiều `equipment_type` ngoài Choice contract nên phải

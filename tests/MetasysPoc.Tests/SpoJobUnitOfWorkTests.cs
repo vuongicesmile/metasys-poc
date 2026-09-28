@@ -1,5 +1,6 @@
 using SPO.Ingestion.Business.Abstractions;
 using SPO.Ingestion.DataAccess;
+using SPO.Ingestion.DataAccess.Storage;
 using SPO.Ingestion.Domain;
 
 namespace MetasysPoc.Tests;

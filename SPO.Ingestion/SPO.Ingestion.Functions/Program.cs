@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using SPO.Ingestion.App.Hosting;
-using SPO.Ingestion.Common;
+using SPO.Ingestion.Common.Configuration;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()

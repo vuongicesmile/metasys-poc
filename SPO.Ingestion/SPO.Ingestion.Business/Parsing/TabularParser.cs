@@ -7,7 +7,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.Business;
+namespace SPO.Ingestion.Business.Parsing;
 
 public sealed class TabularParser
 {

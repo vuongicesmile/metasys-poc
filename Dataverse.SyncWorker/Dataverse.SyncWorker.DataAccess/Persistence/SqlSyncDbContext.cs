@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace DataverseSyncWorker.DataAccess.Persistence;
+namespace Dataverse.SyncWorker.DataAccess.Persistence;
 
 /// <summary>
 /// DbContext chỉ phục vụ các truy vấn đọc catalog.

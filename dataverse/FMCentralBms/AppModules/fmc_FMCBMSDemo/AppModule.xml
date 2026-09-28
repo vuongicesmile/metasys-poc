@@ -14,7 +14,7 @@
     <AppModuleComponent type="1" schemaName="fmc_bmsbuilding" />
     <AppModuleComponent type="1" schemaName="fmc_bmsequipment" />
     <AppModuleComponent type="1" schemaName="fmc_bmspoint" />
-    <AppModuleComponent type="1" schemaName="fmc_bmsreading" />
+    <AppModuleComponent type="1" schemaName="fmc_bmsreadingsnapshot" />
     <AppModuleComponent type="1" schemaName="fmc_changelog" />
     <AppModuleComponent type="1" schemaName="fmc_spochangerequest" />
     <AppModuleComponent type="1" schemaName="fmc_spofile" />
@@ -33,7 +33,7 @@
     <AppModuleComponent type="26" id="{3ceb4ef0-00b7-f111-aaae-00224819a344}" />
     <AppModuleComponent type="26" id="{cc5048f6-00b7-f111-aaae-00224819a344}" />
     <AppModuleComponent type="26" id="{d05048f6-00b7-f111-aaae-00224819a344}" />
-    <AppModuleComponent type="26" id="{2b39920c-7628-4775-ab3e-00463711ae83}" />
+    <AppModuleComponent type="26" id="{79096c68-eab7-f111-aaae-00224819a344}" />
     <AppModuleComponent type="26" id="{ad1ecaaf-dd16-455b-b766-0767c9e018e9}" />
     <AppModuleComponent type="26" id="{f8848442-2db4-4c2d-89d7-095f44b73650}" />
     <AppModuleComponent type="26" id="{1907b68d-d7fc-424d-b8c8-0971c57ef24a}" />
@@ -70,7 +70,6 @@
     <AppModuleComponent type="26" id="{74f3626e-2de7-4469-be5e-c8a62a8ab5a5}" />
     <AppModuleComponent type="26" id="{11ba4d38-6d15-42f5-9ae8-dfa86c6bf278}" />
     <AppModuleComponent type="26" id="{03fcc967-9e34-44d0-b469-e0c956c581cc}" />
-    <AppModuleComponent type="26" id="{b9433a2e-ad97-48d9-8aa6-eb8bf1f493a2}" />
     <AppModuleComponent type="60" id="{0ccdd026-109f-4e91-8552-0ac775cd005c}" />
     <AppModuleComponent type="60" id="{5d748ccd-f0b1-461d-8224-135e1a201d87}" />
     <AppModuleComponent type="60" id="{ee6941bd-20aa-4e47-9e89-2dae37f337bf}" />
@@ -85,7 +84,6 @@
     <AppModuleComponent type="60" id="{16116cbe-739c-40c0-820f-985ae43ca22d}" />
     <AppModuleComponent type="60" id="{5985a37d-7165-4bef-868c-9fad777d3385}" />
     <AppModuleComponent type="60" id="{47330992-406e-4c8c-896e-ac796e53c55f}" />
-    <AppModuleComponent type="60" id="{42fd5516-a98f-42d8-a88a-b8fd33d46d65}" />
     <AppModuleComponent type="60" id="{b3407d07-8f5a-4d4a-b9c5-d216dfb7920c}" />
     <AppModuleComponent type="60" id="{c5622e20-a566-4eb3-b8bf-d2daeda73ece}" />
     <AppModuleComponent type="60" id="{77e328e8-a2ce-49b9-8ef2-dd3cd4e60dd7}" />

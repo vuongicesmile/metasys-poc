@@ -1,6 +1,6 @@
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.Business.Services;
 
 public sealed class RuntimeState
 {

@@ -6,7 +6,7 @@ using Microsoft.Xrm.Sdk.Query;
 using SPO.Ingestion.Business.Abstractions;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.DataAccess;
+namespace SPO.Ingestion.DataAccess.Dataverse;
 
 /// <summary>
 /// Adapter ghi Dataverse. Đây là nơi duy nhất chuyển TargetRecord thuần .NET thành Entity SDK.

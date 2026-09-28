@@ -15,9 +15,9 @@ Retrieve table type, ownership, logical/schema/entity-set names, column types,
 lengths, precision, required levels, keys and relevant relationships. Compare
 live metadata with dataverse/FMCentralBms when cloud state matters.
 
-Keep fmc_bmspoint standard and fmc_bmsreading elastic unless the requested change
-includes migration. Elastic history uses its primary GUID and partitionid;
-do not apply the source skill's generic custom-alternate-key recipe to it.
+Keep fmc_bmspoint and the ongoing fmc_bmsreadingsnapshot Standard. The former
+fmc_bmsreading elastic table was retired after the 2026-09-10 snapshot migration;
+do not recreate it from historical exports or provisioning code.
 Wait for the point alternate-key index to become Active before relying on it.
 
 ## Implement a schema change

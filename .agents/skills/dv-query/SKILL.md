@@ -29,10 +29,10 @@ reach the tool unchanged. Prefer structured tool arguments or SDK queries.
 For an already running service, GET /api/dataverse-sync/status and
 GET /api/dataverse-sync/dead-letters inspect SQL/runtime state.
 
-For retained cloud samples:
+For the Standard readings table (10/09 base plus post-cutover rows):
 
 ```powershell
-dotnet run --project .\DataverseSyncWorker -- --verify
+dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --verify-reading-snapshot
 ```
 
 This reads SQL and Dataverse and checks up to 25 retained history rows.
@@ -45,9 +45,9 @@ sync if the API host must be started.
 - Use per-row delivery receipts and unresolved dead letters to establish pending
   state; lastSuccessfulId does not prove all smaller IDs were delivered.
 - Compare point state to the latest event time and SQL-id tie-breaker.
-- Match history by the mapper's GUID plus partition, SQL ID, object and value.
-- Scope counts to a stated cutoff/retention window. TTL expiry and concurrent
-  ingestion explain why raw SQL and retained history counts may differ.
+- Match Standard reading rows by deterministic GUID, SQL ID, object and value.
+- Scope the base count to 2026-09-10 Asia/Bangkok and new delivery checks to SQL
+  IDs above 82708. SQL retains full history; Standard readings do not use TTL.
 - Account for HistoryEnabled and already acknowledged history before proposing
   a resync. A mismatch is a finding, not authorization to change the ledger.
 - Label capped/approximate counts, incomplete paging and sampled comparisons.

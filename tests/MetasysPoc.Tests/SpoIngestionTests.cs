@@ -3,8 +3,12 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using ClosedXML.Excel;
 using SPO.Ingestion.Business;
+using SPO.Ingestion.Business.Mapping;
+using SPO.Ingestion.Business.Parsing;
+using SPO.Ingestion.Business.Processing;
 using SPO.Ingestion.Common;
 using SPO.Ingestion.DataAccess;
+using SPO.Ingestion.DataAccess.Storage;
 using SPO.Ingestion.Domain;
 
 namespace MetasysPoc.Tests;
@@ -16,6 +20,7 @@ public sealed class SpoIngestionTests
         SourceNamespace = "spo-test",
         SourceId = "FMC",
         HistoryTtlSeconds = 2_592_000,
+        HistoryEnabled = true,
         EquipmentTypeChoices = new(StringComparer.OrdinalIgnoreCase)
         {
             ["WaterMeter"] = 789100000,
@@ -138,6 +143,21 @@ public sealed class SpoIngestionTests
         Assert.Equal("fmc_bmsequipment", point.Get<TargetReference>("fmc_equipmentid")!.LogicalName);
         Assert.False(history.Attributes.ContainsKey("fmc_sqlreadingid"));
         Assert.False(history.Attributes.ContainsKey("fmc_sqlingestedat"));
+        Assert.Equal("EM001", history["fmc_equipmentcode"]);
+    }
+
+    [Fact]
+    public void Snapshot_mode_keeps_current_spo_points_without_history()
+    {
+        var row = Row(("electric_meter_id", "EM001"), ("building_id", "BLD001"),
+            ("timestamp", "2026-09-14 08:00:00"), ("energy_kwh", "1"), ("demand_kw", "2"));
+        var options = Options with { HistoryEnabled = false };
+        var result = new SpoBronzeMapper(options).Map(Source("electricity-reading-v1"), [row],
+            new DateTime(2026, 9, 14, 2, 0, 0, DateTimeKind.Utc));
+
+        Assert.Empty(result.Issues);
+        Assert.Equal(2, result.Records.Count);
+        Assert.All(result.Records, record => Assert.Equal(BronzeRecordKind.Point, record.Kind));
     }
 
     [Fact]

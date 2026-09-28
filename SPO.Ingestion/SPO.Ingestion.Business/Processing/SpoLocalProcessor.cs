@@ -1,8 +1,10 @@
-using SPO.Ingestion.Common;
 using SPO.Ingestion.Business.Abstractions;
 using SPO.Ingestion.Domain;
+using SPO.Ingestion.Common.Configuration;
+using SPO.Ingestion.Business.Parsing;
+using SPO.Ingestion.Business.Mapping;
 
-namespace SPO.Ingestion.Business;
+namespace SPO.Ingestion.Business.Processing;
 
 public sealed record LocalIngestionResult(
     string Status,

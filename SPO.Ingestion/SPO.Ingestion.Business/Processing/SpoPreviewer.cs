@@ -1,7 +1,9 @@
-using SPO.Ingestion.Common;
+using SPO.Ingestion.Business.Mapping;
+using SPO.Ingestion.Business.Parsing;
+using SPO.Ingestion.Common.Configuration;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.Business;
+namespace SPO.Ingestion.Business.Processing;
 
 public sealed class SpoPreviewer(TabularParser parser, SpoBronzeMapper mapper)
 {

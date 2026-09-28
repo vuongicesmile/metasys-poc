@@ -1,9 +1,9 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.Contracts;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Business.Contracts;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.Business.Services;
 
 /// <summary>
 /// Điều phối một batch SQL → Dataverse theo thứ tự catalog, current point, history rồi Ack.
@@ -71,6 +71,13 @@ public sealed class SyncEngine(ISyncBatchUnitOfWorkFactory sessions, ISqlCatalog
             var now = DateTime.UtcNow;
             var readings = valid.Select(r => mapper.History(r, now)).OfType<DataverseRecord>().ToArray();
             await writer.WriteHistory(readings, ct);
+        }
+        if (options.SnapshotSyncEnabled)
+        {
+            // Chỉ SQL row sau cutover mới cần thêm receipt trên bảng Standard.
+            var readings = valid.Where(r => r.Id > options.SnapshotStartSqlId)
+                .Select(mapper.Snapshot).ToArray();
+            await writer.WriteSnapshot(readings, ct);
         }
         // Chỉ acknowledge sau khi point và history (nếu bật) cùng ghi thành công.
         // Nếu Dataverse lỗi giữa chừng, lần chạy sau sẽ replay an toàn nhờ identity cố định.

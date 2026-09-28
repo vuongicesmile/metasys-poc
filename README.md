@@ -28,7 +28,9 @@ The projects under `SPO.Ingestion/` (`Domain`, `Common`, `Business`,
 `DataAccess`, `App`, `Cli` and `Functions`) implement the
 cloud-ready SharePoint file path: CSV/JSON/XLSX raw snapshots in Azure Blob Storage,
 durable queue/lease processing and typed writes into the existing BMS Bronze tables.
-No new Dataverse table or column is provisioned. Azure deployment is currently
+SPO telemetry currently updates points only. SQL COV ingestion writes post-cutover
+readings to the Standard `fmc_bmsreadingsnapshot` table; the 10 September extract
+remains there. Azure deployment is currently
 prepared but not executed because the checked account has no Azure subscription.
 See the [SPO runbook](docs/runbooks/spo-cloud-ingestion-service.vi.md) for dry-run,
 deployment, Power Automate capture-flow and UI test steps.
@@ -97,7 +99,9 @@ production identity guidance, and tests.
    `FMC - Request SQL to Dataverse Sync`. The flow queues one
    `fmc_syncrequest`; the worker claims it, upserts SQL catalog into
    `fmc_bmsbuilding` and `fmc_bmsequipment`, updates Point lookups, then writes
-   the SQL reading cutoff to `fmc_bmspoint` and `fmc_bmsreading`.
+   the SQL reading cutoff to `fmc_bmspoint` and post-cutover readings to
+   `fmc_bmsreadingsnapshot`. The 10 September 2026 extract remains in that table;
+   older SQL history is not replayed automatically.
 
 4. Check worker and delivery state:
 

@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using SPO.Ingestion.Business.Abstractions;
-using SPO.Ingestion.DataAccess;
 using SPO.Ingestion.DataAccess.Hosting;
+using SPO.Ingestion.DataAccess.Storage;
 using SPO.Ingestion.Domain;
 
 namespace MetasysPoc.Tests;

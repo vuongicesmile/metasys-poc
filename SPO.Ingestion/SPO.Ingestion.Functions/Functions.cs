@@ -3,9 +3,9 @@ using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using SPO.Ingestion.Business;
-using SPO.Ingestion.Common;
-using SPO.Ingestion.DataAccess;
+using SPO.Ingestion.Business.Processing;
+using SPO.Ingestion.Common.Configuration;
+using SPO.Ingestion.DataAccess.Storage;
 using SPO.Ingestion.Domain;
 
 namespace SPO.Ingestion.Functions;

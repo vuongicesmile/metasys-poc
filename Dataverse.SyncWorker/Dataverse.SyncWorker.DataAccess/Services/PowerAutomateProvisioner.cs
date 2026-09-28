@@ -1,12 +1,12 @@
 using System.Text.Json;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 /// <summary>Creates the solution-aware manual cloud flow and its ALM dependencies.</summary>
 public sealed class PowerAutomateProvisioner(DataverseConnection connection, SyncOptions options)

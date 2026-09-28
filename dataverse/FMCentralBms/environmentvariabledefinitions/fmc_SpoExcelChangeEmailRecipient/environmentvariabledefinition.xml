@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="fmc_SpoExcelChangeEmailRecipient">
+  <defaultvalue>vuong.nguyenq@titancorpvn.com</defaultvalue>
+  <description default="Recipient for notifications about supported FMC-Inbox Excel file versions.">
+    <label description="Recipient for notifications about supported FMC-Inbox Excel file versions." languagecode="1033" />
+  </description>
+  <displayname default="SPO Excel Change Email Recipient">
+    <label description="SPO Excel Change Email Recipient" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.3.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

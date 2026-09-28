@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.Common;
+namespace SPO.Ingestion.Common.Configuration;
 
 public static class SpoConfiguration
 {

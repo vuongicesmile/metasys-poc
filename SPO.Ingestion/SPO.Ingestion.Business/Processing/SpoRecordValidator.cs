@@ -1,6 +1,7 @@
+using SPO.Ingestion.Business.Mapping;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.Business;
+namespace SPO.Ingestion.Business.Processing;
 
 /// <summary>
 /// Chứa các quy tắc kiểm tra chung trước khi ghi dữ liệu SPO vào Dataverse.

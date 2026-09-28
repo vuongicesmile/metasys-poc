@@ -1,9 +1,9 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.Business.Services;
 
 public sealed class SyncWorker(ISyncEngine engine, ICommandProcessor commands, SyncOptions options, RuntimeState status,
     IIntegrationFailureClassifier failures, ILogger<SyncWorker> logger) : BackgroundService

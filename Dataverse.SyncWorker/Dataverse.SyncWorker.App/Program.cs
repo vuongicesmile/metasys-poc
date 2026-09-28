@@ -1,5 +1,5 @@
-using DataverseSyncWorker.Hosting;
-using DataverseSyncWorker.Endpoints;
+using Dataverse.SyncWorker.App.Hosting;
+using Dataverse.SyncWorker.App.Endpoints;
 
 // Tách command maintenance khỏi args dùng cho ASP.NET host.
 // Nhờ vậy các lệnh --self-test, --verify, --provision... không khởi động worker nền.

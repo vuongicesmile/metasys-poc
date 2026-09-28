@@ -28,18 +28,20 @@ relevant changes, verification and any remaining limitation.
 - `BMS.Ingestion.App` consumes COV over SSE on port 5200 and appends to SQL.
 - SQL Server database FM_Central, table raw.bms_reading, is the system of record
   and holds full history.
-- DataverseSyncWorker on port 5300 sends current state and retained history to
-  Dataverse independently of ingestion.
+- DataverseSyncWorker on port 5300 sends current point state to Dataverse
+  independently of ingestion. Live history writes are disabled; the fixed
+  2026-09-10 (Asia/Bangkok) reading snapshot is in a Standard table.
 - SPO.Ingestion.Functions is the cloud-ready SharePoint file consumer backed by
   Azure Blob Storage/Queue; its checked-in code and Bicep are not evidence of a
   live Azure deployment.
-- SPO mappings write typed records into the existing fmc_bmsbuilding,
-  fmc_bmsequipment, fmc_bmspoint and fmc_bmsreading tables; do not introduce a
+- SPO mappings write typed current records into fmc_bmsbuilding,
+  fmc_bmsequipment and fmc_bmspoint; history writes are disabled. Do not introduce a
   generic Bronze JSON table for this path.
 - Power Automate `FMC - Request SQL to Dataverse Sync` queues `fmc_syncrequest`;
   CommandDriven worker instances atomically claim, lease and complete requests.
 - The existing solution is FMCentralBms, publisher FMCentralBmsPublisher, prefix fmc.
-- fmc_bmspoint is a standard table; fmc_bmsreading is an elastic table.
+- fmc_bmspoint and fmc_bmsreadingsnapshot are Standard tables.
+  The former fmc_bmsreading elastic history is retired.
 - Use the checked-in Developer environment identity and verify the actual target
   before cloud operations. Details are in the shared
   [project reference](.agents/skills/dv-overview/references/project.md).
@@ -55,21 +57,22 @@ a Power Automate flow per reading is not its current integration design.
 
 ## Implementation invariants
 
-- Preserve raw SQL rows, source IDs, SourceId and deterministic GUID/partition
-  mapping. Changing identity requires a reconciliation/migration design.
+- Preserve raw SQL rows, source IDs, SourceId and deterministic GUID mapping.
+  The Standard reading table retains GUIDs derived from SQL ID; changing identity
+  requires a reconciliation/migration design.
 - Pending work comes from the per-row delivery ledger, not only MAX(id).
   Transactions can commit below the reported lastSuccessfulId.
-- Acknowledge a valid row after point writes and enabled history writes succeed.
+- Acknowledge a valid post-cutover row after both point and Standard reading writes succeed.
   Preserve safe replay after partial remote success.
 - Current point state comes from the greatest reading_time, with SQL id as a
   tie-breaker. Backfill must not replace current state with an older event.
-- History retention is calculated from event time. Replaying old data must not
-  grant it another full TTL. Expired history can be intentionally acknowledged.
+- Standard readings have no TTL. `SnapshotStartSqlId=82708` gates the ongoing
+  SQL-to-Dataverse reading writes; the 10/09/2026 extract remains intact without
+  replaying older history. The retired elastic TTL is not a new retention policy.
 - Preserve text storage for SQL bigint IDs, four decimal places, and the
   configured timestamp conversions. ReadingMapper defines the actual mapping.
-- The standard point table has the fmc_bmspoint_objectid alternate key.
-  Elastic history uses its deterministic primary GUID plus partitionid;
-  fmc_externalkey is diagnostic text, not a custom alternate key.
+- The point table has the fmc_bmspoint_objectid alternate key. Snapshot rows use
+  deterministic primary GUIDs; fmc_sqlreadingid and fmc_externalkey are text.
 - Preserve the SQL application lock and local serialization. Schema/permission
   failures must remain visible; do not silently discard readings to clear lag.
 
@@ -120,8 +123,9 @@ Choose checks appropriate to the changed behavior:
 - C# changes: build MetasysPoc.sln; run relevant verification from docs/reference/dataverse-deployment.md.
 - --self-test creates and removes a uniquely named SQL test database and uses a
   simulated Dataverse sink. It requires local SQL access.
-- --verify reads the live organization and SQL ledger, checking up to 25 retained
-  history samples. It does not establish full reconciliation or capacity.
+- --verify reads the live organization and SQL ledger. Use
+  --verify-reading-snapshot for the 2026-09-10 base and post-cutover rows; neither establishes
+  full future reconciliation or capacity.
 - Schema/deployment changes: inspect actual metadata, solution membership, key
   readiness and affected forms/views; retain the exported source diff.
 

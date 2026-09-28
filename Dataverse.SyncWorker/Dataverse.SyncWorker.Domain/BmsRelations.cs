@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-namespace DataverseSyncWorker.Models;
+namespace Dataverse.SyncWorker.Domain;
 
 public sealed record BuildingSeed(string Code, string Name, string SourceBuilding, string? Description);
 public sealed record EquipmentSeed(string Code, string Name, string Type, string BuildingCode, string? Description);

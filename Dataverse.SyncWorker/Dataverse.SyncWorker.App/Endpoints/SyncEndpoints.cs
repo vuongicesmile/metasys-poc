@@ -1,8 +1,9 @@
-using DataverseSyncWorker.Models;
-using DataverseSyncWorker.Services;
-using DataverseSyncWorker.Abstractions;
+using Dataverse.SyncWorker.DataAccess.Services;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Business.Services;
 
-namespace DataverseSyncWorker.Endpoints;
+namespace Dataverse.SyncWorker.App.Endpoints;
 
 public static class SyncEndpoints
 {
@@ -14,7 +15,8 @@ public static class SyncEndpoints
         app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
         app.MapGet("/api/dataverse-sync/status", async (RuntimeState state, SqlStore sql, CancellationToken ct) =>
         {
-            try { return Results.Ok(new SyncStatusResponse(state.Snapshot, await sql.Summary(ct), options.Url, options.HistoryEnabled)); }
+            try { return Results.Ok(new SyncStatusResponse(state.Snapshot, await sql.Summary(ct), options.Url,
+                options.HistoryEnabled, options.SnapshotSyncEnabled, options.SnapshotStartSqlId)); }
             catch (Microsoft.Data.SqlClient.SqlException) { return Results.Problem("SQL integration schema is unavailable. Run create-dataverse-sync-tables.sql."); }
         }).WithTags("Sync").WithSummary("Runtime state, SQL pending rows and acknowledged checkpoint")
             .Produces<SyncStatusResponse>().ProducesProblem(500);

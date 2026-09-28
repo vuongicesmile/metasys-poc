@@ -1,4 +1,4 @@
-namespace DataverseSyncWorker.Abstractions;
+namespace Dataverse.SyncWorker.Business.Abstractions;
 
 /// <summary>
 /// Phân loại lỗi integration mà không để Business phụ thuộc SDK của nhà cung cấp.

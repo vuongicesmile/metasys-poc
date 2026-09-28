@@ -1,6 +1,6 @@
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 
-namespace DataverseSyncWorker.Abstractions;
+namespace Dataverse.SyncWorker.Business.Abstractions;
 
 /// <summary>Runs one serialized delivery batch, optionally bounded by a command cutoff.</summary>
 public interface ISyncEngine

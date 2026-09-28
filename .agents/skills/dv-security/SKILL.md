@@ -17,7 +17,7 @@ test. Use PAC, supported SDK messages or available admin tools with sufficient
 existing rights.
 
 The provisioner defines FM Central BMS Integration with organization-level
-Create, Read and Write on fmc_bmspoint and fmc_bmsreading. Schema provisioning
+Create, Read and Write on fmc_bmspoint and fmc_bmsreadingsnapshot. Schema provisioning
 needs different privileges from continuous runtime. Do not give the steady-state
 worker an admin role to resolve an unexplained access failure.
 

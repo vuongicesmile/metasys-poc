@@ -1,12 +1,12 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.DataAccess.Abstractions;
 using System.Data;
 using System.Text.Json;
-using DataverseSyncWorker.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Dataverse.SyncWorker.DataAccess.Abstractions;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Business.Abstractions;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public sealed class SqlStore(IConfiguration configuration, SyncOptions options) : ISyncLedger, ISqlStore
 {
@@ -25,6 +25,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
         var cmd = new SqlCommand(sql, c);
         cmd.Parameters.Add("@pipeline", SqlDbType.VarChar, 150).Value = options.Pipeline;
         cmd.Parameters.Add("@history", SqlDbType.Bit).Value = options.HistoryEnabled;
+        cmd.Parameters.Add("@snapshot", SqlDbType.Bit).Value = options.SnapshotSyncEnabled;
+        cmd.Parameters.Add("@snapshotStartSqlId", SqlDbType.BigInt).Value = options.SnapshotStartSqlId;
         return cmd;
     }
 
@@ -42,7 +44,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
     }
 
     private const string Columns = "r.id,r.object_id,r.object_name,r.object_type,r.building,r.equipment_code,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at";
-    private const string Pending = "(d.current_done IS NULL OR d.current_done=0 OR (@history=1 AND d.history_done=0))";
+    private const string HistoryRequired = "(@history=1 OR (@snapshot=1 AND r.id>@snapshotStartSqlId))";
+    private const string Pending = "(d.current_done IS NULL OR d.current_done=0 OR (" + HistoryRequired + " AND COALESCE(d.history_done,0)=0))";
     public async Task<List<BmsReading>> ReadBatch(SqlConnection c, CancellationToken ct, long? cutoffId = null)
     {
         // Anti-join đọc delivery ledger thay vì chỉ nhìn watermark. Cách này bắt được
@@ -67,13 +70,13 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
         await using var c = await Open(ct);
         using var cmd = Command(c, $"""
             SELECT COUNT_BIG(*),
-                COALESCE(SUM(CONVERT(bigint,CASE WHEN d.current_done=1 AND (@history=0 OR d.history_done=1) THEN 1 ELSE 0 END)),0),
+                COALESCE(SUM(CONVERT(bigint,CASE WHEN d.current_done=1 AND (NOT {HistoryRequired} OR d.history_done=1) THEN 1 ELSE 0 END)),0),
                 COALESCE(SUM(CONVERT(bigint,CASE WHEN {Pending} THEN 1 ELSE 0 END)),0),
                 (SELECT COUNT_BIG(*) FROM integration.dataverse_dead_letter x WHERE x.pipeline=@pipeline AND x.resolved_at IS NULL AND x.bms_reading_id<=@cutoff),
                 (SELECT COUNT_BIG(*) FROM raw.bms_reading r2
                     LEFT JOIN integration.dataverse_delivery d2 ON d2.pipeline=@pipeline AND d2.reading_id=r2.id
                     WHERE r2.id<=@cutoff
-                    AND (d2.current_done IS NULL OR d2.current_done=0 OR (@history=1 AND d2.history_done=0))
+                    AND (d2.current_done IS NULL OR d2.current_done=0 OR ((@history=1 OR (@snapshot=1 AND r2.id>@snapshotStartSqlId)) AND COALESCE(d2.history_done,0)=0))
                     AND NOT EXISTS (SELECT 1 FROM integration.dataverse_dead_letter x2 WHERE x2.pipeline=@pipeline AND x2.bms_reading_id=r2.id AND x2.resolved_at IS NULL))
             FROM raw.bms_reading r LEFT JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id
             WHERE r.id<=@cutoff;
@@ -110,8 +113,8 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
         using var cmd = Command(c, """
             SET XACT_ABORT ON;
             BEGIN TRAN;
-            UPDATE integration.dataverse_delivery SET current_done=1, history_done=CASE WHEN @history=1 THEN 1 ELSE history_done END, delivered_at=SYSUTCDATETIME() WHERE pipeline=@pipeline AND reading_id=@id;
-            IF @@ROWCOUNT=0 INSERT integration.dataverse_delivery(pipeline,reading_id,current_done,history_done) VALUES(@pipeline,@id,1,@history);
+            UPDATE integration.dataverse_delivery SET current_done=1, history_done=CASE WHEN @history=1 OR (@snapshot=1 AND @id>@snapshotStartSqlId) THEN 1 ELSE history_done END, delivered_at=SYSUTCDATETIME() WHERE pipeline=@pipeline AND reading_id=@id;
+            IF @@ROWCOUNT=0 INSERT integration.dataverse_delivery(pipeline,reading_id,current_done,history_done) VALUES(@pipeline,@id,1,CASE WHEN @history=1 OR (@snapshot=1 AND @id>@snapshotStartSqlId) THEN 1 ELSE 0 END);
             UPDATE integration.dataverse_sync_state SET last_successful_id=CASE WHEN @id>last_successful_id THEN @id ELSE last_successful_id END,last_completed_at=SYSUTCDATETIME(),updated_at=SYSUTCDATETIME() WHERE pipeline_name=@pipeline;
             IF @@ROWCOUNT=0 INSERT integration.dataverse_sync_state(pipeline_name,last_successful_id,last_completed_at) VALUES(@pipeline,@id,SYSUTCDATETIME());
             COMMIT;
@@ -138,7 +141,7 @@ public sealed class SqlStore(IConfiguration configuration, SyncOptions options) 
         await using var c = await Open(ct);
         using var cmd = Command(c, $"""
             SELECT COUNT_BIG(*),
-                COALESCE(SUM(CONVERT(bigint,CASE WHEN d.current_done=1 AND (@history=0 OR d.history_done=1) THEN 1 ELSE 0 END)),0),
+                COALESCE(SUM(CONVERT(bigint,CASE WHEN d.current_done=1 AND (NOT {HistoryRequired} OR d.history_done=1) THEN 1 ELSE 0 END)),0),
                 COALESCE(SUM(CONVERT(bigint,CASE WHEN {Pending} THEN 1 ELSE 0 END)),0),
                 (SELECT COUNT_BIG(*) FROM integration.dataverse_dead_letter WHERE pipeline=@pipeline AND resolved_at IS NULL),
                 (SELECT COALESCE(MAX(last_successful_id),0) FROM integration.dataverse_sync_state WHERE pipeline_name=@pipeline)

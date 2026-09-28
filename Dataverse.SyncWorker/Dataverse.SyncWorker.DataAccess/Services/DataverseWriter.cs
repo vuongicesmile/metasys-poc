@@ -1,10 +1,10 @@
 using System.ServiceModel;
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.Contracts;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Business.Contracts;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 /// <summary>
 /// Adapter Dataverse của tầng DataAccess.
@@ -49,6 +49,9 @@ public sealed class DataverseWriter(
             }
         }, ct);
     }
+
+    public Task WriteSnapshot(IReadOnlyList<DataverseRecord> readings, CancellationToken ct) =>
+        WriteStandard(readings, ct);
 
     /// <summary>Chuyển contract độc lập SDK thành Entity tại đúng boundary Infrastructure.</summary>
     private static Entity ToEntity(DataverseRecord record)

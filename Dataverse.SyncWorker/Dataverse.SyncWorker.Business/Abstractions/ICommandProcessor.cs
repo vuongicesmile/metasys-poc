@@ -1,6 +1,6 @@
-using DataverseSyncWorker.Services;
+using Dataverse.SyncWorker.Business.Services;
 
-namespace DataverseSyncWorker.Abstractions;
+namespace Dataverse.SyncWorker.Business.Abstractions;
 
 public interface ICommandProcessor
 {

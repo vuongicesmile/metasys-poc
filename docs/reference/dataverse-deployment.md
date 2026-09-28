@@ -12,6 +12,40 @@ Target: `https://org06cbc9ec.crm5.dynamics.com/`
 Organization: `ab191700-b99e-f111-aaa0-000d3a80bb96`
 Environment: `5abcb0e5-99b2-e51f-aa0e-90d84405798b`
 
+## Current reading contract (2026-09-24)
+
+The historical elastic `fmc_bmsreading` table was retired. The Standard
+`fmc_bmsreadingsnapshot` table retains the 7,863 SQL readings from 2026-09-10
+Asia/Bangkok (UTC `[2026-09-09T17:00:00Z, 2026-09-10T17:00:00Z)`) and now
+receives new SQL readings after cutover ID `82708`. `SnapshotSyncEnabled=true`,
+`SnapshotStartSqlId=82708`, and `HistoryEnabled=false` in the SQL worker. Each
+new reading is upserted by deterministic GUID after its current point; both
+writes must succeed before the delivery ledger is acknowledged. Prior delivered
+SQL rows are not replayed into the Standard table. The model-driven app's
+`BMS Readings` menu and default view show `fmc_equipmentcode` and new rows.
+SQL `raw.bms_reading` remains the full-history system of record. SPO ingestion
+still updates current points only and does not populate this SQL-sourced table.
+
+Live smoke test on 2026-09-24: Fake Metasys COV -> ingestion SQL rows `82709`
+and `82710` -> worker -> Standard Dataverse readings. Both had matching SQL ID,
+Equipment Code, value, second-resolution time and `current_done=history_done=1`;
+the Standard table then held 7,863 base + 2 post-cutover rows. Two other
+simulator rows (`82711`-`82712`) were left pending deliberately by the 2-row
+test batch.
+
+Migration commands: `--prepare-reading-snapshot`, `--import-reading-snapshot`,
+`--verify-reading-snapshot`, `--switch-reading-snapshot-app`,
+`--refresh-reading-snapshot-app`,
+`--backup-elastic-readings`, and `--retire-elastic-reading`. The last command
+requires the verified 7,863-row snapshot, disabled history, updated app
+navigation and a readable local backup of the old elastic data. The backup is
+under `Dataverse.SyncWorker/Dataverse.SyncWorker.App/.artifacts/reading-snapshot/`
+and is not part of the Git solution export. Deleting the table is not the same
+as deleting SQL raw rows or delivery receipts.
+
+The remaining sections retain dated deployment receipts and historical elastic
+semantics; this current contract takes precedence for operation.
+
 Implementation status: complete in the target Developer environment. The
 `FMCentralBms` solution, BMS tables, `fmc_syncrequest`, keys, views, roles,
 connection reference, environment variable, and activated cloud flow were
@@ -102,7 +136,8 @@ The command verifies the organization ID before writes and creates/reuses:
 - Standard table `fmc_bmsbuilding`, with `fmc_bmsbuilding_buildingcode` alternate key.
 - Standard table `fmc_bmsequipment`, with `fmc_bmsequipment_equipmentcode` alternate key.
 - Relationships `fmc_bmsbuilding_bmsequipment` and `fmc_bmsequipment_bmspoint`.
-- Elastic table `fmc_bmsreading`, using its built-in GUID + partition key.
+- Standard table `fmc_bmsreadingsnapshot`, with deterministic SQL reading GUID
+  and `fmc_equipmentcode` text(100), for the fixed 2026-09-10 demo day.
 - Standard table `fmc_syncrequest`, with correlation alternate key and
   `fmc_syncrequest_activekey` to prevent concurrent active requests per pipeline.
 - Standard table `fmc_notification`, with a correlation alternate key and
@@ -137,9 +172,10 @@ Default binding is loopback; do not expose these endpoints externally without au
 
 ## Delivery semantics and corrections to Plan 3.0
 
-- Elastic tables cannot have custom alternate keys. Reading GUIDs are derived
-  deterministically from `SourceId + SQL id`; partitions are a stable SHA256 of
-  `object_id`. `fmc_externalkey` is a diagnostic text field, not a key definition.
+- The retired elastic history used deterministic reading GUIDs and SHA256
+  partitions; `fmc_externalkey` was diagnostic text, not a custom alternate
+  key. The Standard snapshot preserves the deterministic reading GUID and SQL ID
+  but has no partition or TTL.
 - Current state uses a deterministic point GUID. The object-id alternate key adds
   uniqueness. Do not seed the same object ID manually under a different GUID.
 - SQL bigint IDs are stored in Dataverse as text, not a 32-bit Whole Number.
@@ -156,17 +192,22 @@ Default binding is loopback; do not expose these endpoints externally without au
   `lastSuccessfulId` is informational, not proof every smaller ID was delivered.
 - A SQL application lock serializes this pipeline across processes; run-once also
   shares the local semaphore with background sync.
-- A batch is acknowledged only after both point and history writes succeed.
-  Elastic partial failures leave the batch pending and safe to replay. Validation
+- In the current `SnapshotSyncEnabled=true` mode, post-cutover rows are
+  acknowledged only after both point and Standard reading writes succeed.
+  Earlier rows remain point-only; the old elastic history path stays disabled.
+  Validation
   errors are quarantined individually. Permanent remote schema/permission errors
   block sync until corrected/restarted instead of silently discarding readings.
 - Each command/run first reads `raw.bms_building` and `raw.bms_equipment`, then
-  upserts Building → Equipment before Point/history writes. Point payloads carry
+  upserts Building → Equipment before Point writes. Point payloads carry
   the deterministic `fmc_equipmentid` lookup from `raw.bms_reading.equipment_code`.
 - Latest point means greatest `reading_time`, with SQL `id` breaking ties. Old
   backfill/replay uses the source's current latest value, not the replayed value.
-- History TTL is calculated from reading time. Rows older than retention are
-  intentionally skipped and acknowledged; replay does not grant another 30 days.
+- The retired elastic history calculated TTL from reading time. Standard
+  readings have no TTL and post-cutover rows are refreshed idempotently by the
+  command worker.
+- The 10/09 base was loaded from SQL without replaying the delivery ledger or
+  changing raw identities. No older elastic history is automatically repopulated.
 - Delivered history is not automatically repopulated after Dataverse deletion.
   Do not reset the source IDs, change SourceId, or manually delete target data
   without planning reconciliation.
@@ -180,8 +221,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Start-DataverseSyn
 
 Self-test creates a uniquely named disposable SQL database, exercises the real
 SQL delivery engine against a simulated Dataverse sink, and removes only that
-test database. It does not claim to verify live cloud writes. Live `Verify`
-checks ledger counts and up to 25 actual retained history rows; full capacity
+test database. It does not claim to verify live cloud writes. Live `--verify`
+checks point/catalog, post-cutover reading samples and ledger state; use
+`--verify-reading-snapshot` for the 7,863-row base plus new rows. Full capacity
 and volume testing remains a separate operational task.
 
 After successful provisioning, export the deployable solution with existing PAC:

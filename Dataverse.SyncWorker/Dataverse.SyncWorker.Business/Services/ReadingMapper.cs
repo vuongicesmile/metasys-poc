@@ -1,10 +1,11 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using DataverseSyncWorker.Contracts;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Business.Contracts;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Domain;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.Business.Services;
 
 /// <summary>
 /// Chuyển model đọc từ SQL thành contract thuần .NET để DataAccess ghi sang Dataverse.
@@ -105,11 +106,33 @@ public sealed class ReadingMapper(SyncOptions options)
         e["fmc_objecttype"] = r.ObjectType;
         e["fmc_building"] = r.Building;
         e["fmc_readingtime"] = time;
+        e["fmc_equipmentcode"] = r.EquipmentCode;
         e["fmc_readingvalue"] = r.ReadingValue;
         e["fmc_unit"] = r.Unit;
         e["fmc_sourcesystem"] = r.SourceSystem;
         e["fmc_sqlingestedat"] = r.IngestedAt is { } at ? ToUtc(at, options.SqlIngestedTimeZoneId) : null;
         e["ttlinseconds"] = remaining;
+        return e;
+    }
+
+    /// <summary>Standard reading: giữ GUID của SQL row nhưng không có partition hoặc TTL.</summary>
+    public DataverseRecord Snapshot(BmsReading r)
+    {
+        var time = ReadingUtc(r);
+        var e = new DataverseRecord("fmc_bmsreadingsnapshot", ReadingId(r.Id));
+        e["fmc_name"] = $"{r.ObjectId} {time:O}";
+        e["fmc_externalkey"] = $"{options.SourceId}-{r.Id}";
+        e["fmc_sqlreadingid"] = r.Id.ToString(CultureInfo.InvariantCulture);
+        e["fmc_objectid"] = r.ObjectId;
+        e["fmc_objectname"] = r.ObjectName;
+        e["fmc_objecttype"] = r.ObjectType;
+        e["fmc_building"] = r.Building;
+        e["fmc_equipmentcode"] = r.EquipmentCode;
+        e["fmc_readingtime"] = time;
+        e["fmc_readingvalue"] = r.ReadingValue;
+        e["fmc_unit"] = r.Unit;
+        e["fmc_sourcesystem"] = r.SourceSystem;
+        e["fmc_sqlingestedat"] = r.IngestedAt is { } at ? ToUtc(at, options.SqlIngestedTimeZoneId) : null;
         return e;
     }
 }

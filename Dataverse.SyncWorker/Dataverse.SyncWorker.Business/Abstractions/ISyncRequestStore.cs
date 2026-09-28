@@ -1,6 +1,6 @@
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 
-namespace DataverseSyncWorker.Abstractions;
+namespace Dataverse.SyncWorker.Business.Abstractions;
 
 public interface ISyncRequestStore
 {

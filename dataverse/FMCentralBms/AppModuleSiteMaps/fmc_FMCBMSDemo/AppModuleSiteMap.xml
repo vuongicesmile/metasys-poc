@@ -54,9 +54,9 @@
             <Title LCID="1033" Title="Current Points" />
           </Titles>
         </SubArea>
-        <SubArea Id="sub_0_2_1" Entity="fmc_bmsreading" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
+        <SubArea Id="sub_0_2_1" Entity="fmc_bmsreadingsnapshot" ResourceId="SitemapDesigner.NewSubArea" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" Sku="All,OnPremise,Live,SPLA" AvailableOffline="true" PassParams="false">
           <Titles>
-            <Title LCID="1033" Title="Reading History" />
+            <Title LCID="1033" Title="BMS Readings" />
           </Titles>
         </SubArea>
       </Group>

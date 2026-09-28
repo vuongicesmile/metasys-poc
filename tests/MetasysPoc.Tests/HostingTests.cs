@@ -1,6 +1,7 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.Hosting;
-using DataverseSyncWorker.Services;
+using Dataverse.SyncWorker.App.Hosting;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Business.Services;
+using Dataverse.SyncWorker.DataAccess.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

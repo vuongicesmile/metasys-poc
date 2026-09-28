@@ -19,7 +19,7 @@
     <RolePrivilege name="prvReadfmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvReadfmc_bmspoint" level="Global" />
-    <RolePrivilege name="prvReadfmc_bmsreading" level="Global" />
+    <RolePrivilege name="prvReadfmc_bmsreadingsnapshot" level="Global" />
     <RolePrivilege name="prvReadfmc_changelog" level="Global" />
     <RolePrivilege name="prvReadfmc_spochangerequest" level="Global" />
     <RolePrivilege name="prvReadfmc_spofile" level="Global" />

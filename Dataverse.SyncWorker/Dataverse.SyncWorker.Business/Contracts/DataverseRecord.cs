@@ -1,4 +1,4 @@
-namespace DataverseSyncWorker.Contracts;
+namespace Dataverse.SyncWorker.Business.Contracts;
 
 /// <summary>
 /// Bản ghi trung gian thuần .NET mà Application tạo ra trước khi ghi Dataverse.

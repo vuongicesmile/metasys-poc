@@ -1,12 +1,12 @@
-using DataverseSyncWorker.Services;
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.DataAccess.Abstractions;
-using DataverseSyncWorker.DataAccess.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Dataverse.SyncWorker.DataAccess.Persistence;
+using Dataverse.SyncWorker.DataAccess.Services;
+using Dataverse.SyncWorker.DataAccess.Abstractions;
+using Dataverse.SyncWorker.Business.Abstractions;
 
-namespace DataverseSyncWorker.DataAccess.Hosting;
+namespace Dataverse.SyncWorker.DataAccess.Hosting;
 
 public static class ServiceCollectionExtensions
 {

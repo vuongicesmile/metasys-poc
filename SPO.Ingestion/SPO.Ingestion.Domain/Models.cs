@@ -18,6 +18,7 @@ public sealed record SpoIngestionOptions
     public string SourceNamespace { get; init; } = "bms_spo_dev01";
     public string SourceId { get; init; } = "FMC";
     public int HistoryTtlSeconds { get; init; } = 2_592_000;
+    public bool HistoryEnabled { get; init; } = false;
     public int BatchSize { get; init; } = 100;
     public long MaxFileBytes { get; init; } = 52_428_800;
     public string RawContainer { get; init; } = "spo-raw";

@@ -1,6 +1,6 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.Models;
-using DataverseSyncWorker.Services;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Business.Services;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace MetasysPoc.Tests;

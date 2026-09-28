@@ -1,7 +1,3 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.Contracts;
-using DataverseSyncWorker.DataAccess.Persistence;
-using DataverseSyncWorker.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
@@ -10,8 +6,13 @@ using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Dataverse.SyncWorker.DataAccess.Persistence;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Business.Contracts;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Business.Services;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public static class Verification
 {
@@ -170,12 +171,17 @@ public static class Verification
         var summary = await sql.Summary(CancellationToken.None);
         Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(summary));
         await using var c = await sql.Open(CancellationToken.None);
-        using var cmd = sql.Command(c, """
-            SELECT TOP(25) r.id,r.object_id,r.object_name,r.object_type,r.building,r.equipment_code,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at
-            FROM raw.bms_reading r JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id
-            WHERE d.history_done=1 ORDER BY r.id DESC;
-            """);
-        var samples = await SqlStore.Read(cmd,CancellationToken.None);
+        var samples = new List<BmsReading>();
+        if (options.SnapshotSyncEnabled)
+        {
+            using var cmd = sql.Command(c, """
+                SELECT TOP(25) r.id,r.object_id,r.object_name,r.object_type,r.building,r.equipment_code,r.reading_time,r.reading_value,r.unit,r.source_system,r.ingested_at
+                FROM raw.bms_reading r JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id
+                WHERE d.history_done=1 AND r.id > @snapshotStartSqlId ORDER BY r.id DESC;
+                """);
+            cmd.Parameters.Add("@snapshotStartSqlId", System.Data.SqlDbType.BigInt).Value = options.SnapshotStartSqlId;
+            samples = await SqlStore.Read(cmd, CancellationToken.None);
+        }
         var catalog = await services.GetRequiredService<ISqlCatalogReader>().Read(CancellationToken.None);
         foreach (var building in catalog.Buildings)
         {
@@ -195,18 +201,13 @@ public static class Verification
         }
         foreach (var r in samples)
         {
-            if (mapper.History(r,DateTime.UtcNow) is null) continue;
-            var target = new EntityReference("fmc_bmsreading", new KeyAttributeCollection
-            {
-                ["fmc_bmsreadingid"] = mapper.ReadingId(r.Id), ["partitionid"] = ReadingMapper.Partition(r.ObjectId)
-            });
-            var actual = ((RetrieveResponse)await client.ExecuteAsync(new RetrieveRequest
-                { Target = target, ColumnSet = new ColumnSet("fmc_sqlreadingid","fmc_readingvalue","fmc_objectid") })).Entity;
+            var actual = await client.RetrieveAsync(ReadingSnapshotMigration.Table, mapper.ReadingId(r.Id),
+                new ColumnSet("fmc_sqlreadingid", "fmc_readingvalue", "fmc_objectid"));
             Assert(actual.GetAttributeValue<string>("fmc_sqlreadingid") == r.Id.ToString() &&
                    actual.GetAttributeValue<decimal?>("fmc_readingvalue") == r.ReadingValue &&
-                   actual.GetAttributeValue<string>("fmc_objectid") == r.ObjectId, $"live history SQL row {r.Id}");
+                   actual.GetAttributeValue<string>("fmc_objectid") == r.ObjectId, $"live snapshot SQL row {r.Id}");
         }
-        Console.WriteLine($"Reconciled up to {samples.Count} history samples. Pending={summary.PendingRows}, dead-letter={summary.DeadLetterRows}. Current state is eventually consistent while source ingestion runs.");
+        Console.WriteLine($"Reconciled up to {samples.Count} post-cutover snapshot samples. Pending={summary.PendingRows}, dead-letter={summary.DeadLetterRows}. Current state is eventually consistent while source ingestion runs.");
     }
 
     public static async Task VerifyRelationships(IServiceProvider services)
@@ -253,6 +254,7 @@ public static class Verification
         public Dictionary<Guid,DataverseRecord> Equipment { get; } = [];
         public Dictionary<Guid,DataverseRecord> Points { get; } = [];
         public Dictionary<(Guid,string),DataverseRecord> History { get; } = [];
+        public Dictionary<Guid,DataverseRecord> Snapshots { get; } = [];
         public bool FailAfterHistory { get; set; }
         public Task WriteBuildings(IReadOnlyList<DataverseRecord> buildings,CancellationToken ct)
         { foreach(var b in buildings) Buildings[b.Id]=b; return Task.CompletedTask; }
@@ -266,6 +268,8 @@ public static class Verification
             if(FailAfterHistory) throw new TimeoutException("Simulated lost response after remote commit");
             return Task.CompletedTask;
         }
+        public Task WriteSnapshot(IReadOnlyList<DataverseRecord> rows, CancellationToken ct)
+        { foreach (var row in rows) Snapshots[row.Id] = row; return Task.CompletedTask; }
     }
 
     private sealed class TestRequestStore : ISyncRequestStore

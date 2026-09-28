@@ -3,13 +3,15 @@ using System.Security.Cryptography;
 using System.ServiceModel;
 using System.Text;
 using System.Text.Json;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Domain;
+using Dataverse.SyncWorker.Business.Services;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public interface IBmsRelationStore
 {

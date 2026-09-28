@@ -16,7 +16,7 @@ when a task depends on it.
 | Runtime role | FM Central BMS Integration |
 | SQL source | localhost / FM_Central / raw.bms_reading |
 | SourceId | FMC |
-| Point / history | fmc_bmspoint standard / fmc_bmsreading elastic |
+| Point / reading history | fmc_bmspoint standard / fmc_bmsreadingsnapshot standard |
 | Request / flow | fmc_syncrequest / FMC - Request SQL to Dataverse Sync |
 | Worker mode | CommandDriven (Dataverse request queue) |
 
@@ -42,10 +42,12 @@ to this baseline. Public identifiers above do not supply credentials.
 | Flow/connection/environment-variable provisioning | [PowerAutomateProvisioner.cs](../../../../Dataverse.SyncWorker/Dataverse.SyncWorker.DataAccess/Services/PowerAutomateProvisioner.cs) |
 | SQL integration schema | [create-dataverse-sync-tables.sql](../../../../sql/create-dataverse-sync-tables.sql) |
 
-History GUID is derived from SourceId + SQL id; point GUID from SourceId +
-object_id. partitionid is the SHA256 hex of object_id. Preserve the exact
-implementation. Current history TTL defaults to 2,592,000 seconds, calculated
-from reading time; a change does not automatically rewrite existing records.
+Reading GUID is derived from SourceId + SQL id; point GUID from SourceId +
+object_id. The Standard table contains 7,863 base rows from 2026-09-10
+Asia/Bangkok and post-cutover SQL IDs above 82708; it has no TTL. The SQL
+worker uses `SnapshotSyncEnabled=true`, `HistoryEnabled=false` and acknowledges
+new rows only after point and Standard reading writes. Raw SQL retains full
+history. The former elastic partition/TTL mapping must not be re-enabled.
 
 ## Windows developer authentication
 
@@ -93,7 +95,8 @@ Run from the repository root. Do not start a write mode merely to inspect status
 | Command or mode | Effect |
 | --- | --- |
 | dotnet build .\MetasysPoc.sln | Local build |
-| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --verify | Live SQL/Dataverse reads; up to 25 retained history samples |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --verify | Live SQL/Dataverse point and ledger reads |
+| dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --verify-reading-snapshot | Read-only count/code check for base day and post-cutover readings |
 | dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -c Release --no-launch-profile -- --self-test | Creates/removes isolated SQL test database; simulated cloud sink |
 | dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --provision | Cloud metadata, views, solution and role writes |
 | dotnet run --project .\Dataverse.SyncWorker\Dataverse.SyncWorker.App -- --run-once | One synchronization batch and SQL delivery-state writes |
@@ -115,6 +118,7 @@ avoids SQL persistence but creates a simulator subscription.
 ## Verification limits
 
 The delivery ledger is the authority for pending rows. lastSuccessfulId is
-informational; history count also depends on TTL, HistoryEnabled and ingestion
-in progress. --verify reports samples and ledger counts, not an exhaustive
+informational; the 10/09 base is independent of new delivery receipts, while
+post-cutover Standard readings use `history_done` in the delivery ledger.
+--verify reports point/catalog and ledger checks, not an exhaustive
 point comparison, zero data loss, or a throughput/capacity certification.

@@ -1,4 +1,4 @@
-namespace SPO.Ingestion.Business;
+namespace SPO.Ingestion.Business.Contracts;
 
 /// <summary>Kết quả xử lý một file đã được lưu trong Dataverse inbox.</summary>
 public sealed record SpoInboxFileResult(

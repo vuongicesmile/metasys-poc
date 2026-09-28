@@ -1,9 +1,9 @@
-using DataverseSyncWorker.Abstractions;
 using System.Diagnostics;
-using DataverseSyncWorker.Models;
 using Microsoft.Extensions.Logging;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Business.Abstractions;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.Business.Services;
 
 public sealed class CommandProcessor(ISyncRequestStore requests, ISyncLedger sql, ISyncEngine engine,
     SyncOptions options, ILogger<CommandProcessor> logger) : ICommandProcessor

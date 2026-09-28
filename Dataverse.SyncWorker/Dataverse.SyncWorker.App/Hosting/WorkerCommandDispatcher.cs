@@ -1,7 +1,9 @@
-using DataverseSyncWorker.Models;
-using DataverseSyncWorker.Services;
+using Dataverse.SyncWorker.Business.Services;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.DataAccess.Services;
+using Dataverse.SyncWorker.Domain;
 
-namespace DataverseSyncWorker.Hosting;
+namespace Dataverse.SyncWorker.App.Hosting;
 
 // Command dispatch is a composition boundary. Resolve only the services needed
 // by the selected maintenance command; none of these paths start hosted workers.
@@ -87,6 +89,11 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             await services.GetRequiredService<DataverseProvisioner>().VerifySpoIngestion();
             return true;
         }
+        if (args.Contains("--provision-building-code"))
+        {
+            await services.GetRequiredService<DataverseProvisioner>().ProvisionBuildingCode();
+            return true;
+        }
         if (args.Contains("--spo-change-status"))
         {
             await services.GetRequiredService<DataverseProvisioner>().PrintSpoChangeStatus();
@@ -102,11 +109,6 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             await services.GetRequiredService<DataverseProvisioner>().VerifySpoChanges();
             return true;
         }
-        if (args.Contains("--provision-building-code"))
-        {
-            await services.GetRequiredService<DataverseProvisioner>().ProvisionBuildingCode();
-            return true;
-        }
         if (args.Contains("--provision")) { await services.GetRequiredService<DataverseProvisioner>().Run(); return true; }
         if (args.Contains("--register-plugin"))
         {
@@ -118,6 +120,11 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
         if (args.Contains("--plugin-status"))
         {
             await services.GetRequiredService<DataversePluginProvisioner>().PrintPluginStatus();
+            return true;
+        }
+        if (args.Contains("--ensure-migration-ledger"))
+        {
+            services.GetRequiredService<DataverseProvisioner>().EnsureMigrationLedger();
             return true;
         }
         if (args.Contains("--verify")) { await Verification.Reconcile(services); return true; }

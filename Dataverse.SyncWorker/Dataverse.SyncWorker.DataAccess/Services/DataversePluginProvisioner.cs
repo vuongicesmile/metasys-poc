@@ -1,13 +1,13 @@
 using System.Reflection;
 using System.Text.Json;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 /// <summary>
 /// Registers the BMS plug-in assembly, validation steps and sync-request Custom API.

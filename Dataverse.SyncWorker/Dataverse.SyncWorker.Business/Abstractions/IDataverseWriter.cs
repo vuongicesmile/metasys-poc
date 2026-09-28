@@ -1,6 +1,6 @@
-using DataverseSyncWorker.Contracts;
+using Dataverse.SyncWorker.Business.Contracts;
 
-namespace DataverseSyncWorker.Abstractions;
+namespace Dataverse.SyncWorker.Business.Abstractions;
 
 /// <summary>
 /// Cổng ghi các bản ghi đã được mapper sang Dataverse.
@@ -12,4 +12,5 @@ public interface IDataverseWriter
     Task WriteEquipment(IReadOnlyList<DataverseRecord> equipment, CancellationToken ct);
     Task WritePoints(IReadOnlyList<DataverseRecord> points, CancellationToken ct);
     Task WriteHistory(IReadOnlyList<DataverseRecord> readings, CancellationToken ct);
+    Task WriteSnapshot(IReadOnlyList<DataverseRecord> readings, CancellationToken ct);
 }

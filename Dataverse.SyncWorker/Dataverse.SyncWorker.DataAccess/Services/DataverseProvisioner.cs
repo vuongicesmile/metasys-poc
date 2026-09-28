@@ -1,4 +1,4 @@
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -6,7 +6,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 /// <summary>Explicit deployment command; never runs as part of ordinary synchronization.</summary>
 public sealed partial class DataverseProvisioner(DataverseConnection connection, SyncOptions options)
@@ -33,7 +33,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
         foreach (var (table, label, elastic, columns) in new[]
         {
             ("fmc_bmspoint", "BMS Point", false, Columns(false)),
-            ("fmc_bmsreading", "BMS Reading", true, Columns(true)),
+            (ReadingSnapshotMigration.Table, "BMS Reading Snapshot", false, Columns(true)),
             ("fmc_syncrequest", "Sync Request", false, SyncRequestColumns()),
             ("fmc_notification", "Notification", false, NotificationColumns())
         })
@@ -136,8 +136,6 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
         // Elastic uses its built-in primary GUID + partitionid key only.
         await ConfigureDefaultView(client, "fmc_bmspoint", "Active BMS Points",
             ["fmc_objectid", "fmc_name", "fmc_objecttype", "fmc_currentvalue", "fmc_unit", "fmc_lastreadingtime", "fmc_buildingcode", "fmc_building"]);
-        await ConfigureDefaultView(client, "fmc_bmsreading", "All BMS Readings",
-            ["fmc_objectid", "fmc_objectname", "fmc_objecttype", "fmc_readingvalue", "fmc_unit", "fmc_readingtime", "fmc_building"]);
         await ConfigureDefaultView(client, "fmc_syncrequest", "Active Sync Requests",
             ["fmc_name", "fmc_status", "fmc_requestedcutoffid", "fmc_startedat", "fmc_completedat", "fmc_deliveredrows", "fmc_pendingafter"]);
         await ConfigureDefaultView(client, "fmc_notification", "Active Notifications",
@@ -150,7 +148,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
             $"<condition attribute=\"fmc_status\" operator=\"in\"><value>{SyncRequestStatuses.Succeeded}</value><value>{SyncRequestStatuses.CompletedWithIssues}</value></condition>");
         await client.ExecuteAsync(new PublishXmlRequest
         {
-            ParameterXml = "<importexportxml><entities><entity>fmc_bmspoint</entity><entity>fmc_bmsreading</entity><entity>fmc_syncrequest</entity><entity>fmc_notification</entity></entities></importexportxml>"
+            ParameterXml = "<importexportxml><entities><entity>fmc_bmspoint</entity><entity>fmc_bmsreadingsnapshot</entity><entity>fmc_syncrequest</entity><entity>fmc_notification</entity></entities></importexportxml>"
         });
 
         var rootQuery = new QueryExpression("businessunit") { ColumnSet = new ColumnSet("businessunitid") };
@@ -164,7 +162,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
             ["name"] = "FM Central BMS Integration", ["businessunitid"] = new EntityReference("businessunit", root)
         });
         var privileges = new List<RolePrivilege>();
-        foreach (var table in new[] { "fmc_bmspoint", "fmc_bmsreading", "fmc_syncrequest", "fmc_notification" })
+        foreach (var table in new[] { "fmc_bmspoint", ReadingSnapshotMigration.Table, "fmc_syncrequest", "fmc_notification" })
         {
             var meta = ((RetrieveEntityResponse)await client.ExecuteAsync(new RetrieveEntityRequest
                 { LogicalName = table, EntityFilters = EntityFilters.Privileges })).EntityMetadata;
@@ -314,6 +312,7 @@ public sealed partial class DataverseProvisioner(DataverseConnection connection,
         yield return Time(history ? "fmc_readingtime" : "fmc_lastreadingtime", "Reading Time");
         if (history)
         {
+            yield return Text("fmc_equipmentcode", "Equipment Code", 100);
             yield return Text("fmc_externalkey", "External Key (reference)", 100);
             yield return Text("fmc_objectname", "Object Name", 200);
             yield return Time("fmc_sqlingestedat", "SQL Ingested At");

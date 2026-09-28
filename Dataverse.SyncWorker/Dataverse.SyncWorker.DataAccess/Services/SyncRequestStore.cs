@@ -1,13 +1,13 @@
 using System.ServiceModel;
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.Models;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Extensions.Logging;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Business.Abstractions;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public sealed class SyncRequestStore(DataverseConnection connection, SyncOptions options,
     ILogger<SyncRequestStore> logger)

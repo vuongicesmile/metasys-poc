@@ -1,8 +1,8 @@
 using System.ServiceModel;
-using DataverseSyncWorker.Abstractions;
+using Dataverse.SyncWorker.Business.Abstractions;
 using Microsoft.Xrm.Sdk;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 /// <summary>Phân loại lỗi Dataverse SDK tại boundary DataAccess.</summary>
 public sealed class DataverseFailureClassifier : IIntegrationFailureClassifier

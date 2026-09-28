@@ -5,6 +5,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| React handbook | [Custom API CRUD — Point Issue](interactive/custom-api-crud-guide/README.md) | Mở local port 5431: 10 bài, code C#/React theo file, CRUD sandbox; hướng dẫn tự implement, chưa deploy feature |
 | Runbook | [Change Log bằng plugin](runbooks/change-log-plugin.vi.md) | Ghi vết Create/Update/Delete Building và Equipment; source chuẩn bị, chưa deploy do thiếu khóa ký |
 | Plan | [Agents trong Power Apps BMS](plans/power-apps-bms-agents.vi.md) | Assistant tra dữ liệu/chẩn đoán sync, gọi Custom API, roadmap Agent feed và tích hợp PCF; Agent MVP đã publish, tools/host còn chờ |
 | Plan | [Thông báo SPO đổi file và tự sync sau 5 phút](plans/spo-change-notification-auto-sync.vi.md) | Home báo file đổi, nút Sync now và Power Automate tự dispatch khi đến hạn; đề xuất, chưa triển khai |
@@ -31,6 +32,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | Plan | [SPO Cloud Ingestion Service](plans/spo-cloud-ingestion-service.vi.md) | CSV/JSON/XLSX → column Bronze hiện có; Core/Functions/Bicep đã implement local, cloud chưa deploy |
 | Runbook | [Build/deploy/test SPO Cloud Ingestion](runbooks/spo-cloud-ingestion-service.vi.md) | Dry-run data lớn, deploy Azure, tạo capture flow, test UI và đọc receipts |
 | Runbook | [SPO Local Ingestion](runbooks/spo-local-ingestion.vi.md) | Chạy parser/mapper mới ở local và upsert trực tiếp vào các Bronze table khi chưa có Azure subscription |
+| Runbook | [Email khi SPO Excel thay đổi](runbooks/spo-excel-change-email.vi.md) | Flow solution-aware theo dõi file `.xlsx` trong FMC-Inbox, gửi email tới recipient cấu hình và cách kiểm tra Run history |
 | Runbook | [Triển khai và test SharePoint Online → Dataverse](runbooks/spo-file-ingestion.vi.md) | Receipt live của schema/UI, PAC commands, cấu hình flow còn thiếu và demo fixtures end-to-end |
 | Runbook | [Tracing plugin Equipment](runbooks/dataverse-plugin-tracing.vi.md) | Build bản tracing, bật logging và đọc START/SKIP/BLOCK/PASS |
 | Plan nâng cao | [BMS Maintenance Engine](plans/plugin-bms-maintenance-engine.vi.md) | Thiết kế phiếu bảo trì, state machine, plugin transaction/history, UI và concurrency; chưa deploy |

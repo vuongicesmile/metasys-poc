@@ -1,7 +1,7 @@
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Data.SqlClient;
 
-namespace DataverseSyncWorker.DataAccess.Abstractions;
+namespace Dataverse.SyncWorker.DataAccess.Abstractions;
 
 /// <summary>
 /// Boundary cho các thao tác SQL cần giữ connection/session riêng.

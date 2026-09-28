@@ -23,11 +23,14 @@ duplicates. Carry out authorized work without re-asking settled choices.
 
 ## Preserve the BMS contract
 
-- Derive reading and point GUIDs and partitions with ReadingMapper.
+- Derive snapshot reading and point GUIDs with ReadingMapper. The retired
+  elastic partition mapping is historical, not part of new writes.
 - Do not manually seed a point under a different GUID for the same object_id.
 - Preserve bigint IDs as text and validate numeric range, decimal precision and UTC.
-- Preserve event-age TTL. An expired reading may be acknowledged without a
-  history write; distinguish this from a dropped/error row.
+- The Standard reading table has no TTL. With `SnapshotSyncEnabled=true`, SQL
+  IDs above `SnapshotStartSqlId=82708` are written after point upserts and before
+  acknowledgement. `HistoryEnabled=false` keeps the deleted Elastic path off.
+  Pre-cutover delivered rows are not replayed automatically.
 - Pending selection uses the ledger, including rows committed below an older
   high watermark. Current state must not regress during backfill.
 - Respect the configured batch limit (currently 1..100) and single pipeline writer.

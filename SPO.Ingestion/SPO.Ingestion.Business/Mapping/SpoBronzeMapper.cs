@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.Business;
+namespace SPO.Ingestion.Business.Mapping;
 
 /// <summary>
 /// Chuyển từng dòng CSV/JSON/XLSX đã parse thành các bản ghi đích thuần .NET.
@@ -141,6 +141,8 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
             output.Add(new(row.Ordinal, objectId, BronzeRecordKind.Point, point, time,
                 ParentIdentity: attachEquipment ? meter : null));
 
+            if (!options.HistoryEnabled) continue;
+
             // History hết TTL vẫn bỏ qua, nhưng current point phía trên vẫn được giữ.
             var remaining = (int)Math.Ceiling((time.AddSeconds(options.HistoryTtlSeconds) - utcNow).TotalSeconds);
             if (remaining <= 0) { expired(); continue; }
@@ -155,6 +157,7 @@ public sealed class SpoBronzeMapper(SpoIngestionOptions options)
                 ["fmc_objecttype"] = metric.Label,
                 ["fmc_building"] = building,
                 ["fmc_readingtime"] = time,
+                ["fmc_equipmentcode"] = meter,
                 ["fmc_readingvalue"] = value,
                 ["fmc_unit"] = metric.Unit,
                 ["fmc_sourcesystem"] = "SharePoint",

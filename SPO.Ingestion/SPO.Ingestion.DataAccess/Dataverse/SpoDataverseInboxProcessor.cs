@@ -4,11 +4,12 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
-using SPO.Ingestion.Business;
-using SPO.Ingestion.Common;
+using SPO.Ingestion.Business.Contracts;
+using SPO.Ingestion.Business.Processing;
+using SPO.Ingestion.Common.Configuration;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.DataAccess;
+namespace SPO.Ingestion.DataAccess.Dataverse;
 
 /// <summary>
 /// Đọc file đã archive trong Dataverse và giao nội dung cho Application xử lý.

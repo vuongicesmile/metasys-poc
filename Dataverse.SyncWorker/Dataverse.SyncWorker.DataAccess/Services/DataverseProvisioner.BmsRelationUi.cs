@@ -1,8 +1,9 @@
 using System.Xml.Linq;
+using Dataverse.SyncWorker.Business.Services;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public sealed partial class DataverseProvisioner
 {

@@ -3,12 +3,13 @@ using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using SPO.Ingestion.App.Hosting;
 using SPO.Ingestion.Business.Abstractions;
-using DataverseSyncWorker.Models;
-using DataverseSyncWorker.Services;
-using SPO.Ingestion.Business;
-using SPO.Ingestion.Common;
 using SPO.Ingestion.DataAccess;
 using SPO.Ingestion.Domain;
+using Dataverse.SyncWorker.DataAccess.Services;
+using SPO.Ingestion.Common.Configuration;
+using SPO.Ingestion.DataAccess.Dataverse;
+using Dataverse.SyncWorker.Common.Configuration;
+using SPO.Ingestion.Business.Processing;
 
 // Không có command hoặc có --help thì chỉ in hướng dẫn, không mở kết nối Dataverse.
 if (args.Length == 0 || args[0] is "-h" or "--help")
@@ -162,8 +163,7 @@ Environment.ExitCode = exit;
 
 static SyncOptions LoadDataverseOptions(string path)
 {
-    // Apply the same ignored per-machine override as the SQL worker. The SPO
-    // consumer still uses the checked-in target organization and source IDs.
+    // Apply the same ignored per-machine override as the SQL worker.
     using var document = JsonDocument.Parse(File.ReadAllText(path));
     if (!document.RootElement.TryGetProperty("Dataverse", out var section))
         throw new InvalidOperationException($"Dataverse section is missing in '{path}'.");

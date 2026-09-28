@@ -1,9 +1,9 @@
-using DataverseSyncWorker.Abstractions;
-using DataverseSyncWorker.DataAccess.Persistence;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Business.Abstractions;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.DataAccess.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 /// <summary>
 /// Adapter EF Core chuyển các row persistence thành domain record.

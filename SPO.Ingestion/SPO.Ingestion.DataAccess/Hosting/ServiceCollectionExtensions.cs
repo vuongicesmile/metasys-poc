@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using SPO.Ingestion.Business.Abstractions;
+using SPO.Ingestion.DataAccess.Dataverse;
+using SPO.Ingestion.DataAccess.Storage;
 using SPO.Ingestion.Domain;
 
 namespace SPO.Ingestion.DataAccess.Hosting;

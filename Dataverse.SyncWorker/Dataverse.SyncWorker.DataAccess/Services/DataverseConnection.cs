@@ -1,11 +1,11 @@
 using System.Data.Common;
 using System.Diagnostics;
 using System.Text.Json;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.Common.Configuration;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 public sealed class DataverseConnection(SyncOptions options) : IDisposable
 {

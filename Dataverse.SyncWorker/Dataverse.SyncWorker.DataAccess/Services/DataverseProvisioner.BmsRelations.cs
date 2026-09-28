@@ -1,13 +1,15 @@
 using System.Text.Json;
 using System.Xml.Linq;
-using DataverseSyncWorker.Models;
+using Dataverse.SyncWorker.DataAccess.Services;
+using Dataverse.SyncWorker.Domain;
+using Dataverse.SyncWorker.Business.Services;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DataverseSyncWorker.Services;
+namespace Dataverse.SyncWorker.DataAccess.Services;
 
 // Additive migration: explicitly invoked, independent of flow/role provisioning and SQL sync.
 public sealed partial class DataverseProvisioner

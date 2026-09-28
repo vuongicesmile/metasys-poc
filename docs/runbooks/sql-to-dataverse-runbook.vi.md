@@ -1,5 +1,11 @@
 # Quy trình SQL → Dataverse
 
+Từ 24/09/2026, worker đồng bộ **current point** và reading mới vào bảng
+Standard `fmc_bmsreadingsnapshot`. Bảng này giữ 7.863 reading ngày 10/09/2026
+theo giờ Việt Nam, rồi nhận các SQL ID lớn hơn mốc cutover `82708`; có
+`fmc_equipmentcode` và không dùng TTL. `raw.bms_reading` trong SQL vẫn giữ toàn
+bộ lịch sử. Không bật lại ghi vào bảng Elastic cũ đã xóa.
+
 ## Kích hoạt cho các lần sau
 
 Sau khi hoàn thành thiết lập lần đầu, mở
@@ -32,15 +38,16 @@ Cấu hình ở [appsettings.json](../../Dataverse.SyncWorker/Dataverse.SyncWork
 | Organization ID cần khớp | ab191700-b99e-f111-aaa0-000d3a80bb96 |
 | Solution / prefix | FMCentralBms / fmc |
 | Trạng thái mới nhất | fmc_bmspoint, standard table |
-| Lịch sử gần đây | fmc_bmsreading, elastic table |
+| Reading Standard | fmc_bmsreadingsnapshot, 7.863 dòng nền 10/09 và readings mới sau cutover |
 | Execution mode | CommandDriven |
 | Chu kỳ poll request | 10 giây |
 | Batch tối đa | 100 dòng |
-| History TTL mặc định | 30 ngày tính từ thời điểm reading |
+| HistoryEnabled | false; không ghi vào Elastic cũ |
+| SnapshotSyncEnabled / SnapshotStartSqlId | true / 82708; ghi Standard cho SQL ID lớn hơn mốc |
 | SourceId | FMC |
 
 Các giá trị có thể được override bởi cấu hình môi trường hoặc tham số worker.
-Đừng đổi SourceId, GUID mapping, partition hay ledger để chạy lại dữ liệu.
+Đừng đổi SourceId, GUID mapping hay ledger để chạy lại dữ liệu.
 
 ## 2. Chuẩn bị SQL và Dataverse — làm một lần
 
@@ -127,8 +134,8 @@ SQL/private key theo [Power Automate runbook](power-automate-sql-sync.vi.md).
 Lệnh đọc SQL và Dataverse, không bắt đầu vòng lặp đồng bộ. Worker kiểm tra
 Organization ID; nếu khác cấu hình thì từ chối sử dụng connection.
 
-Kết quả gồm số dòng nguồn, đã giao, đang chờ, dead-letter và tối đa 25 mẫu lịch sử
-còn trong thời gian lưu giữ. PendingRows lớn hơn 0 có nghĩa còn dữ liệu cần xử lý,
+Kết quả gồm số dòng nguồn, đã giao, đang chờ, dead-letter và tối đa 25 mẫu reading
+sau cutover trong bảng Standard. PendingRows lớn hơn 0 có nghĩa còn dữ liệu cần xử lý,
 không nhất thiết là lỗi kết nối. Mẫu kiểm tra thành công không chứng minh mọi
 dòng, current point, capacity hoặc quyền ghi đều đã được kiểm thử.
 
@@ -144,12 +151,12 @@ Sau mỗi lần kích hoạt, worker thực hiện:
 2. Chọn các dòng còn thiếu delivery receipt, loại riêng các dead-letter chưa xử lý.
 3. Validate giá trị và timestamp; ghi nhận riêng các dòng không hợp lệ.
 4. Upsert trạng thái mới nhất của từng point.
-5. Upsert lịch sử còn trong TTL bằng GUID và partition ổn định.
-6. Ghi receipt khi cả point và history được yêu cầu đã thành công.
+5. Với SQL ID lớn hơn `82708`, upsert reading vào `fmc_bmsreadingsnapshot`.
+6. Ghi receipt sau khi cả point và reading cần ghi đã thành công.
 7. Tiếp tục batch kế tiếp đến cutoff, cập nhật heartbeat/progress và kết thúc request.
 
-Dữ liệu đã giao không bị tạo bản sao chỉ vì mở lại worker. Dòng history quá tuổi
-TTL được bỏ qua có chủ đích, còn SQL vẫn giữ lịch sử đầy đủ.
+Dữ liệu đã giao không bị tạo bản sao chỉ vì mở lại worker. SQL vẫn giữ lịch sử
+đầy đủ; Dataverse giữ current point, dữ liệu nền ngày 10/09 và readings sau cutover.
 
 Nguồn phát sinh SQL hoạt động độc lập. Nếu cần dữ liệu giả mới cho demo, chạy
 `BMS.Fake.App` và `BMS.Ingestion.App` theo [README](../../README.md). File kích hoạt này

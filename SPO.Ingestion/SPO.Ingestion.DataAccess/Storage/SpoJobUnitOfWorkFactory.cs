@@ -1,7 +1,7 @@
 using SPO.Ingestion.Business.Abstractions;
 using SPO.Ingestion.Domain;
 
-namespace SPO.Ingestion.DataAccess;
+namespace SPO.Ingestion.DataAccess.Storage;
 
 public sealed class SpoJobUnitOfWorkFactory(ISpoJobStore store) : ISpoJobUnitOfWorkFactory
 {

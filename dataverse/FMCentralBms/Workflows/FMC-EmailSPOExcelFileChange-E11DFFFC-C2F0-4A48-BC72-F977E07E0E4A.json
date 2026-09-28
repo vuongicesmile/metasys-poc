@@ -1,0 +1,146 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedsharepointonline"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedoffice365outlook"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "SpoSiteUrl": {
+          "type": "String",
+          "defaultValue": "https://titancorpvncom.sharepoint.com/sites/Powerplatform",
+          "metadata": {
+            "schemaName": "fmc_SpoSiteUrl"
+          }
+        },
+        "SpoLibraryId": {
+          "type": "String",
+          "defaultValue": "7d9282a4-c45d-4ef8-8719-18f78e71d0d0",
+          "metadata": {
+            "schemaName": "fmc_SpoLibraryId"
+          }
+        },
+        "SpoInboxPath": {
+          "type": "String",
+          "defaultValue": "/Shared Documents/FMC-Inbox",
+          "metadata": {
+            "schemaName": "fmc_SpoInboxPath"
+          }
+        },
+        "EmailRecipient": {
+          "type": "String",
+          "defaultValue": "vuong.nguyenq@titancorpvn.com",
+          "metadata": {
+            "schemaName": "fmc_SpoExcelChangeEmailRecipient"
+          }
+        }
+      },
+      "triggers": {
+        "When_Excel_file_created_or_modified": {
+          "type": "OpenApiConnection",
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 1
+          },
+          "splitOn": "@triggerBody()?['value']",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetOnUpdatedFileItems"
+            },
+            "parameters": {
+              "dataset": "@parameters('SpoSiteUrl')",
+              "table": "@parameters('SpoLibraryId')"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Supported_FMC_Excel_source": {
+          "type": "If",
+          "runAfter": {},
+          "expression": "@and(endsWith(toLower(concat('/', triggerBody()?['{FullPath}'])),'.xlsx'),not(startsWith(triggerBody()?['{FilenameWithExtension}'],'~$')),or(startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])),toLower(concat(parameters('SpoInboxPath'),'/01-Master/Building/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])),toLower(concat(parameters('SpoInboxPath'),'/01-Master/Equipment/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])),toLower(concat(parameters('SpoInboxPath'),'/01-Master/ElectricMeter/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])),toLower(concat(parameters('SpoInboxPath'),'/01-Master/WaterMeter/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])),toLower(concat(parameters('SpoInboxPath'),'/02-Telemetry/Electricity/'))),startsWith(toLower(concat('/', triggerBody()?['{FullPath}'])),toLower(concat(parameters('SpoInboxPath'),'/02-Telemetry/Water/')))))",
+          "actions": {
+            "Get_file_metadata": {
+              "type": "OpenApiConnection",
+              "runAfter": {},
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileMetadata"
+                },
+                "parameters": {
+                  "dataset": "@parameters('SpoSiteUrl')",
+                  "id": "@triggerBody()?['{Identifier}']"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Send_email": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Get_file_metadata": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                  "connectionName": "shared_office365",
+                  "operationId": "SendEmailV2"
+                },
+                "parameters": {
+                  "emailMessage/To": "@parameters('EmailRecipient')",
+                  "emailMessage/Subject": "@concat('[FMC] SharePoint Excel changed: ',coalesce(triggerBody()?['{FilenameWithExtension}'],'Excel file'))",
+                  "emailMessage/Body": "@concat('<p>A SharePoint Excel file was created or modified.</p>','<p><b>File:</b> ',coalesce(triggerBody()?['{FilenameWithExtension}'],'Excel file'),'<br/><b>Path:</b> ',concat('/', triggerBody()?['{FullPath}']),'<br/><b>Modified by:</b> ',coalesce(triggerBody()?['Editor']?['DisplayName'],triggerBody()?['Editor']?['Email'],'Unknown'),'<br/><b>Modified at (UTC):</b> ',coalesce(triggerBody()?['Modified'],'Unknown'),'<br/><b>Detected at (UTC):</b> ',utcNow(),'<br/><b>ETag:</b> ',coalesce(body('Get_file_metadata')?['ETag'],'Unknown'),'</p><p><a href=\"',coalesce(triggerBody()?['{Link}'],''),'\">Open Excel file</a></p>','<p>This notification tracks a file version, not individual changed cells or rows.</p>')",
+                  "emailMessage/Importance": "Normal"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Skip_other_files": {
+                "type": "Compose",
+                "runAfter": {},
+                "inputs": "Outside supported FMC-Inbox .xlsx sources"
+              }
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

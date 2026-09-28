@@ -1,5 +1,6 @@
-using DataverseSyncWorker.Models;
-using DataverseSyncWorker.Services;
+using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.Business.Services;
+using Dataverse.SyncWorker.DataAccess.Services;
 using Microsoft.Xrm.Sdk.Metadata;
 
 namespace MetasysPoc.Tests;
@@ -34,5 +35,6 @@ public sealed class BuildingCodeTests
         Assert.False(original.Attributes.ContainsKey("fmc_buildingcode"));
         Assert.False(mapper.Point(row, " ").Attributes.ContainsKey("fmc_buildingcode"));
         Assert.False(mapper.History(row, time)!.Attributes.ContainsKey("fmc_buildingcode"));
+        Assert.Equal("E1", mapper.History(row, time)!["fmc_equipmentcode"]);
     }
 }
