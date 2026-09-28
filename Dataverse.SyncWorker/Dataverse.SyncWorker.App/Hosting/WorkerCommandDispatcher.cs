@@ -120,6 +120,12 @@ public sealed class WorkerCommandDispatcher(IServiceProvider services, SyncOptio
             await services.GetRequiredService<DataversePluginProvisioner>().PrintPluginStatus();
             return true;
         }
+        if (args.Contains("--ensure-migration-ledger"))
+        {
+            // Chỉ tạo ledger theo yêu cầu; không chạy verify hoặc hosted sync worker.
+            services.GetRequiredService<DataverseProvisioner>().EnsureMigrationLedger();
+            return true;
+        }
         if (args.Contains("--verify")) { await Verification.Reconcile(services); return true; }
         if (args.Contains("--enqueue"))
         {
