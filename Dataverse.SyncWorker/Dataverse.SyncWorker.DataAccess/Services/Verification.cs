@@ -179,7 +179,6 @@ public static class Verification
                 FROM raw.bms_reading r JOIN integration.dataverse_delivery d ON d.pipeline=@pipeline AND d.reading_id=r.id
                 WHERE d.history_done=1 AND r.id > @snapshotStartSqlId ORDER BY r.id DESC;
                 """);
-            cmd.Parameters.Add("@snapshotStartSqlId", System.Data.SqlDbType.BigInt).Value = options.SnapshotStartSqlId;
             samples = await SqlStore.Read(cmd, CancellationToken.None);
         }
         var catalog = await services.GetRequiredService<ISqlCatalogReader>().Read(CancellationToken.None);

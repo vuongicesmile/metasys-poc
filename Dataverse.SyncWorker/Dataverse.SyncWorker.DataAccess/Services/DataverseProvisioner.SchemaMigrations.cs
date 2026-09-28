@@ -1,4 +1,5 @@
 using Dataverse.SyncWorker.DataAccess.Constants;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
@@ -21,10 +22,16 @@ public sealed partial class DataverseProvisioner
         if (!exists)
         {
             CreateMigrationLedger(service);
+            Console.WriteLine($"Created table {tableLogicalName}.");
         }
+        else Console.WriteLine($"Table {tableLogicalName} already exists.");
 
         EnsureMigrationVersionColumn(service);
-
+        service.Execute(new PublishXmlRequest
+        {
+            ParameterXml = $"<importexportxml><entities><entity>{tableLogicalName}</entity></entities></importexportxml>"
+        });
+        Console.WriteLine($"Published table {tableLogicalName}.");
     }
 
     private void EnsureMigrationVersionColumn(
@@ -38,6 +45,7 @@ public sealed partial class DataverseProvisioner
 
         if (exists)
         {
+            Console.WriteLine($"Column {DataverseSchema.SchemaMigration.VersionLogicalName} already exists.");
             return;
         }
 
@@ -68,6 +76,7 @@ public sealed partial class DataverseProvisioner
         };
 
         service.Execute(request);
+        Console.WriteLine($"Created column {DataverseSchema.SchemaMigration.VersionLogicalName}.");
     }
 
 

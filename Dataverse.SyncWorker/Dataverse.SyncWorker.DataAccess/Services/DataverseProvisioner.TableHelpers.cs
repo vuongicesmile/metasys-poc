@@ -59,10 +59,13 @@ public sealed partial class DataverseProvisioner
             return true;
         }
         catch (FaultException<OrganizationServiceFault> ex) when
-            (ex.Message.Contains(columnLogicalName, StringComparison.OrdinalIgnoreCase) &&
+            (ex.Message.Contains(tableLogicalName, StringComparison.OrdinalIgnoreCase) &&
+             ex.Message.Contains(columnLogicalName, StringComparison.OrdinalIgnoreCase) &&
              (ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
-              ex.Message.Contains("does not exist", StringComparison.OrdinalIgnoreCase)))
+              ex.Message.Contains("does not exist", StringComparison.OrdinalIgnoreCase) ||
+              ex.Message.Contains("Could not find an attribute", StringComparison.OrdinalIgnoreCase)))
         {
+            // Dataverse dùng "Could not find an attribute" cho cột chưa tồn tại.
             return false;
         }
     }
