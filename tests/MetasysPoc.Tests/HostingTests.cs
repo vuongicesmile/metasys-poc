@@ -28,6 +28,7 @@ public sealed class HostingTests
     [InlineData("--self-test")]
     [InlineData("--run-once")]
     [InlineData("--verify")]
+    [InlineData("--ensure-migration-ledger")]
     [InlineData("--process-command-once")]
     public void Maintenance_flags_are_removed_from_host_configuration(string flag)
     {
