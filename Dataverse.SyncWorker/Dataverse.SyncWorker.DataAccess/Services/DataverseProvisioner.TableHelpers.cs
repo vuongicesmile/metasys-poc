@@ -8,7 +8,7 @@ namespace Dataverse.SyncWorker.DataAccess.Services;
 // Các thao tác metadata dùng chung cho các migration.
 public sealed partial class DataverseProvisioner
 {
-    private bool TableExists(IOrganizationService service, string logicalName)
+    private static bool TableExists(IOrganizationService service, string logicalName)
     {
         try
         {

@@ -55,9 +55,10 @@ public sealed partial class DataverseProvisioner
         service.Execute(new CreateAttributeRequest
         {
             EntityName = table,
+            SolutionUniqueName = Solution,
             Attribute = new DateTimeAttributeMetadata
             {
-                SchemaName = column,
+                SchemaName = DataverseSchema.SchemaMigration.AppliedOnSchemaName,
                 DisplayName = new Label("Applied On", 1033),
                 RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.ApplicationRequired),
                 Format = DateTimeFormat.DateAndTime

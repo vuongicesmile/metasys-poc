@@ -27,4 +27,29 @@ public static class DataverseSchema
         // Checksum dùng để nhận biết nội dung migration bị thay đổi.
         public const string ChecksumSchemaName = "fmc_Checksum";
     }
+
+
+    public static class FmRequest
+    {
+        public const string TableLogicalName = "fmc_fmrequest";
+        public const string TableSchemaName = "fmc_FmRequest";
+
+        public const string PrimaryNameLogicalName = "fmc_name";
+        public const string PrimaryNameSchemaName = "fmc_Name";
+
+        public const string DescriptionLogicalName = "fmc_description";
+        public const string DescriptionSchemaName = "fmc_Description";
+
+        public const string StatusLogicalName = "fmc_status";
+        public const string StatusSchemaName = "fmc_Status";
+    }
+
+    public static class FmRequestStatus
+    {
+        public const int Draft = 100000000;
+        public const int Submitted = 100000001;
+        public const int Approved = 100000002;
+        public const int Rejected = 100000003;
+    }
+
 }
