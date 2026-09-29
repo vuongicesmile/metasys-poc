@@ -13,6 +13,7 @@ public static class DataverseSchema
 
         // Cột primary name bắt buộc của mỗi bảng Dataverse.
         public const string PrimaryNameSchemaName = "fmc_Name";
+        public const string PrimaryNameLogicalName = "fmc_name";
 
         // Các tên dưới đây dành cho cột tracking ở bước migration tiếp theo.
         // Version định danh phiên bản migration đã áp dụng.

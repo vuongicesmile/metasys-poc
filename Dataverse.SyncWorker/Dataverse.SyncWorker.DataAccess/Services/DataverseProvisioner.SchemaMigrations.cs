@@ -3,6 +3,7 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace Dataverse.SyncWorker.DataAccess.Services;
 
@@ -29,6 +30,8 @@ public sealed partial class DataverseProvisioner
         EnsureMigrationVersionColumn(service);
         // đảm bảo cột khi times được áp dụng migration
         EnsureMigrationAppliedOnColumn(service);
+
+        RunMigrations(service);
 
         service.Execute(new PublishXmlRequest
         {
@@ -116,7 +119,6 @@ public sealed partial class DataverseProvisioner
 
     }
 
-
     private void CreateMigrationLedger(IOrganizationService service)
     {
         // Chuẩn bị tên, nhãn và ownership của bảng.
@@ -138,5 +140,76 @@ public sealed partial class DataverseProvisioner
 
         // Gửi request; nếu Dataverse từ chối thì để caller thấy lỗi thật.
         service.Execute(request);
+    }
+
+    private bool MigrationAlreadyApplied(IOrganizationService service, string version)
+    {
+        // bước sau sẽ query fmc_schemamigration
+        var query = new QueryExpression(
+        DataverseSchema.SchemaMigration.TableLogicalName)
+        {
+            ColumnSet = new ColumnSet(false), // tôi ko càn lấy dữ liệu của các column về, chỉ cần biết record có tồn tại hay ko
+            TopCount = 1, // tìm thấy 1 record là đủ
+        };
+
+
+        query.Criteria.AddCondition(
+            DataverseSchema.SchemaMigration.VersionLogicalName,
+            ConditionOperator.Equal,
+            version
+        ); // giống như query sql: Where fmc_version = @version
+
+        var result = service.RetrieveMultiple(query);
+
+        return result.Entities.Count > 0;
+    }
+
+    private void ApplyMigration001( IOrganizationService service )
+    {
+        // logic thay đổi schema thật sự sẽ nằm ở đây
+        Console.WriteLine("Applying migration 001...");
+
+    }
+
+    private void RunMigrations(IOrganizationService service)
+    {
+        const string version = "001";
+
+        if (MigrationAlreadyApplied(service, version))
+        {
+            return;
+        }
+
+        ApplyMigration001(service);
+
+        RecordMigration(
+            service,
+            version,
+            "Initial migration"
+        );
+    }
+
+    private void RecordMigration(
+    IOrganizationService service,
+    string version,
+    string name)
+    {
+        var migration = new Entity(
+            DataverseSchema.SchemaMigration.TableLogicalName
+        );
+
+        migration[
+            DataverseSchema.SchemaMigration.PrimaryNameLogicalName
+        ] = name;
+
+        migration[
+            DataverseSchema.SchemaMigration.VersionLogicalName
+        ] = version;
+
+        migration[
+            DataverseSchema.SchemaMigration.AppliedOnLogicalName
+        ] = DateTime.UtcNow;
+
+        service.Create(migration);
     }
 }
