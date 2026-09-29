@@ -28,6 +28,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SyncRequestStore>();
         services.AddSingleton<ISyncRequestStore>(services => services.GetRequiredService<SyncRequestStore>());
         services.AddTransient<DataverseProvisioner>();
+        // đăng kí FM request services vô DI
+        services.AddTransient<FmRequestService>();
+        //---------------------------------------
         services.AddTransient<DataversePluginProvisioner>();
         services.AddTransient<IBmsRelationStore>(sp => new DataverseBmsRelationStore(sp.GetRequiredService<DataverseConnection>().Get()));
         services.AddTransient<BmsRelationshipSeeder>();

@@ -31,6 +31,29 @@ public static class SyncEndpoints
                 Results.Ok(new { released = await sql.Replay(id, ct) }))
                 .WithTags("Development").WithSummary("Release a corrected row for the next synchronization run");
         }
+
+        app.MapPost(
+        "api/fm-requests",
+        (
+             CreateFmRequestRequest request,
+             FmRequestService service
+        ) =>
+        {
+            var id = service.CreateFmRequest(
+                request.Name,
+                request.Description
+                );
+
+            return Results.Ok(id);
+        })
+        .WithTags("FM Requests")
+        .WithSummary("Create a new FM Request in Draft status");
+
         return app;
     }
 }
+
+public sealed record CreateFmRequestRequest(
+    string Name,
+    string Description
+);
