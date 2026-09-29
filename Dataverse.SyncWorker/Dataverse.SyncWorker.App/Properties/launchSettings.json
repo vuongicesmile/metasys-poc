@@ -10,6 +10,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+
     "migration-ledger": {
       "commandName": "Project",
       "dotnetRunMessages": true,

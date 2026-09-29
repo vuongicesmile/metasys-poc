@@ -27,6 +27,9 @@ public sealed partial class DataverseProvisioner
         else Console.WriteLine($"Table {tableLogicalName} already exists.");
 
         EnsureMigrationVersionColumn(service);
+        // đảm bảo cột khi times được áp dụng migration
+        EnsureMigrationAppliedOnColumn(service);
+
         service.Execute(new PublishXmlRequest
         {
             ParameterXml = $"<importexportxml><entities><entity>{tableLogicalName}</entity></entities></importexportxml>"
@@ -77,6 +80,40 @@ public sealed partial class DataverseProvisioner
 
         service.Execute(request);
         Console.WriteLine($"Created column {DataverseSchema.SchemaMigration.VersionLogicalName}.");
+    }
+
+
+    private void EnsureMigrationAppliedOnColumn(IOrganizationService service)
+    {
+        var exists = ColumnExists(service,
+            DataverseSchema.SchemaMigration.TableLogicalName,
+            DataverseSchema.SchemaMigration.AppliedOnLogicalName
+        );
+
+        if (exists)
+        {
+            Console.WriteLine($"Column {DataverseSchema.SchemaMigration.AppliedOnLogicalName} already exists.");
+            return;
+        }
+
+        // bước kế tiếp: define DateTimeAttributeMetadata
+        var appliedOnColumn = new DateTimeAttributeMetadata // định nghĩa 1 column kiểu Datatime
+        {
+            SchemaName = DataverseSchema.SchemaMigration.AppliedOnLogicalName, // column này tên gì trong dataverse
+            DisplayName = new Label("Applied On", 1033), // thấy tên gì
+            RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.ApplicationRequired), // có bắt buộc nhập ko
+            Format = DateTimeFormat.DateAndTime // hiển thị cả ngày giờ hay chỉ ngày
+        };
+
+        var request = new CreateAttributeRequest
+        {
+            EntityName = DataverseSchema.SchemaMigration.TableLogicalName,
+            Attribute = appliedOnColumn,
+        };
+
+        service.Execute(request);
+        Console.WriteLine($"Created column {DataverseSchema.SchemaMigration.AppliedOnLogicalName}.");
+
     }
 
 

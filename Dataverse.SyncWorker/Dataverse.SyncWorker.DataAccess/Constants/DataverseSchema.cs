@@ -21,6 +21,7 @@ public static class DataverseSchema
 
         // AppliedOn lưu thời điểm áp dụng migration.
         public const string AppliedOnSchemaName = "fmc_AppliedOn";
+        public const string AppliedOnLogicalName = "fmc_appliedon";
 
         // Checksum dùng để nhận biết nội dung migration bị thay đổi.
         public const string ChecksumSchemaName = "fmc_Checksum";
