@@ -21,15 +21,17 @@ import ReactDOM from 'react-dom';
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import Dashboard from '${process.argv.includes('--source') ? './src/Dashboard' : './trung-tam-van-hanh'}';
 window.queries = 0;
+window.queriedTables = [];
 const dataApi = { queryTable: async (table) => {
     window.queries++;
+    window.queriedTables.push(table);
     if (location.search.includes('fail')) throw Error('synthetic failure');
     const rows = {
         fmc_bmspoint: [{fmc_bmspointid:'point-1',fmc_name:'Temperature demo',fmc_building:'Building A',fmc_currentvalue:1234.56,fmc_lastreadingtime:new Date('2026-09-12T08:00:00Z')}],
         fmc_syncrequest: [{fmc_syncrequestid:'sync-1',fmc_name:'Request demo',fmc_status:789100000,fmc_deliveredrows:1234,fmc_startedat:new Date('2026-09-12T08:00:00Z')}],
         fmc_spofile: [{fmc_spofileid:'file-1',fmc_filename:'demo.csv',fmc_status:789110002,fmc_importstatus:789111000}]
     };
-    return { rows: rows[table] || [{id:'fixture'}], hasMoreRows: table === 'fmc_bmsreading' };
+    return { rows: rows[table] || [{id:'fixture'}], hasMoreRows: table === 'fmc_bmsreadingsnapshot' };
 }};
 ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataApi} pageInput={{}} /></FluentProvider>,document.getElementById('root'));
 `, resolveDir: appDir, loader: 'tsx' },
@@ -67,6 +69,9 @@ ReactDOM.render(<FluentProvider theme={webLightTheme}><Dashboard dataApi={dataAp
         assert.ok((await page.locator('main').innerText()).includes('1,234.56'));
         assert.ok((await page.locator('main').innerText()).includes('9/12/26'));
         const count = await page.evaluate(() => window.queries);
+        const queriedTables = await page.evaluate(() => window.queriedTables);
+        assert.ok(queriedTables.includes('fmc_bmsreadingsnapshot'), 'Dashboard must query the Standard reading snapshot table');
+        assert.ok(!queriedTables.includes('fmc_bmsreading'), 'Dashboard must not query the retired elastic reading table');
         // Dashboard snapshot uses eight bounded reads; the independent SPO
         // debounce banner adds one small, visibility-aware queue read.
         assert.equal(count, 9);

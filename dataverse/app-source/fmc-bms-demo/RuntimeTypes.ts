@@ -1,10 +1,10 @@
-// ---------------- Type Definitions which can be imported from ./RuntimeTypes -------------------------
+﻿// ---------------- Type Definitions which can be imported from ./RuntimeTypes -------------------------
 export interface TableRegistrations extends BaseTableRegistrations {
     "cr3c8_silvernewbmspoint": cr3c8_silvernewbmspoint,
     "fmc_bmsbuilding": fmc_bmsbuilding,
     "fmc_bmsequipment": fmc_bmsequipment,
     "fmc_bmspoint": fmc_bmspoint,
-    "fmc_bmsreading": fmc_bmsreading,
+    "fmc_bmsreadingsnapshot": fmc_bmsreadingsnapshot,
     "fmc_spochangerequest": fmc_spochangerequest,
     "fmc_spofile": fmc_spofile,
     "fmc_spoimportrow": fmc_spoimportrow,
@@ -20,6 +20,8 @@ export interface EnumRegistrations extends BaseEnumRegistrations {
     "fmc_bmsequipment-statuscode": fmc_bmsequipment_statuscode,
     "fmc_bmspoint-statecode": fmc_bmspoint_statecode,
     "fmc_bmspoint-statuscode": fmc_bmspoint_statuscode,
+    "fmc_bmsreadingsnapshot-statecode": fmc_bmsreadingsnapshot_statecode,
+    "fmc_bmsreadingsnapshot-statuscode": fmc_bmsreadingsnapshot_statuscode,
     "fmc_spochangerequest-fmc_status": fmc_spochangerequest_fmc_status,
     "fmc_spochangerequest-statecode": fmc_spochangerequest_statecode,
     "fmc_spochangerequest-statuscode": fmc_spochangerequest_statuscode,
@@ -142,14 +144,15 @@ export type fmc_bmspoint = TableRow<{
     statuscode: fmc_bmspoint_statuscode,
 }>
 
-export type fmc_bmsreading = TableRow<{
+export type fmc_bmsreadingsnapshot = TableRow<{
     // Primary Key Column
-    readonly fmc_bmsreadingid: string,
+    readonly fmc_bmsreadingsnapshotid: string,
     readonly createdbyname: string,
     readonly createdbyyominame: string,
     readonly createdonbehalfbyname: string,
     readonly createdonbehalfbyyominame: string,
     fmc_building: string,
+    fmc_equipmentcode: string,
     fmc_externalkey: string,
     fmc_name: string,
     fmc_objectid: string,
@@ -165,9 +168,11 @@ export type fmc_bmsreading = TableRow<{
     readonly modifiedbyyominame: string,
     readonly modifiedonbehalfbyname: string,
     readonly modifiedonbehalfbyyominame: string,
-    readonly owningbusinessunitname: string,
-    partitionid: string,
-    ttlinseconds: number,
+    // Foreign Key Column
+    readonly _organizationid_value: `/organization(${string})`,
+    readonly organizationidname: string,
+    statecode: fmc_bmsreadingsnapshot_statecode,
+    statuscode: fmc_bmsreadingsnapshot_statuscode,
 }>
 
 export type fmc_spochangerequest = TableRow<{
@@ -343,6 +348,14 @@ const enum fmc_bmspoint_statecode {
 "Inactive" = 1,
 }
 const enum fmc_bmspoint_statuscode {
+"Active" = 1,
+"Inactive" = 2,
+}
+const enum fmc_bmsreadingsnapshot_statecode {
+"Active" = 0,
+"Inactive" = 1,
+}
+const enum fmc_bmsreadingsnapshot_statuscode {
 "Active" = 1,
 "Inactive" = 2,
 }

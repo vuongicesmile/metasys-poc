@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using Dataverse.SyncWorker.Common.Configuration;
+using Dataverse.SyncWorker.DataAccess.Constants;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -28,6 +29,7 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
     private const string FullRequestPluginTypeName = "FMCentralBms.Plugins.RequestFullSync";
     private const string FullRequestApiName = "fmc_RequestFullSync";
     private const string NotificationPluginTypeName = "FMCentralBms.Plugins.QueueSyncNotification";
+    private const string FmRequestNotificationPluginTypeName = "FMCentralBms.Plugins.NotifyNewFmRequest";
     private const string Table = "fmc_bmsequipment";
     private const string Solution = DataverseProvisioner.Solution;
     private const string Publisher = "FMCentralBmsPublisher";
@@ -90,6 +92,8 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
             FullRequestPluginTypeName, "Request Full Sync");
         var notificationPluginType = await EnsurePluginType(client, assembly.Id,
             NotificationPluginTypeName, "Queue Sync Notification");
+        var fmRequestNotificationPluginType = await EnsurePluginType(client, assembly.Id,
+            FmRequestNotificationPluginTypeName, "Notify New FM Request");
         await AddToSolution(client, solutionId, assembly.Id, PluginAssemblyComponent,
             $"assembly {AssemblyName}", addRequiredComponents: false);
 
@@ -106,7 +110,11 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
             new StepDefinition(
                 "BMS: Queue notification on Sync Request completion", "Update", "fmc_status",
                 "fmc_syncrequest", notificationPluginType.Id, 1, 40,
-                "Creates an idempotent email notification outbox record after a terminal sync status.")
+                "Creates an idempotent email notification outbox record after a terminal sync status."),
+            new StepDefinition(
+                "BMS: Notify Operators on FM Request creation", "Create", null,
+                DataverseSchema.FmRequest.TableLogicalName, fmRequestNotificationPluginType.Id, 1, 40,
+                "Sends one in-app notification to each active FMC BMS Demo Operator after an FM Request is created.")
         })
         {
             var message = await FindMessage(client, definition.Message);

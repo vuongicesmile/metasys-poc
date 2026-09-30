@@ -1,35 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Role id="{a00ad2b9-86ae-f111-aaad-00224819a344}" name="FMC BMS Demo Operator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <IsCustomizable>1</IsCustomizable>
   <IsAutoAssigned>0</IsAutoAssigned>
   <Description>Authored by @maker-studio/cds-maker-sdk (persona/security role).</Description>
   <RolePrivileges>
+    <RolePrivilege name="prvAppendAppUserSetting" level="Global" />
+    <RolePrivilege name="prvAppendfmc_approvalroute" level="Global" />
     <RolePrivilege name="prvAppendfmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvAppendfmc_bmsequipment" level="Global" />
+    <RolePrivilege name="prvAppendfmc_fmrequest" level="Global" />
+    <RolePrivilege name="prvAppendfmc_utilitytarget" level="Global" />
+    <RolePrivilege name="prvAppendTofmc_approvalroute" level="Global" />
     <RolePrivilege name="prvAppendTofmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvAppendTofmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvAppendTofmc_bmspoint" level="Global" />
+    <RolePrivilege name="prvAppendTofmc_fmrequest" level="Global" />
+    <RolePrivilege name="prvAppendTofmc_utilitytarget" level="Global" />
+    <RolePrivilege name="prvAppendToSettingDefinition" level="Global" />
+    <RolePrivilege name="prvCreateAppUserSetting" level="Global" />
+    <RolePrivilege name="prvCreatefmc_approvalroute" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvCreatefmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvCreatefmc_changelog" level="Global" />
+    <RolePrivilege name="prvCreatefmc_fmrequest" level="Global" />
     <RolePrivilege name="prvCreatefmc_syncrequest" level="Global" />
+    <RolePrivilege name="prvCreatefmc_utilitytarget" level="Global" />
     <RolePrivilege name="prvCreateSharePointData" level="Global" />
     <RolePrivilege name="prvReadAppModule" level="Global" />
+    <RolePrivilege name="prvReadappnotification" level="Basic" />
+    <RolePrivilege name="prvReadAppUserSetting" level="Global" />
     <RolePrivilege name="prvReadcr3c8_SilvernewBMSPoint" level="Global" />
+    <RolePrivilege name="prvReadfmc_approvalroute" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsequipment" level="Global" />
     <RolePrivilege name="prvReadfmc_bmspoint" level="Global" />
     <RolePrivilege name="prvReadfmc_bmsreadingsnapshot" level="Global" />
     <RolePrivilege name="prvReadfmc_changelog" level="Global" />
+    <RolePrivilege name="prvReadfmc_fmrequest" level="Global" />
+    <RolePrivilege name="prvReadfmc_goldmeterdaily" level="Global" />
+    <RolePrivilege name="prvReadfmc_goldmeterhourly" level="Global" />
+    <RolePrivilege name="prvReadfmc_requesthistory" level="Global" />
     <RolePrivilege name="prvReadfmc_spochangerequest" level="Global" />
     <RolePrivilege name="prvReadfmc_spofile" level="Global" />
     <RolePrivilege name="prvReadfmc_spoimportrow" level="Global" />
     <RolePrivilege name="prvReadfmc_syncrequest" level="Global" />
+    <RolePrivilege name="prvReadfmc_utilitytarget" level="Global" />
+    <RolePrivilege name="prvReadSettingDefinition" level="Global" />
     <RolePrivilege name="prvReadSharePointData" level="Global" />
     <RolePrivilege name="prvReadSharePointDocument" level="Global" />
+    <RolePrivilege name="prvWriteAppUserSetting" level="Global" />
+    <RolePrivilege name="prvWritefmc_approvalroute" level="Global" />
     <RolePrivilege name="prvWritefmc_bmsbuilding" level="Global" />
     <RolePrivilege name="prvWritefmc_bmsequipment" level="Global" />
+    <RolePrivilege name="prvWritefmc_fmrequest" level="Global" />
     <RolePrivilege name="prvWritefmc_spochangerequest" level="Global" />
+    <RolePrivilege name="prvWritefmc_utilitytarget" level="Global" />
     <RolePrivilege name="prvWriteSharePointData" level="Global" />
   </RolePrivileges>
 </Role>

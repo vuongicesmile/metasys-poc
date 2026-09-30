@@ -58,6 +58,7 @@ export const englishMessages: Record<string, string> = {
     "Năm yêu cầu đồng bộ mới nhất": "Five latest sync requests",
     "Năm điểm Bronze mới nhất": "Five latest Bronze points",
     "Reading Bronze lưu giữ": "Retained Bronze readings",
+    "Reading SQL lưu giữ": "SQL reading snapshots",
     "Sẵn sàng khai thác": "Ready for analysis",
     "Số dòng khai báo": "Reported row count",
     "Sự kiện và reading": "Events and readings",

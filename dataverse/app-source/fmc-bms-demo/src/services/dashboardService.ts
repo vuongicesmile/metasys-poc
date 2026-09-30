@@ -38,8 +38,8 @@ export async function queryDashboard(dataApi: GeneratedComponentProps["dataApi"]
                 orderBy: "fmc_lastreadingtime desc",
                 pageSize: MASTER_COUNT_LIMIT,
             }),
-            dataApi.queryTable("fmc_bmsreading", {
-                select: ["fmc_bmsreadingid"],
+            dataApi.queryTable("fmc_bmsreadingsnapshot", {
+                select: ["fmc_bmsreadingsnapshotid"],
                 pageSize: ELASTIC_COUNT_LIMIT,
             }),
             dataApi.queryTable("cr3c8_silvernewbmspoint", {

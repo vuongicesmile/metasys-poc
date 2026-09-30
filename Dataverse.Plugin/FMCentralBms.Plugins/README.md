@@ -14,6 +14,14 @@ Plugins/          IPlugin entry points registered in Dataverse
 Public type names stay under `FMCentralBms.Plugins.*` so existing step
 registrations keep working after rebuild.
 
+`NotifyNewFmRequest` runs asynchronously after `fmc_fmrequest` Create and sends
+native in-app notifications to active users with the `FMC BMS Demo Operator`
+role, including team-derived membership. Each recipient gets a separate
+notification. An empty recipient set is not a plug-in failure; assign the role
+to at least one test user before testing the FM Request-to-bell path. The role
+also needs the model-driven app notification *receive* privileges documented by
+[Microsoft](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/send-in-app-notifications#manage-security-for-notifications).
+
 ## Signing
 
 The original signing key `FMCentralBms.Plugins.snk` is checked into this public

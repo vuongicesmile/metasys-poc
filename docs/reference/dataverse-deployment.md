@@ -12,6 +12,37 @@ Target: `https://org06cbc9ec.crm5.dynamics.com/`
 Organization: `ab191700-b99e-f111-aaa0-000d3a80bb96`
 Environment: `5abcb0e5-99b2-e51f-aa0e-90d84405798b`
 
+## FM Request in-app notification (2026-09-30)
+
+`FMC BMS Demo` has In-app notifications enabled. Signed plug-in assembly
+`FMCentralBms.Plugins` version `1.0.0.8` and the asynchronous PostOperation
+`Create` step `BMS: Notify Operators on FM Request creation` are deployed in
+`FMCentralBms`. The step sends a native `SendAppNotification` to each active
+user with the `FMC BMS Demo Operator` role, including team-derived members.
+The recipient role has the minimum notification receive privileges and is
+assigned to `vuong.nguyenq@titancorpvn.com` in this Developer environment.
+
+Live smoke test: FM Request `e773ed00-7dbc-f111-aaaf-00224819a344`
+(`NOTIFY-SMOKE-20260930-101414`) produced appnotification
+`fcfd7a01-7dbc-f111-aaad-70a8a501ecc3` owned by that user, with a link
+to the request. The solution was exported and unpacked after deployment under
+`.artifacts/fm-request-notification-final-20260930`. This verifies one
+server-side delivery, not the visual state of the user's open app. The app
+loads new notifications on launch or navigation after the polling interval;
+remaining on an unchanged page does not continuously refresh the bell.
+
+## Operations Center reading query repair (2026-09-30)
+
+The live generated page still queried retired `fmc_bmsreading`, so its
+`Promise.all` data load rejected and the whole Operations Center displayed
+"Unable to load data". The page now queries the Standard
+`fmc_bmsreadingsnapshot` table and is published with that table in its nine
+data-source bindings. The current source and generated TSX passed the UI tests;
+live Web API reads succeeded for each dashboard table/selected column. A live
+page download confirmed the new query and binding, and a post-publish solution
+export is retained under `.artifacts/ops-center-fix-live-20260930`. A manual
+browser visual check remains separate from these server-side checks.
+
 ## Current reading contract (2026-09-24)
 
 The historical elastic `fmc_bmsreading` table was retired. The Standard

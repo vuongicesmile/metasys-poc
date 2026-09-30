@@ -132,10 +132,10 @@
       ]
     },
     {
-      "schemaName": "fmc_bmsreading",
-      "displayName": "[Bronze] BMS Reading",
-      "pluralName": "[Bronze] BMS Readings",
-      "description": "Retained Bronze reading history in an elastic table with event-time TTL.",
+      "schemaName": "fmc_bmsreadingsnapshot",
+      "displayName": "BMS Reading Snapshot",
+      "pluralName": "BMS Reading Snapshots",
+      "description": "Standard Dataverse table for the 2026-09-10 base readings and post-cutover SQL readings.",
       "existing": true,
       "primaryAttribute": {
         "schemaName": "fmc_name",
@@ -550,9 +550,9 @@
       "activeOnly": true
     },
     {
-      "entity": "fmc_bmsreading",
-      "name": "Recent Bronze Readings",
-      "description": "Server-side paged view for the large elastic history.",
+      "entity": "fmc_bmsreadingsnapshot",
+      "name": "Recent SQL Readings",
+      "description": "Server-side paged view of retained SQL reading snapshots.",
       "columns": [
         "fmc_objectname",
         "fmc_objectid",
@@ -1031,12 +1031,12 @@
     {
       "key": "trung-tam-van-hanh",
       "name": "BMS Operations Center1",
-      "purpose": "English-first landing page with an English/Vietnamese selector. Persist the choice in localStorage key fmc.bms.language, fall back to English if unavailable, and localize static copy, statuses, date and number formats without changing business data. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained Bronze Readings, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables; never enumerate all elastic readings. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
+      "purpose": "English-first landing page with an English/Vietnamese selector. Persist the choice in localStorage key fmc.bms.language, fall back to English if unavailable, and localize static copy, statuses, date and number formats without changing business data. Show the signed-in Microsoft Entra user and explain that sign-out is available from the Power Apps profile menu. Present KPI cards for Buildings, Equipment, current Bronze Points, retained SQL Reading Snapshots, Silver rows, Sync Requests and SharePoint files. Show only the newest five Bronze points, newest five sync requests and newest SharePoint receipt. Add a Bronze-to-Silver pipeline strip and quick actions that open create forms for fmc_bmsbuilding and fmc_bmsequipment, open fmc_/pages/BmsEventDemo.html, and open the entity lists. Query only counts and the first small page of large tables. Use Fluent UI V9 with responsive cards, loading, empty, error and refresh states.",
       "dataSources": [
         "fmc_bmsbuilding",
         "fmc_bmsequipment",
         "fmc_bmspoint",
-        "fmc_bmsreading",
+        "fmc_bmsreadingsnapshot",
         "cr3c8_silvernewbmspoint",
         "fmc_syncrequest",
         "fmc_spofile",
@@ -1095,8 +1095,8 @@
                 "title": "Current Points"
               },
               {
-                "entity": "fmc_bmsreading",
-                "title": "Reading History"
+                "entity": "fmc_bmsreadingsnapshot",
+                "title": "BMS Readings"
               }
             ]
           },
@@ -1153,7 +1153,7 @@
           "surfaces": [
             "trung-tam-van-hanh",
             "Current BMS Points",
-            "Recent Bronze Readings",
+            "Recent SQL Readings",
             "Normalized Silver Data"
           ],
           "privileges": [
@@ -1179,7 +1179,7 @@
               "scope": "organization"
             },
             {
-              "entity": "fmc_bmsreading",
+              "entity": "fmc_bmsreadingsnapshot",
               "access": [
                 "read"
               ],
@@ -1295,7 +1295,7 @@
               "scope": "organization"
             },
             {
-              "entity": "fmc_bmsreading",
+              "entity": "fmc_bmsreadingsnapshot",
               "access": [
                 "read"
               ],
@@ -1372,7 +1372,7 @@
               "scope": "organization"
             },
             {
-              "entity": "fmc_bmsreading",
+              "entity": "fmc_bmsreadingsnapshot",
               "access": [
                 "read"
               ],

@@ -418,7 +418,7 @@ export const GeneratedComponent = (props: GeneratedComponentProps) => {
                             <KpiCard icon={<BuildingRegular />} label={t("Tòa nhà")} count={state.value.buildings} note={t("Danh mục vận hành")} />
                             <KpiCard icon={<DesktopRegular />} label={t("Thiết bị")} count={state.value.equipment} note={t("Thiết bị đã đăng ký")} />
                             <KpiCard icon={<PulseRegular />} label={t("Điểm Bronze hiện tại")} count={state.value.bronzePoints} note={t("Giá trị BMS mới nhất")} />
-                            <KpiCard icon={<DatabaseRegular />} label={t("Reading Bronze lưu giữ")} count={state.value.bronzeReadings} note={t("Giới hạn 25 dòng đầu")} />
+                            <KpiCard icon={<DatabaseRegular />} label={t("Reading SQL lưu giữ")} count={state.value.bronzeReadings} note={t("Giới hạn 25 dòng đầu")} />
                             <KpiCard icon={<CheckmarkCircleRegular />} label={t("Dòng Silver")} count={state.value.silverRows} note={t("Dữ liệu đã chuẩn hóa")} />
                             <KpiCard icon={<ArrowSyncRegular />} label={t("Yêu cầu đồng bộ")} count={state.value.syncRequests} note={t("Yêu cầu đồng bộ SQL")} />
                             <KpiCard icon={<FolderRegular />} label={t("Tệp SharePoint")} count={state.value.sharePointFiles} note={`${t("Dòng catalog")}: ${state.value.importRows.label}`} />

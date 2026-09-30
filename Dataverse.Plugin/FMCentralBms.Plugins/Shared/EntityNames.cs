@@ -8,5 +8,6 @@ namespace FMCentralBms.Plugins
         public const string SpoChangeRequest = "fmc_spochangerequest";
         public const string Equipment = "fmc_bmsequipment";
         public const string SystemUser = "systemuser";
+        public const string FmRequest = "fmc_fmrequest";
     }
 }
