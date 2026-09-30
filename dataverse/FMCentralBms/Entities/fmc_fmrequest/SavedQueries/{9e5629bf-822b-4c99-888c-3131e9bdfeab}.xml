@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{9e5629bf-822b-4c99-888c-3131e9bdfeab}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_fmrequestid">
+          <cell name="fmc_name" width="220" />
+          <cell name="fmc_requesttype" width="220" />
+          <cell name="fmc_requeststatus" width="140" />
+          <cell name="fmc_currentstep" width="140" />
+          <cell name="fmc_currentapproveremail" width="140" />
+          <cell name="fmc_stepdueon" width="140" />
+          <cell name="fmc_estimatedvalue" width="140" />
+          <cell name="fmc_riskseverity" width="140" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_fmrequest">
+          <attribute name="fmc_fmrequestid" />
+          <attribute name="fmc_name" />
+          <attribute name="fmc_requesttype" />
+          <attribute name="fmc_requeststatus" />
+          <attribute name="fmc_currentstep" />
+          <attribute name="fmc_currentapproveremail" />
+          <attribute name="fmc_stepdueon" />
+          <attribute name="fmc_estimatedvalue" />
+          <attribute name="fmc_riskseverity" />
+          <order attribute="createdon" descending="true" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.3.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active FM Requests" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Name LocalizedName="Notification" OriginalName="Notification">fmc_notification</Name>
   <EntityInfo>
@@ -400,6 +400,11 @@
               <displayname description="Event Type" languagecode="1033" />
             </displaynames>
             <options>
+              <option value="789122020" IsHidden="0">
+                <labels>
+                  <label description="Threshold alert" languagecode="1033" />
+                </labels>
+              </option>
               <option value="789122000" ExternalValue="" IsHidden="0">
                 <labels>
                   <label description="Sync succeeded" languagecode="1033" />
@@ -410,6 +415,16 @@
                   <label description="Sync completed with issues" languagecode="1033" />
                 </labels>
               </option>
+              <option value="789122021" IsHidden="0">
+                <labels>
+                  <label description="Reminder" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="789122015" IsHidden="0">
+                <labels>
+                  <label description="Reminder" languagecode="1033" />
+                </labels>
+              </option>
               <option value="789122002" ExternalValue="" IsHidden="0">
                 <labels>
                   <label description="Sync failed" languagecode="1033" />
@@ -418,6 +433,11 @@
               <option value="789122010" ExternalValue="" IsHidden="0">
                 <labels>
                   <label description="Submitted" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="789122016" IsHidden="0">
+                <labels>
+                  <label description="Closed" languagecode="1033" />
                 </labels>
               </option>
               <option value="789122011" ExternalValue="" IsHidden="0">

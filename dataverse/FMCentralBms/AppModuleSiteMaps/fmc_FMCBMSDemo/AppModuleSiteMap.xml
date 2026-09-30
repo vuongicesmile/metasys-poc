@@ -105,6 +105,36 @@
           </Titles>
         </SubArea>
       </Group>
+      <Group Id="fmc_fmworkflow" IsProfile="false" ToolTipResourseId="SitemapDesigner.Unknown">
+        <Titles>
+          <Title LCID="1033" Title="FM Workflow" />
+        </Titles>
+        <SubArea Id="fmc_workflow_console" Url="$webresource:fmc_/pages/FmWorkflow.html" AvailableOffline="false" PassParams="false">
+          <Titles>
+            <Title LCID="1033" Title="My Requests &amp; Approvals" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="fmc_fmrequest_nav" Entity="fmc_fmrequest" AvailableOffline="true" PassParams="false">
+          <Titles>
+            <Title LCID="1033" Title="FM Requests" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="subarea_2fa5783e" Icon="/_imgs/imagestrips/transparent_spacer.gif" Client="All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web" AvailableOffline="true" PassParams="false" Sku="All,OnPremise,Live,SPLA" Page="fmc_newfmrequest_66e0f">
+          <Titles>
+            <Title LCID="1033" Title="New FM Request" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="fmc_approvalroute_nav" Entity="fmc_approvalroute" AvailableOffline="true" PassParams="false">
+          <Titles>
+            <Title LCID="1033" Title="Approval Routes" />
+          </Titles>
+        </SubArea>
+        <SubArea Id="fmc_requesthistory_nav" Entity="fmc_requesthistory" AvailableOffline="true" PassParams="false">
+          <Titles>
+            <Title LCID="1033" Title="Request History" />
+          </Titles>
+        </SubArea>
+      </Group>
     </Area>
   </SiteMap>
   <LocalizedNames>

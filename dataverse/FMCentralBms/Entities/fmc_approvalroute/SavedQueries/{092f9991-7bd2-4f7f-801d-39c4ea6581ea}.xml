@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{092f9991-7bd2-4f7f-801d-39c4ea6581ea}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_approvalrouteid">
+          <cell name="fmc_name" width="220" />
+          <cell name="fmc_requesttype" width="220" />
+          <cell name="fmc_stepno" width="140" />
+          <cell name="fmc_approveremail" width="140" />
+          <cell name="fmc_minvalue" width="140" />
+          <cell name="fmc_minseverity" width="140" />
+          <cell name="fmc_sladays" width="140" />
+          <cell name="fmc_isactive" width="140" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_approvalroute">
+          <attribute name="fmc_approvalrouteid" />
+          <attribute name="fmc_name" />
+          <attribute name="fmc_requesttype" />
+          <attribute name="fmc_stepno" />
+          <attribute name="fmc_approveremail" />
+          <attribute name="fmc_minvalue" />
+          <attribute name="fmc_minseverity" />
+          <attribute name="fmc_sladays" />
+          <attribute name="fmc_isactive" />
+          <order attribute="createdon" descending="true" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.3.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active Approval Routes" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

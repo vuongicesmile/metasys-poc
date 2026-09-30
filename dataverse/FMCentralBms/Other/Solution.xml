@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ImportExportXml version="9.2.26085.152" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.26085.152" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.26085.00152">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.26091.152" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.26091.152" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.26091.00152">
   <SolutionManifest>
     <UniqueName>FMCentralBms</UniqueName>
     <LocalizedNames>
@@ -78,18 +78,26 @@
       </Addresses>
     </Publisher>
     <RootComponents>
-      <RootComponent type="1" schemaName="cr3c8_silvernewbmspoint" behavior="0" />
+      <RootComponent type="1" schemaName="cr3c8_fmc_silver_bmsbuilding" behavior="0" />
+      <RootComponent type="1" schemaName="cr3c8_fmc_silver_bmsequipment" behavior="0" />
+      <RootComponent type="1" schemaName="cr3c8_fmc_silver_bmspoint" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_approvalroute" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmsbuilding" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmsequipment" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmspoint" behavior="0" />
       <RootComponent type="1" schemaName="fmc_bmsreadingsnapshot" behavior="0" />
       <RootComponent type="1" schemaName="fmc_changelog" behavior="0" />
-      <RootComponent type="1" schemaName="fmc_local_silver_bmspoint" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_fmrequest" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_goldmeterdaily" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_goldmeterhourly" behavior="0" />
       <RootComponent type="1" schemaName="fmc_notification" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_requesthistory" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_schemamigration" behavior="1" />
       <RootComponent type="1" schemaName="fmc_spochangerequest" behavior="0" />
       <RootComponent type="1" schemaName="fmc_spofile" behavior="0" />
       <RootComponent type="1" schemaName="fmc_spoimportrow" behavior="0" />
       <RootComponent type="1" schemaName="fmc_syncrequest" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_utilitytarget" behavior="0" />
       <RootComponent type="20" id="{46639136-95aa-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="20" id="{5ae2d6e5-3cab-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="20" id="{6348e20b-05ae-f111-aaad-00224819a344}" behavior="0" />
@@ -99,6 +107,7 @@
       <RootComponent type="29" id="{23cc5a60-0e28-4afd-8226-042dfeab84d4}" behavior="0" />
       <RootComponent type="29" id="{2d643497-109a-406d-a350-e039d41ecd5b}" behavior="0" />
       <RootComponent type="29" id="{314a0489-54ab-f111-aaad-00224819a344}" behavior="0" />
+      <RootComponent type="29" id="{59414d43-f813-4a86-a331-96851e43a77f}" behavior="0" />
       <RootComponent type="29" id="{6fa6c13a-3eab-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="29" id="{785893e5-ab31-4cb1-98d6-432f6a9c6870}" behavior="0" />
       <RootComponent type="29" id="{7c61ab3d-e46e-4c48-9e1b-b7d14438fe08}" behavior="0" />
@@ -106,33 +115,85 @@
       <RootComponent type="29" id="{d1810c81-d313-46fa-b7be-04ea538bc939}" behavior="0" />
       <RootComponent type="29" id="{e11dfffc-c2f0-4a48-bc72-f977e07e0e4a}" behavior="0" />
       <RootComponent type="29" id="{e4a38516-292c-4a32-a292-c71091692c7f}" behavior="0" />
+      <RootComponent type="29" id="{f2212c5e-05b8-f111-aaae-00224819a344}" behavior="0" />
       <RootComponent type="300" schemaName="fmc_fmcbmsfieldapp_10673" behavior="0" />
+      <RootComponent type="300" schemaName="fmc_newfmrequest_66e0f" behavior="0" />
       <RootComponent type="61" schemaName="fmc_/pages/BmsEventDemo.html" behavior="0" />
+      <RootComponent type="61" schemaName="fmc_/pages/FmWorkflow.html" behavior="0" />
       <RootComponent type="61" schemaName="fmc_/scripts/EquipmentPluginTest.js" behavior="0" />
+      <RootComponent type="61" schemaName="fmc_/scripts/FmWorkflow.js" behavior="0" />
       <RootComponent type="61" schemaName="fmc_FMCBMSDemo_icon" behavior="0" />
       <RootComponent type="61" schemaName="fmc_FMCBMSDemo_pagemanifest" behavior="0" />
       <RootComponent type="62" schemaName="fmc_FMCBMSDemo" behavior="0" />
       <RootComponent type="66" schemaName="fmc_FMC.Bms.BmsPointGrid" behavior="0" />
       <RootComponent type="66" schemaName="fmc_FMC.Bms.ScrollDownButton" behavior="0" />
       <RootComponent type="80" schemaName="fmc_FMCBMSDemo" behavior="0" />
-      <RootComponent type="91" id="{a5233bd0-bbac-f111-aaad-00224819a344}" schemaName="FMCentralBms.Plugins, Version=1.0.0.7, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" behavior="0" />
+      <RootComponent type="91" id="{a5233bd0-bbac-f111-aaad-00224819a344}" schemaName="FMCentralBms.Plugins, Version=1.0.0.13, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" behavior="0" />
       <RootComponent type="92" id="{00029f22-bcac-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{013ca71a-f2b6-f111-aaae-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{11adca20-f2b6-f111-aaae-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{1415c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{15adca20-f2b6-f111-aaae-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{19adca20-f2b6-f111-aaae-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{1eadca20-f2b6-f111-aaae-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{27894c29-bcac-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{2a80cbef-f1b6-f111-aaae-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{4c16c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{5514c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{5914c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{5c14c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{5f14c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{677c02d3-7bbc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{6814c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{7014c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{7714c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
+      <RootComponent type="92" id="{7a14c0a0-a8bc-f111-aaaf-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{926528c5-73b1-f111-aaad-00224819a344}" behavior="0" />
     </RootComponents>
     <MissingDependencies>
+      <MissingDependency>
+        <Required type="1" schemaName="cr3c8_silvernewbmspoint" displayName="[Silver-Cloud] BMS Point" solution="Active" />
+        <Dependent type="62" schemaName="fmc_FMCBMSDemo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="cr3c8_silvernewbmspoint" displayName="[Silver-Cloud] BMS Point" solution="Active" />
+        <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="fmc_schemamigration" displayName="Schema migration" solution="Active" />
+        <Dependent type="1" schemaName="fmc_schemamigration" displayName="Schema migration" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="26" schemaName="Active [Silver-new] BMS Points" displayName="Active [Silver-new] BMS Points" parentSchemaName="cr3c8_silvernewbmspoint" parentDisplayName="[Silver-Cloud] BMS Point" solution="Active" id="{ad1ecaaf-dd16-455b-b766-0767c9e018e9}" />
+        <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="26" schemaName="Inactive [Silver-new] BMS Points" displayName="Inactive [Silver-new] BMS Points" parentSchemaName="cr3c8_silvernewbmspoint" parentDisplayName="[Silver-Cloud] BMS Point" solution="Active" id="{97d7ec4a-2260-48b2-8da7-7c71a6a72621}" />
+        <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="26" schemaName="Normalized Silver Data" displayName="Normalized Silver Data" parentSchemaName="cr3c8_silvernewbmspoint" parentDisplayName="[Silver-Cloud] BMS Point" solution="Active" id="{b23206f0-c45d-4abd-97e6-b7898f2b2f3d}" />
+        <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="26" schemaName="Silver Quality Warnings" displayName="Silver Quality Warnings" parentSchemaName="cr3c8_silvernewbmspoint" parentDisplayName="[Silver-Cloud] BMS Point" solution="Active" id="{b498e21f-73bd-462e-bfbe-b7158f65b07e}" />
+        <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="60" displayName="Information" parentDisplayName="[Silver-Cloud] BMS Point" solution="Active" id="{69eafd8d-0115-4709-9288-669b4ad4f648}" />
+        <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
       <MissingDependency>
         <Required type="61" schemaName="msdyn_/Images/AppModule_Default_Icon.png" displayName="msdyn_/Images/AppModule_Default_Icon.png" solution="AppModuleWebResources (2.5)">
           <package appName="AppModule Web Resources Package" version="2.5">AppModuleWebResources (2.5)</package>
         </Required>
         <Dependent type="80" schemaName="fmc_FMCBMSDemo" displayName="FMC BMS Demo" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="SettingDefinition" displayName="AllowNotificationsEarlyAccess" solution="AppNotifications (10.0.0.17)" id.uniquename="AllowNotificationsEarlyAccess">
+          <package appName="PowerAppsUnifiedClientExtensionApp Package" version="1.0.0.103">PowerAppsUnifiedClientExtensionApp_Anchor (1.0.0.103)</package>
+        </Required>
+        <Dependent type="AppSetting" displayName="parentappmoduleid.uniquename=fmc_FMCBMSDemo,settingdefinitionid.uniquename=AllowNotificationsEarlyAccess" id.parentappmoduleid.uniquename="fmc_FMCBMSDemo" id.settingdefinitionid.uniquename="AllowNotificationsEarlyAccess" />
       </MissingDependency>
       <MissingDependency>
         <Required type="SettingDefinition" displayName="AppChannel" solution="msdyn_AppFrameworkInfraExtensions (1.0.0.20)" id.uniquename="AppChannel">
@@ -145,6 +206,12 @@
           <package appName="PowerAppsAppFramework Package" version="1.0.0.25">PowerAppsAppFramework_Anchor (1.0.0.25)</package>
         </Required>
         <Dependent type="AppSetting" displayName="parentappmoduleid.uniquename=fmc_FMCBMSDemo,settingdefinitionid.uniquename=HeaderAndNavigationRefresh" id.parentappmoduleid.uniquename="fmc_FMCBMSDemo" id.settingdefinitionid.uniquename="HeaderAndNavigationRefresh" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="SettingDefinition" displayName="m365copilotmodelappenabled" solution="msdyn_M365CopilotAppInfraSettings (9.2.0.5)" id.uniquename="m365copilotmodelappenabled">
+          <package appName="PowerAppsAppCopilotApp Package" version="9.2.0.5">msdyn_M365CopilotAppInfraSettings (9.2.0.5)</package>
+        </Required>
+        <Dependent type="AppSetting" displayName="parentappmoduleid.uniquename=fmc_FMCBMSDemo,settingdefinitionid.uniquename=m365copilotmodelappenabled" id.parentappmoduleid.uniquename="fmc_FMCBMSDemo" id.settingdefinitionid.uniquename="m365copilotmodelappenabled" />
       </MissingDependency>
       <MissingDependency>
         <Required type="SettingDefinition" displayName="NewLookAlwaysOn" solution="msdyn_AppFrameworkInfraExtensions (1.0.0.20)" id.uniquename="NewLookAlwaysOn">

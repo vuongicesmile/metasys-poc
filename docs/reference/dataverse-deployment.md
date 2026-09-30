@@ -14,6 +14,13 @@ Environment: `5abcb0e5-99b2-e51f-aa0e-90d84405798b`
 
 ## FM Request in-app notification (2026-09-30)
 
+Epic 3 workflow bổ sung sau bản notification: migrations 004/005, signed assembly
+`1.0.0.12`, transactional `fmc_TransitionFmRequest` / `fmc_ProcessFmRequestDeadline`,
+synchronous lifecycle guards, Approval Routes snapshots, history/email outbox,
+scheduled deadline flow và webresource actions trong FMC BMS Demo đã được triển khai.
+Xem [Epic 3 runbook và receipt](../runbooks/epic-3-fm-workflow.vi.md) để demo,
+đọc giới hạn verification và phân biệt với bell-on-create bên dưới.
+
 `FMC BMS Demo` has In-app notifications enabled. Signed plug-in assembly
 `FMCentralBms.Plugins` version `1.0.0.8` and the asynchronous PostOperation
 `Create` step `BMS: Notify Operators on FM Request creation` are deployed in

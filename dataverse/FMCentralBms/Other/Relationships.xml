@@ -43,4 +43,17 @@
   <EntityRelationship Name="owner_cr3c8_silvernewbmspoint" />
   <EntityRelationship Name="team_cr3c8_silvernewbmspoint" />
   <EntityRelationship Name="user_cr3c8_silvernewbmspoint" />
+  <EntityRelationship Name="business_unit_fmc_fmrequest" />
+  <EntityRelationship Name="fmc_fmrequest_fmc_requesthistory" />
+  <EntityRelationship Name="lk_fmc_approvalroute_createdby" />
+  <EntityRelationship Name="lk_fmc_approvalroute_modifiedby" />
+  <EntityRelationship Name="lk_fmc_fmrequest_createdby" />
+  <EntityRelationship Name="lk_fmc_fmrequest_modifiedby" />
+  <EntityRelationship Name="lk_fmc_requesthistory_createdby" />
+  <EntityRelationship Name="lk_fmc_requesthistory_modifiedby" />
+  <EntityRelationship Name="organization_fmc_approvalroute" />
+  <EntityRelationship Name="organization_fmc_requesthistory" />
+  <EntityRelationship Name="owner_fmc_fmrequest" />
+  <EntityRelationship Name="team_fmc_fmrequest" />
+  <EntityRelationship Name="user_fmc_fmrequest" />
 </EntityRelationships>

@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="Action">
+  <displayname default="Action">
+    <label description="Action" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>Action</name>
+  <type>10</type>
+</customapirequestparameter>

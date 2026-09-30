@@ -15,6 +15,8 @@ public sealed partial class DataverseProvisioner
         RunMigration(service, "001", "Initial migration", ApplyMigration001);
         RunMigration(service, "002", "Second migration", ApplyMigration002);
         RunMigration(service, "003", "Create FM Request table", ApplyMigration003);
+        RunMigration(service, "004", "FM workflow lifecycle, routing and audit", ApplyMigration004);
+        RunMigration(service, "005", "FM overdue notification before delayed escalation", ApplyMigration005);
     }
 
     private static void RunMigration(IOrganizationService service, string version, string name,

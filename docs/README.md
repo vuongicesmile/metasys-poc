@@ -5,9 +5,12 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
+| Runbook | [Epic 3 — FM Request workflow](runbooks/epic-3-fm-workflow.vi.md) | Tạo Draft, submit, duyệt nhiều bước, email, reminder/escalation, history và Risk register trong app demo |
+| Plan | [Epic 3 implementation](plans/epic-3-fm-workflow.vi.md) | Contract, route selection, transaction và tiêu chí kiểm thử FR-3.1–FR-3.7 |
 | React handbook | [Custom API CRUD — Point Issue](interactive/custom-api-crud-guide/README.md) | Mở local port 5431: 10 bài, code C#/React theo file, CRUD sandbox; hướng dẫn tự implement, chưa deploy feature |
 | Runbook | [Change Log bằng plugin](runbooks/change-log-plugin.vi.md) | Ghi vết Create/Update/Delete Building và Equipment; source chuẩn bị, chưa deploy do thiếu khóa ký |
 | Plan | [Agents trong Power Apps BMS](plans/power-apps-bms-agents.vi.md) | Assistant tra dữ liệu/chẩn đoán sync, gọi Custom API, roadmap Agent feed và tích hợp PCF; Agent MVP đã publish, tools/host còn chờ |
+| Plan | [FM Request custom page](plans/fm-request-custom-page.vi.md) | Kế hoạch và Power Fx tạo phiếu Draft trong FMC BMS Demo; schema/app live đã kiểm tra, custom page chưa publish |
 | Plan | [Thông báo SPO đổi file và tự sync sau 5 phút](plans/spo-change-notification-auto-sync.vi.md) | Home báo file đổi, nút Sync now và Power Automate tự dispatch khi đến hạn; đề xuất, chưa triển khai |
 | Runbook | [BMS Operations Assistant](runbooks/power-apps-bms-agents.vi.md) | Deploy, test guardrail Agent, đóng gói source và điều kiện thêm Agent Flow tools |
 | Reference | [BMS Operations Assistant](reference/bms-operations-assistant.vi.md) | Tool contract, guardrail và evaluation cases của Agent source |

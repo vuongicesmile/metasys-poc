@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebResource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <WebResourceId>{b4be2407-1f36-4841-8016-27a2cc811bf4}</WebResourceId>
+  <Name>fmc_/scripts/FmWorkflow.js</Name>
+  <DisplayName>FM Workflow Script</DisplayName>
+  <WebResourceType>3</WebResourceType>
+  <IntroducedVersion>1.0.3.0</IntroducedVersion>
+  <IsEnabledForMobileClient>0</IsEnabledForMobileClient>
+  <IsAvailableForMobileOffline>0</IsAvailableForMobileOffline>
+  <IsCustomizable>1</IsCustomizable>
+  <CanBeDeleted>1</CanBeDeleted>
+  <IsHidden>0</IsHidden>
+  <FileName>/WebResources/fmc_scriptsFmWorkflowjsB4BE2407-1F36-4841-8016-27A2CC811BF4</FileName>
+</WebResource>

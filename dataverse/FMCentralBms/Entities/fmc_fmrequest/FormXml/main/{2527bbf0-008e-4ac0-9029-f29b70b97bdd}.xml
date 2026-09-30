@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{2527bbf0-008e-4ac0-9029-f29b70b97bdd}</formid>
+    <IntroducedVersion>1.0.3.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{feee0f77-dbbe-445d-ade2-a8196818543c}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{415f9e9d-d73c-473d-9267-050428712d16}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{1cb685fb-1236-455b-88e8-7210ba6d2312}">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="fmc_name" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{83be4d8c-4143-4bc9-b844-46a4f1b679e5}">
+                        <labels>
+                          <label description="Owner" languagecode="1033" />
+                        </labels>
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_workflow_details" id="{59df0c29-cb09-4399-ace1-a3af4d4f31fb}" IsUserDefined="1" expanded="true">
+          <labels>
+            <label description="Workflow details" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_workflow_details_section" id="{fce6c157-7dec-4379-855e-4af31ba32692}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="Workflow details" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{0cc9525c-3a09-44b0-83f7-bea1e9b36743}">
+                        <labels>
+                          <label description="Description" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_description" datafieldname="fmc_description" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{b5ac8511-e925-42ea-aa76-be3afa2d63b4}">
+                        <labels>
+                          <label description="Request Type" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_requesttype" datafieldname="fmc_requesttype" classid="{3EF39988-22BB-4f0b-BBBE-64B5A3748AEE}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{086acf06-54ef-41ff-8e5e-b49f3b736fa8}">
+                        <labels>
+                          <label description="Department" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_department" datafieldname="fmc_department" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{4d1bb7ce-d9b4-4e5d-80f3-3ef9371b585c}">
+                        <labels>
+                          <label description="Building Code" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_buildingcode" datafieldname="fmc_buildingcode" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{a98a3935-4312-45e9-b143-a7a878190945}">
+                        <labels>
+                          <label description="Estimated Value" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_estimatedvalue" datafieldname="fmc_estimatedvalue" classid="{C3EFE0C3-0EC6-42BE-8349-CBD9079DFD8E}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{a4203ebb-184c-47e5-898e-6ff64388cfe5}">
+                        <labels>
+                          <label description="Request Status" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_requeststatus" datafieldname="fmc_requeststatus" classid="{3EF39988-22BB-4f0b-BBBE-64B5A3748AEE}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{2cb0398e-be52-4d56-8863-18e0912d6c77}">
+                        <labels>
+                          <label description="Risk Severity" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_riskseverity" datafieldname="fmc_riskseverity" classid="{3EF39988-22BB-4f0b-BBBE-64B5A3748AEE}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{f44f9171-0b4e-450a-b1ad-968694d68e9c}">
+                        <labels>
+                          <label description="Likelihood (1-5)" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_likelihood" datafieldname="fmc_likelihood" classid="{C6D124CA-7EDA-4a60-AEA9-7FB8D318B68F}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{17467852-7982-43ab-a2e7-567181fe998c}">
+                        <labels>
+                          <label description="Impact (1-5)" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_impact" datafieldname="fmc_impact" classid="{C6D124CA-7EDA-4a60-AEA9-7FB8D318B68F}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ed6e1f56-71f6-4e60-912f-6e92aa68f746}">
+                        <labels>
+                          <label description="Mitigation" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_mitigation" datafieldname="fmc_mitigation" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{f5013ffb-d8dc-48db-baf2-41b5f705fda5}">
+                        <labels>
+                          <label description="Review Date" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_reviewdate" datafieldname="fmc_reviewdate" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{9f28a28f-7137-4a7b-a9d2-0547819eff49}">
+                        <labels>
+                          <label description="Current Step" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_currentstep" datafieldname="fmc_currentstep" classid="{C6D124CA-7EDA-4a60-AEA9-7FB8D318B68F}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{488dcb93-b340-4baf-8681-16d2d3b8fa21}">
+                        <labels>
+                          <label description="Current Approver Email" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_currentapproveremail" datafieldname="fmc_currentapproveremail" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{16a9913a-064b-4447-8d07-2fb0498fa1d1}">
+                        <labels>
+                          <label description="Step Due On" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_stepdueon" datafieldname="fmc_stepdueon" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" disabled="true" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab name="fmc_workflow_actions" id="{de530ca5-1ade-4e36-9224-ead2433cd2aa}" IsUserDefined="1" expanded="true">
+          <labels>
+            <label description="Workflow actions &amp; history" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section name="fmc_workflow_actions_section" id="{d40514c7-fe74-4223-a066-3fb959c81de1}" showlabel="false" showbar="false" columns="1">
+                  <labels>
+                    <label description="Workflow actions &amp; history" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{e7f98ceb-25d3-45f2-b4cf-6102b7564d02}" showlabel="false" rowspan="20">
+                        <labels>
+                          <label description="Workflow actions" languagecode="1033" />
+                        </labels>
+                        <control id="WebResource_fmc_workflow" classid="{9FDF5F91-88B1-47F4-AD53-C11EFC01A01D}">
+                          <parameters>
+                            <Url>fmc_/pages/FmWorkflow.html</Url>
+                            <PassParameters>true</PassParameters>
+                            <Security>false</Security>
+                            <Scrolling>auto</Scrolling>
+                            <Border>false</Border>
+                            <WebResourceId>{a46bb45c-77cf-4c5a-9b38-d2cff73458d4}</WebResourceId>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

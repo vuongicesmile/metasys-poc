@@ -131,6 +131,8 @@ public sealed partial class DataversePluginProvisioner(DataverseConnection conne
         await EnsureClaimSpoChangeCustomApi(client, claimSpoChangePluginType.Id);
         await EnsureFullRequestCustomApi(client, fullRequestPluginType.Id);
 
+        await RegisterFmWorkflow(client, assembly.Id, solutionId);
+
         Console.WriteLine($"Plug-in registration complete in {options.Url.TrimEnd('/')}");
     }
 

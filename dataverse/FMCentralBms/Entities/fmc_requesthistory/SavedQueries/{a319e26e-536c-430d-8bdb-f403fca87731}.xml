@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{a319e26e-536c-430d-8bdb-f403fca87731}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="fmc_name" select="1" icon="1" preview="1">
+        <row name="result" id="fmc_requesthistoryid">
+          <cell name="fmc_name" width="220" />
+          <cell name="fmc_requestid" width="220" />
+          <cell name="fmc_action" width="140" />
+          <cell name="fmc_stepno" width="140" />
+          <cell name="fmc_actoremail" width="140" />
+          <cell name="fmc_actedon" width="140" />
+          <cell name="fmc_comments" width="140" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="fmc_requesthistory">
+          <attribute name="fmc_requesthistoryid" />
+          <attribute name="fmc_name" />
+          <attribute name="fmc_requestid" />
+          <attribute name="fmc_action" />
+          <attribute name="fmc_stepno" />
+          <attribute name="fmc_actoremail" />
+          <attribute name="fmc_actedon" />
+          <attribute name="fmc_comments" />
+          <order attribute="createdon" descending="true" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.3.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active Request History Entries" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

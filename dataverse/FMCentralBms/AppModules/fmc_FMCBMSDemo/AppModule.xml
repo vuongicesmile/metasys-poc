@@ -89,6 +89,15 @@
     <AppModuleComponent type="60" id="{77e328e8-a2ce-49b9-8ef2-dd3cd4e60dd7}" />
     <AppModuleComponent type="60" id="{2b09585b-c7e9-410b-891e-f38551a9968e}" />
     <AppModuleComponent type="62" schemaName="fmc_FMCBMSDemo" />
+    <AppModuleComponent type="1" schemaName="fmc_approvalroute" />
+    <AppModuleComponent type="1" schemaName="fmc_fmrequest" />
+    <AppModuleComponent type="1" schemaName="fmc_requesthistory" />
+    <AppModuleComponent type="26" id="{9e5629bf-822b-4c99-888c-3131e9bdfeab}" />
+    <AppModuleComponent type="26" id="{5704a0c0-bb38-48bf-881a-343143db64e6}" />
+    <AppModuleComponent type="26" id="{092f9991-7bd2-4f7f-801d-39c4ea6581ea}" />
+    <AppModuleComponent type="26" id="{039ccf82-7c72-4587-8fe1-640099aea782}" />
+    <AppModuleComponent type="26" id="{a319e26e-536c-430d-8bdb-f403fca87731}" />
+    <AppModuleComponent type="26" id="{8d9d9012-2a3a-4533-8d8e-fc4c5440df90}" />
   </AppModuleComponents>
   <AppModuleRoleMaps>
     <Role id="{a00ad2b9-86ae-f111-aaad-00224819a344}" />
@@ -111,6 +120,13 @@
       </objectid>
       <objectidtype>bot</objectidtype>
     </appelement>
+    <appelement uniquename="fmc_fmc_FMCBMSDemo_canvasappid_fmc_newfmrequest_66e0f">
+      <canvasappid>
+        <name>fmc_newfmrequest_66e0f</name>
+      </canvasappid>
+      <iscustomizable>1</iscustomizable>
+      <name>fmc_fmc_FMCBMSDemo_canvasappid_fmc_newfmrequest_66e0f</name>
+    </appelement>
   </appelements>
   <appsettings>
     <appsetting settingdefinitionid.uniquename="AppChannel">
@@ -122,6 +138,10 @@
       <value>2</value>
     </appsetting>
     <appsetting settingdefinitionid.uniquename="NewLookAlwaysOn">
+      <iscustomizable>1</iscustomizable>
+      <value>true</value>
+    </appsetting>
+    <appsetting settingdefinitionid.uniquename="AllowNotificationsEarlyAccess">
       <iscustomizable>1</iscustomizable>
       <value>true</value>
     </appsetting>

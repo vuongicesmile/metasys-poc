@@ -1,0 +1,9 @@
+<customapirequestparameter uniquename="ExpectedRevision">
+  <displayname default="Expected Revision">
+    <label description="Expected Revision" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>0</isoptional>
+  <name>ExpectedRevision</name>
+  <type>7</type>
+</customapirequestparameter>

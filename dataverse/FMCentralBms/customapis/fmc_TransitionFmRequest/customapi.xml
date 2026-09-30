@@ -1,0 +1,19 @@
+<customapi uniquename="fmc_TransitionFmRequest">
+  <allowedcustomprocessingsteptype>1</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Transactional FM workflow with concurrency, authorization, immutable history and email outbox.">
+    <label description="Transactional FM workflow with concurrency, authorization, immutable history and email outbox." languagecode="1033" />
+  </description>
+  <displayname default="FM Request Action">
+    <label description="FM Request Action" languagecode="1033" />
+  </displayname>
+  <executeprivilegename>prvWritefmc_fmrequest</executeprivilegename>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>fmc_TransitionFmRequest</name>
+  <plugintypeid>
+    <plugintypeexportkey>4e14c0a0-a8bc-f111-aaaf-00224819a344</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>1</workflowsdkstepenabled>
+</customapi>

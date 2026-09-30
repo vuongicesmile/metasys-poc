@@ -1,0 +1,8 @@
+<customapiresponseproperty uniquename="Revision">
+  <displayname default="Revision">
+    <label description="Revision" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>Revision</name>
+  <type>7</type>
+</customapiresponseproperty>

@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="fmc_FmAppUrl">
+  <defaultvalue>https://org06cbc9ec.crm5.dynamics.com/main.aspx?appid=d19f4897-d227-4df3-8361-988f97c53e89</defaultvalue>
+  <description default="Model-driven app base URL used for record links in approval and notification emails.">
+    <label description="Model-driven app base URL used for record links in approval and notification emails." languagecode="1033" />
+  </description>
+  <displayname default="FM App URL">
+    <label description="FM App URL" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

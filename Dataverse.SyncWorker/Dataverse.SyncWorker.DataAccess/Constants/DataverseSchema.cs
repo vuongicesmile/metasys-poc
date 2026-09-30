@@ -1,7 +1,7 @@
 namespace Dataverse.SyncWorker.DataAccess.Constants;
 
 // Gom tên schema để các bước tạo và truy vấn bảng không dùng nhầm tên.
-public static class DataverseSchema
+public static partial class DataverseSchema
 {
     public static class SchemaMigration
     {
