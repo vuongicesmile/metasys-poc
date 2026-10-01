@@ -14,6 +14,8 @@ namespace Dataverse.SyncWorker.DataAccess.Constants
             public const string Requester = "fmc_requesteremail", Approver = "fmc_currentapproveremail", Step = "fmc_currentstep";
             public const string Due = "fmc_stepdueon", SubmittedOn = "fmc_submittedon", CompletedOn = "fmc_completedon";
             public const string Plan = "fmc_workflowplan", Revision = "fmc_workflowrevision";
+            public const string EvidenceReading = "fmc_evidencereadingid", EvidenceReadingIds = "fmc_evidencereadingids", EvidenceSnapshot = "fmc_evidencesnapshot";
+            public const string ReadingTable = "fmc_bmsreadingsnapshot";
             public const string ReminderOn = "fmc_reminderon", OverdueOn = "fmc_overdueon", EscalatedOn = "fmc_escalatedon";
             public const string RouteApprover = "fmc_approveremail", Escalation = "fmc_escalationemail", Role = "fmc_approverrole";
             public const string Active = "fmc_isactive", MinValue = "fmc_minvalue", MinSeverity = "fmc_minseverity", Sla = "fmc_sladays";

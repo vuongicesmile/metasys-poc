@@ -6,6 +6,7 @@ Các lệnh trong tài liệu chạy từ `D:\metasys-poc`, trừ khi có hướ
 | Nhóm | Tài liệu | Dùng khi |
 | --- | --- | --- |
 | Runbook | [Epic 3 — FM Request workflow](runbooks/epic-3-fm-workflow.vi.md) | Tạo Draft, submit, duyệt nhiều bước, email, reminder/escalation, history và Risk register trong app demo |
+| Demo guide | [Epic 3 — chuẩn bị, test và demo](runbooks/epic-3-demo-guide.vi.md) | Sườn trình bày, full flow, dữ liệu demo, test matrix, lệnh kiểm tra và cách xử lý lỗi |
 | Plan | [Epic 3 implementation](plans/epic-3-fm-workflow.vi.md) | Contract, route selection, transaction và tiêu chí kiểm thử FR-3.1–FR-3.7 |
 | React handbook | [Custom API CRUD — Point Issue](interactive/custom-api-crud-guide/README.md) | Mở local port 5431: 10 bài, code C#/React theo file, CRUD sandbox; hướng dẫn tự implement, chưa deploy feature |
 | Runbook | [Change Log bằng plugin](runbooks/change-log-plugin.vi.md) | Ghi vết Create/Update/Delete Building và Equipment; source chuẩn bị, chưa deploy do thiếu khóa ký |

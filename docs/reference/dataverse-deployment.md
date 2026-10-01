@@ -12,6 +12,42 @@ Target: `https://org06cbc9ec.crm5.dynamics.com/`
 Organization: `ab191700-b99e-f111-aaa0-000d3a80bb96`
 Environment: `5abcb0e5-99b2-e51f-aa0e-90d84405798b`
 
+## FM Request reading evidence (2026-10-01)
+
+Migration 006 (receipt `bb7f0f69-42bd-f111-aaaf-00224819a344`) adds
+`fmc_evidencereadingid` (String 36) and `fmc_evidencesnapshot` (Memo 12000)
+to `fmc_fmrequest`. Signed assembly `1.0.0.14` captures a caller-readable
+Standard reading when attached to a Draft. The server validates the source and
+copies its measurement, UTC timestamp, point/equipment/building, text SQL ID,
+source identifiers and capture actor/time. Evidence cannot be edited directly
+and is frozen after Submit. This uses existing read/write privileges; no roles
+were granted or expanded.
+
+The published FM Workflow page now has a polished filter/result panel (including
+a mobile card layout) and searches synced readings by point/equipment/SQL ID and
+time range with paging. On a New request it can select evidence before the row
+has an ID, then the native **Save** (or **Save & submit for approval**) saves the
+form, lets the server capture the snapshot during Create, and immediately calls
+Submit. A saved
+Draft can still attach/replace one primary reading with an ETag check; the native
+request form shows read-only evidence fields. Live metadata, plug-in version, webresource hashes
+and app validation passed. A post-publish check found that the FM Request main
+form itself was not yet an `FMC BMS Demo` app component, so the app could open a
+different entry surface without the workflow tab. Form
+`2527bbf0-008e-4ac0-9029-f29b70b97bdd` was added with `AddAppComponents`, the
+app was republished, and published membership plus validation were re-read.
+Transactional rollback checks verified snapshot
+tamper protection and the non-Draft lock, with no committed test records or
+notifications. Full Submit/Approve was tested locally with a simulated service,
+not end-to-end in a signed-in Power Apps browser; Submit inside a rollback
+change set was rejected by the existing lifecycle guard on the internal status
+update. This does not establish behavior of ordinary Submit from that test.
+
+Solution build: zero warnings/errors; 102 .NET tests, three JS policy tests,
+two deployment tests and desktop/mobile browser regression passed. See the
+[evidence operating steps](../runbooks/epic-3-fm-workflow.vi.md#reading-bằng-chứng).
+Receipts and solution export are retained under `.artifacts/fm-reading-evidence`.
+
 ## FM Request in-app notification (2026-09-30)
 
 Epic 3 workflow bổ sung sau bản notification: migrations 004/005, signed assembly

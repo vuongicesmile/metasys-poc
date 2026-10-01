@@ -13,7 +13,7 @@ namespace FMCentralBms.Plugins
     public sealed class GuardFmWorkflow : IPlugin
     {
         internal static readonly string[] Protected = { S.Status, S.LegacyStatus, S.Requester, S.Approver, S.Step, S.Due,
-            S.SubmittedOn, S.CompletedOn, S.Plan, S.Revision, S.ReminderOn, S.OverdueOn, S.EscalatedOn };
+            S.SubmittedOn, S.CompletedOn, S.Plan, S.Revision, S.ReminderOn, S.OverdueOn, S.EscalatedOn, S.EvidenceSnapshot };
         public void Execute(IServiceProvider serviceProvider)
         {
             ITracingService trace; IPluginExecutionContext context; IOrganizationServiceFactory factory;
@@ -41,6 +41,7 @@ namespace FMCentralBms.Plugins
                     (!target.Contains(S.LegacyStatus) || FmWorkflowPolicy.Choice(target, S.LegacyStatus) == 100000000), "New requests must be Draft.");
                 FmWorkflowPolicy.Require(!Protected.Where(f => f != S.Status && f != S.LegacyStatus).Any(f => target.Contains(f) && target[f] != null), "Workflow-managed fields cannot be supplied on Create.");
                 FmWorkflowPolicy.ValidateDraft(target, false);
+                FmReadingEvidence.Capture(factory.CreateOrganizationService(context.InitiatingUserId), target, null, context.InitiatingUserId, DateTime.UtcNow);
                 target[S.Status] = new OptionSetValue(S.Draft); target[S.LegacyStatus] = new OptionSetValue(100000000);
                 target[S.Revision] = 0;
                 if (!target.Contains(S.Type)) target[S.Type] = new OptionSetValue(S.Ciwg);
@@ -58,6 +59,7 @@ namespace FMCentralBms.Plugins
                 var target = (Entity)context.InputParameters["Target"];
                 foreach (var field in Protected)
                     FmWorkflowPolicy.Require(!target.Contains(field) || Equal(target[field], existing.Contains(field) ? existing[field] : null), "Use workflow actions; field is managed: " + field);
+                FmReadingEvidence.Capture(factory.CreateOrganizationService(context.InitiatingUserId), target, existing, context.InitiatingUserId, DateTime.UtcNow);
                 foreach (var pair in target.Attributes) existing[pair.Key] = pair.Value;
                 FmWorkflowPolicy.ValidateDraft(existing, false);
                 target[S.Revision] = checked(existing.GetAttributeValue<int>(S.Revision) + 1);

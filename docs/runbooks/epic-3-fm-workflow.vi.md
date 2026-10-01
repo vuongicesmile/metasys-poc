@@ -7,15 +7,47 @@ Environment: Developer `org06cbc9ec`; solution `FMCentralBms`; app **FMC BMS Dem
 [Mở FMC BMS Demo](https://org06cbc9ec.crm5.dynamics.com/main.aspx?appid=d19f4897-d227-4df3-8361-988f97c53e89).
 Refresh app sau khi publish. Trong nhóm menu **FM Workflow** bên trái:
 
-1. **FM Requests → New**: nhập Name. Trong tab **Workflow details**, nhập Description, Request Type, Department và Estimated Value. Save.
+1. **FM Requests → New**: nhập Name. Trong tab **Workflow details**, nhập Description, Request Type, Department và Estimated Value. Trong panel **Reading bằng chứng**, lọc và chọn reading ngay trên form New, rồi bấm **Lưu & gửi phê duyệt** để lưu Draft, chụp evidence và Submit liên tiếp.
 2. Demo dùng Department **EPIC3-DEMO**. Đã có 2 bước cho mỗi loại CIWG/Risk/Project, cùng tài khoản demo để dễ trình diễn. Đây không phải quy tắc phân tách người tạo/người duyệt dùng cho production.
-3. **My Requests & Approvals → Yêu cầu của tôi**: chọn request, bấm **Gửi phê duyệt**. Hoặc mở tab **Workflow actions & history** ngay trên form đã lưu.
+3. Nếu chỉ bấm **Lưu Draft**, vào **My Requests & Approvals → Yêu cầu của tôi** để mở lại; nếu đã bấm **Lưu & gửi phê duyệt**, request đi thẳng tới bước chờ duyệt. Với Draft đã lưu, panel vẫn cho phép lọc/thay reading trước khi bấm **Gửi phê duyệt**.
+   Nút **Save** chuẩn trên command bar tự Submit sau PostSave; dùng nút **Lưu Draft** trong panel nếu muốn lưu mà chưa gửi. Evidence vẫn là tùy chọn của workflow, nhưng nếu đã chọn thì server sẽ chụp snapshot trong lần Save đó.
 4. Request sang **In Approval**, hiện bước 1, người duyệt và hạn. Flow gửi email kèm link mở request.
 5. **Chờ tôi duyệt**: nhập nhận xét → **Duyệt bước này**. Bước 1 chuyển sang bước 2; bước cuối chuyển Approved. **Từ chối** kết thúc ở Rejected.
 6. Người tạo nhập nhận xét → **Đóng request** khi Approved/Rejected. Lịch sử giữ actor, UTC timestamp, bước và comment.
 7. Risk: thêm Likelihood/Impact 1–5, Risk Severity, Mitigation, Review Date, Owner là user. Mở **Risk register** để xem heatmap. Số liệu chỉ tính các trang đã tải; dùng **Xem thêm** để tải tiếp.
 
 Native form vẫn làm CRUD; không cần chạy worker local cho workflow này. Chỉ Draft của người sở hữu được sửa/xóa. Không sửa trực tiếp Status để duyệt — plugin chặn cả form, API và import. Canvas **New FM Request** hiện có vẫn là điểm tạo Draft; bổ sung các thông tin cần duyệt trong native form.
+
+## Reading bằng chứng
+
+Trong **FM Requests → New**, panel **Reading bằng chứng** hoạt động ngay cả khi request chưa có ID. Đây là luồng khuyến nghị để không phải Save rồi mở lại:
+
+Nếu app đã mở trước lần publish ngày 01/10/2026, đóng record và refresh toàn bộ
+app trước khi kiểm tra. Main form phải là component của `FMC BMS Demo`; script
+deployment hiện gọi `AddAppComponents`, publish app rồi đọc lại membership để
+không tái diễn trường hợp form có tab trong metadata nhưng app chưa sử dụng form.
+
+1. Nhập Point, Equipment hoặc SQL reading ID; có thể chọn Unit (ví dụ `C`) và khoảng thời gian theo giờ máy.
+2. Dùng **Điều kiện bất thường** để chỉ lấy giá trị `Cao hơn ngưỡng`, `Thấp hơn ngưỡng` hoặc `Ngoài khoảng`. Ví dụ: Point `TEMP-001`, Unit `C`, `Cao hơn ngưỡng`, `40` chỉ lấy nhiệt độ trên 40°C. Bấm **Tìm readings** → kiểm tra thời gian/giá trị → **Chọn reading**. Dùng **Xem thêm readings** để phân trang. Trên mobile, mỗi kết quả hiển thị dạng card.
+3. Bấm **Lưu & gửi phê duyệt**. Client lưu các trường form và `fmc_evidencereadingid`; sau khi Create thành công, gọi Submit ngay. Plugin server đọc `fmc_bmsreadingsnapshot` và tạo snapshot trong Create transaction, sau đó lifecycle API ghi Submit/history/outbox.
+4. Nếu chỉ bấm **Lưu Draft**, có thể thay/gỡ reading trong Draft rồi mới Submit. Sau Submit, người duyệt thấy cùng snapshot và không thể thay/gỡ bằng chứng; reading mới không cập nhật lại snapshot.
+
+Mỗi request có một reading bằng chứng chính; bằng chứng là tùy chọn để giữ luồng CIWG/Risk/Project không liên quan BMS. Draft có thể thay hoặc gỡ bằng chứng. Chọn lại cùng reading giữ bản chụp cũ; muốn chụp lại nguồn đã được sửa, gỡ rồi đính kèm lại khi còn Draft. Chỉ đọc readings đã đồng bộ vào Standard table; không truy vấn trực tiếp toàn bộ lịch sử SQL hoặc tự chạy sync.
+
+Schema migration **006** thêm `fmc_evidencereadingid` (String 36, GUID nguồn được server xác thực) và `fmc_evidencesnapshot` (Memo 12000, server quản lý). Source reference là ID dạng text, không phải lookup cần quyền Append To vào telemetry. Quyền hiện có Read readings và Write Draft được sử dụng; không cấp thêm role. Xóa/sửa nguồn sau này không xóa bản chụp đã lưu. Người có quyền đọc request cũng đọc được bằng chứng trong request.
+
+Guard synchronous Create/Update chặn snapshot tự nhập; chỉ chấp nhận nguồn đầy đủ và người đính kèm đọc được. UI dùng ETag/If-Match khi thay bằng chứng để phát hiện request đã thay đổi; Submit tăng revision và khóa cả request. Hướng dẫn nền tảng: [conditional Web API operations](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/webapi/perform-conditional-operations-using-web-api).
+
+Triển khai theo thứ tự migration → signed plug-in → `python scripts/provision-fm-workflow.py deploy-evidence-ui`. Mode UI này chỉ cập nhật form request và workflow webresources. Dùng đường dẫn tuyệt đối cho `--plugin-path` vì `dotnet run --project` đổi working directory.
+
+Kiểm tra riêng bằng chứng:
+
+```powershell
+python scripts/verify-fm-evidence.py inspect
+python scripts/verify-fm-evidence.py rollback-smoke
+```
+
+`inspect` chỉ đọc metadata và một reading. `rollback-smoke` thử create/attach và chặn sửa snapshot, sau đó kiểm tra update bị chặn trên một request không còn Draft trong các [atomic change sets](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/webapi/execute-batch-operations-using-web-api). Mỗi change set có bước lỗi bắt buộc cuối cùng: mọi thay đổi bị rollback, không commit thông báo. Request có sẵn được đọc lại để xác nhận không đổi. Receipt nằm `.artifacts/fm-reading-evidence`. Đây không phải kiểm chứng live toàn bộ Submit → Approve: thử Submit bên trong change set đã bị lifecycle guard hiện có từ chối ở cập nhật status, nên không dùng cách đó để kết luận luồng Submit thông thường. Unit/browser tests kiểm tra luồng gửi/duyệt với bằng chứng; browser dùng Dataverse giả lập, không thay thế kiểm tra phiên Power Apps thật.
 
 ## Full flow
 

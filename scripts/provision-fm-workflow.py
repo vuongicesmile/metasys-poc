@@ -24,6 +24,9 @@ REFERENCE = "fmc_sharedcommondataserviceforapps"
 PAGE = "fmc_/pages/FmWorkflow.html"
 SCRIPT = "fmc_/scripts/FmWorkflow.js"
 ARTIFACTS = ROOT / ".artifacts/epic3-workflow"
+REQUEST_FIELDS = ["fmc_description", "fmc_requesttype", "fmc_department", "fmc_buildingcode", "fmc_estimatedvalue",
+    "fmc_requeststatus", "fmc_riskseverity", "fmc_likelihood", "fmc_impact", "fmc_mitigation", "fmc_reviewdate",
+    "fmc_currentstep", "fmc_currentapproveremail", "fmc_stepdueon", "fmc_evidencereadingid", "fmc_evidencereadingids", "fmc_evidencesnapshot"]
 
 
 class Client:
@@ -150,7 +153,7 @@ def deploy_form(c, table, fields, resource_id=None):
         title = (attr.get("DisplayName", {}).get("UserLocalizedLabel") or {}).get("Label", field)
         label(cell, title)
         control = ET.SubElement(cell, "control", {"id": field, "datafieldname": field, "classid": "{" + CONTROL[attr["AttributeType"]] + "}"})
-        if field in ("fmc_requeststatus", "fmc_status", "fmc_currentapproveremail", "fmc_currentstep", "fmc_stepdueon"):
+        if field in ("fmc_requeststatus", "fmc_status", "fmc_currentapproveremail", "fmc_currentstep", "fmc_stepdueon", "fmc_evidencereadingid", "fmc_evidencereadingids", "fmc_evidencesnapshot"):
             control.set("disabled", "true")
     for control in form.findall(".//control"):
         if control.get("datafieldname") in ("fmc_requeststatus", "fmc_status"):
@@ -165,6 +168,23 @@ def deploy_form(c, table, fields, resource_id=None):
     c.api("PATCH", f"systemforms({record['formid']})", json={"formxml": ET.tostring(form, encoding="unicode")})
     c.add(record["formid"], 60)
     print(json.dumps({"form": table, "id": record["formid"]}))
+    return record["formid"]
+
+
+def ensure_app_form(c, form_id):
+    components = c.api("GET", f"RetrieveAppComponents(AppModuleId={APP})").get("value", [])
+    if not any(str(item.get("objectid", "")).lower() == form_id.lower() and item.get("componenttype") == 60
+               for item in components):
+        c.api("POST", "AddAppComponents", json={"AppId": APP, "Components": [
+            {"formid": form_id, "@odata.type": "Microsoft.Dynamics.CRM.systemform"}]})
+
+
+def verify_app_form(c, form_id):
+    # RetrieveAppComponents exposes the published app, so verify only after PublishXml.
+    components = c.api("GET", f"RetrieveAppComponents(AppModuleId={APP})").get("value", [])
+    if not any(str(item.get("objectid", "")).lower() == form_id.lower() and item.get("componenttype") == 60
+               for item in components):
+        raise RuntimeError("FM Request main form is not included in the app")
 
 
 def deploy_resources(c):
@@ -194,7 +214,8 @@ def deploy_ui(c):
         c.api("PATCH", f"environmentvariabledefinitions({definition['environmentvariabledefinitionid']})", json={"defaultvalue": ORG + "/main.aspx?appid=" + APP})
     c.add(definition["environmentvariabledefinitionid"], 380)
     ids = deploy_resources(c)
-    deploy_form(c, "fmc_fmrequest", ["fmc_description", "fmc_requesttype", "fmc_department", "fmc_buildingcode", "fmc_estimatedvalue", "fmc_requeststatus", "fmc_riskseverity", "fmc_likelihood", "fmc_impact", "fmc_mitigation", "fmc_reviewdate", "fmc_currentstep", "fmc_currentapproveremail", "fmc_stepdueon"], ids[PAGE])
+    request_form = deploy_form(c, "fmc_fmrequest", REQUEST_FIELDS, ids[PAGE])
+    ensure_app_form(c, request_form)
     deploy_form(c, "fmc_approvalroute", ["fmc_requesttype", "fmc_department", "fmc_stepno", "fmc_minvalue", "fmc_minseverity", "fmc_approveremail", "fmc_approverrole", "fmc_escalationemail", "fmc_sladays", "fmc_reminderhours", "fmc_escalationhours", "fmc_isactive"])
     maps = c.rows("sitemaps", "sitemapnameunique eq 'fmc_FMCBMSDemo'", "sitemapid,sitemapxml")
     if len(maps) != 1:
@@ -214,6 +235,23 @@ def deploy_ui(c):
     if any(i.get("ErrorType") == "Error" for i in validation.get("ValidationIssueList", [])):
         raise RuntimeError("App validation errors: " + json.dumps(validation))
     c.api("POST", "PublishXml", json={"ParameterXml": f"<importexportxml><appmodules><appmodule>{APP}</appmodule></appmodules></importexportxml>"})
+    verify_app_form(c, request_form)
+    print(json.dumps({"appPublished": APP, "validation": validation}))
+
+
+def deploy_evidence_ui(c):
+    """Publish the request form/evidence panel only; existing navigation and routes are reused."""
+    global ARTIFACTS
+    ARTIFACTS = ROOT / ".artifacts/fm-reading-evidence"
+    ids = deploy_resources(c)
+    request_form = deploy_form(c, "fmc_fmrequest", REQUEST_FIELDS, ids[PAGE])
+    ensure_app_form(c, request_form)
+    c.api("POST", "PublishXml", json={"ParameterXml": "<importexportxml><entities><entity>fmc_fmrequest</entity></entities>"
+        f"<appmodules><appmodule>{APP}</appmodule></appmodules></importexportxml>"})
+    validation = c.api("GET", f"ValidateApp(AppModuleId={APP})")["AppValidationResponse"]
+    if not validation["ValidationSuccess"]:
+        raise RuntimeError("App validation failed: " + json.dumps(validation))
+    verify_app_form(c, request_form)
     print(json.dumps({"appPublished": APP, "validation": validation}))
 
 
@@ -235,7 +273,7 @@ def seed_demo(c):
 
 
 def verify(c):
-    for table, fields in {"fmc_fmrequest": ["fmc_workflowrevision", "fmc_workflowplan", "fmc_reminderon", "fmc_overdueon", "fmc_escalatedon"], "fmc_requesthistory": ["fmc_actorid", "fmc_command", "fmc_resultrevision"]}.items():
+    for table, fields in {"fmc_fmrequest": ["fmc_workflowrevision", "fmc_workflowplan", "fmc_reminderon", "fmc_overdueon", "fmc_escalatedon", "fmc_evidencereadingid", "fmc_evidencereadingids", "fmc_evidencesnapshot"], "fmc_requesthistory": ["fmc_actorid", "fmc_command", "fmc_resultrevision"]}.items():
         for field in fields:
             c.api("GET", f"EntityDefinitions(LogicalName='{table}')/Attributes(LogicalName='{field}')", params={"$select": "LogicalName"})
     flows = c.rows("workflows", f"name eq '{FLOW}' and category eq 5 and type eq 1", "workflowid,name,statecode,clientdata")
@@ -264,6 +302,7 @@ def verify(c):
     form = c.rows("systemforms", "objecttypecode eq 'fmc_fmrequest' and type eq 2 and formactivationstate eq 1", "formxml")
     if len(form) != 1 or ET.fromstring(form[0]["formxml"]).find(".//control[@id='WebResource_fmc_workflow']") is None:
         raise RuntimeError("Workflow form panel missing")
+    verify_app_form(c, form[0]["formid"])
     validation = c.api("GET", f"ValidateApp(AppModuleId={APP})")["AppValidationResponse"]
     if not validation["ValidationSuccess"]:
         raise RuntimeError("App validation failed")
@@ -275,14 +314,14 @@ def verify(c):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["inspect", "deploy-ui", "deploy-resources", "deploy-flow", "seed-demo", "verify"])
+    parser.add_argument("mode", choices=["inspect", "deploy-ui", "deploy-evidence-ui", "deploy-resources", "deploy-flow", "seed-demo", "verify"])
     args = parser.parse_args(); c = Client()
     if args.mode == "inspect":
         for table in ("fmc_fmrequest", "fmc_approvalroute"):
             print(json.dumps({"table": table, "forms": c.rows("systemforms", f"objecttypecode eq '{table}' and type eq 2", "formid,name,formactivationstate")}))
         print(json.dumps(c.rows("sitemaps", "sitemapnameunique eq 'fmc_FMCBMSDemo'", "sitemapid,sitemapnameunique")))
     else:
-        {"deploy-ui": deploy_ui, "deploy-resources": deploy_resources, "deploy-flow": deploy_flow, "seed-demo": seed_demo, "verify": verify}[args.mode](c)
+        {"deploy-ui": deploy_ui, "deploy-evidence-ui": deploy_evidence_ui, "deploy-resources": deploy_resources, "deploy-flow": deploy_flow, "seed-demo": seed_demo, "verify": verify}[args.mode](c)
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@
     <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Infrastructure/PluginServices.cs" Link="Plugin/PluginServices.cs" />
     <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Services/FmWorkflowPolicy.cs" Link="Plugin/FmWorkflowPolicy.cs" />
     <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Services/FmWorkflowStore.cs" Link="Plugin/FmWorkflowStore.cs" />
+    <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Services/FmReadingEvidence.cs" Link="Plugin/FmReadingEvidence.cs" />
     <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Plugins/TransitionFmRequest.cs" Link="Plugin/TransitionFmRequest.cs" />
     <Compile Include="../../Dataverse.Plugin/FMCentralBms.Plugins/Plugins/GuardFmWorkflow.cs" Link="Plugin/GuardFmWorkflow.cs" />
   </ItemGroup>

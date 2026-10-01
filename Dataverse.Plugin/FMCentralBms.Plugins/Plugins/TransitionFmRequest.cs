@@ -58,6 +58,9 @@ namespace FMCentralBms.Plugins
             {
                 FmWorkflowPolicy.Require(status == S.Draft && owner?.Id == context.InitiatingUserId, "Only the owner may submit a Draft request.");
                 FmWorkflowPolicy.ValidateDraft(request, true);
+                FmWorkflowPolicy.Require(string.IsNullOrWhiteSpace(request.GetAttributeValue<string>(S.EvidenceReading)) && string.IsNullOrWhiteSpace(request.GetAttributeValue<string>(S.EvidenceReadingIds)) ||
+                    !string.IsNullOrWhiteSpace(request.GetAttributeValue<string>(S.EvidenceSnapshot)),
+                    "Evidence snapshot is missing. Reattach the reading before submitting.");
                 var plan = FmWorkflowStore.ResolvePlan(system, request);
                 update[S.Plan] = FmWorkflowPolicy.Serialize(plan);
                 update[S.Requester] = email;

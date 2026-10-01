@@ -9,15 +9,36 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 
 DATAVERSE_URL = "https://org06cbc9ec.crm5.dynamics.com"
 TENANT_ID = "31983a93-6f80-4356-a4e1-a65055e8327e"
 
-azure_cli = shutil.which("az")
+def find_azure_cli() -> str | None:
+    azure_cli = shutil.which("az")
+    if azure_cli or sys.platform != "win32":
+        return azure_cli
+
+    roots = [
+        os.environ.get("ProgramW6432"),
+        os.environ.get("ProgramFiles"),
+        os.environ.get("ProgramFiles(x86)"),
+        r"C:\Program Files",
+        r"C:\Program Files (x86)",
+    ]
+    for root in dict.fromkeys(value for value in roots if value):
+        candidate = Path(root) / "Microsoft SDKs" / "Azure" / "CLI2" / "wbin" / "az.cmd"
+        if candidate.is_file():
+            return str(candidate)
+    return None
+
+
+azure_cli = find_azure_cli()
 command = [azure_cli] if azure_cli else [sys.executable, "-m", "azure.cli"]
 
 result = subprocess.run(

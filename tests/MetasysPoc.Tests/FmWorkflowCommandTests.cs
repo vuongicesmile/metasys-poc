@@ -151,6 +151,30 @@ public sealed class FmWorkflowCommandTests
         h.Request[S.Status] = new OptionSetValue(S.InApproval); h.Input["Target"] = new Entity(S.Request, h.Request.Id) { [S.Name] = "Edit after submit" };
         Assert.Throws<InvalidPluginExecutionException>(() => new GuardFmWorkflow().Execute(h));
     }
+    [Fact] public void Client_cannot_forge_evidence_snapshot_on_create_or_update()
+    {
+        var h = new Host();
+        foreach (var message in new[] { "Create", "Update" }) {
+            h.Message = message;
+            h.Input["Target"] = new Entity(S.Request, h.Request.Id) { [S.EvidenceSnapshot] = "Forged reading" };
+            Assert.Throws<InvalidPluginExecutionException>(() => new GuardFmWorkflow().Execute(h));
+        }
+    }
+    [Fact] public void Submit_preserves_captured_evidence_and_locks_lookup()
+    {
+        var h = new Host(); h.Request[S.EvidenceReading] = Guid.NewGuid().ToString("D");
+        h.Request[S.EvidenceSnapshot] = "Captured reading value: 27.1234 C";
+        h.Command("Submit"); Assert.Equal("Captured reading value: 27.1234 C", h.Request[S.EvidenceSnapshot]);
+        h.Message = "Update";
+        h.Input["Target"] = new Entity(S.Request, h.Request.Id) { [S.EvidenceReading] = null };
+        Assert.Throws<InvalidPluginExecutionException>(() => new GuardFmWorkflow().Execute(h));
+    }
+    [Fact] public void Submit_rejects_lookup_without_server_snapshot()
+    {
+        var h = new Host(); h.Request[S.EvidenceReading] = Guid.NewGuid().ToString("D");
+        Assert.Throws<InvalidPluginExecutionException>(() => h.Command("Submit"));
+        Assert.Equal(S.Draft, FmWorkflowPolicy.Status(h.Request)); Assert.Empty(h.Created);
+    }
     [Fact] public void Delayed_escalation_sends_overdue_once_before_reassignment()
     {
         var h = new Host(); h.Command("Submit"); h.Message = S.DeadlineApi;

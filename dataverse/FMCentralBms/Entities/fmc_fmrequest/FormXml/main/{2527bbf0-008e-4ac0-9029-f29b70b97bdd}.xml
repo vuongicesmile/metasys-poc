@@ -41,20 +41,20 @@
             </column>
           </columns>
         </tab>
-        <tab name="fmc_workflow_details" id="{59df0c29-cb09-4399-ace1-a3af4d4f31fb}" IsUserDefined="1" expanded="true">
+        <tab name="fmc_workflow_details" id="{0721252e-692f-47e2-a0c7-aafcf8e7f99f}" IsUserDefined="1" expanded="true">
           <labels>
             <label description="Workflow details" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
               <sections>
-                <section name="fmc_workflow_details_section" id="{fce6c157-7dec-4379-855e-4af31ba32692}" showlabel="false" showbar="false" columns="1">
+                <section name="fmc_workflow_details_section" id="{fe85aa2c-62f1-4eb4-82cc-62fe4fb5f7ce}" showlabel="false" showbar="false" columns="1">
                   <labels>
                     <label description="Workflow details" languagecode="1033" />
                   </labels>
                   <rows>
                     <row>
-                      <cell id="{0cc9525c-3a09-44b0-83f7-bea1e9b36743}">
+                      <cell id="{f4607dae-dc7c-4edc-aaeb-061cf536bbfd}">
                         <labels>
                           <label description="Description" languagecode="1033" />
                         </labels>
@@ -62,7 +62,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{b5ac8511-e925-42ea-aa76-be3afa2d63b4}">
+                      <cell id="{6c0e65f2-f477-4a14-901c-e63d774edf52}">
                         <labels>
                           <label description="Request Type" languagecode="1033" />
                         </labels>
@@ -70,7 +70,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{086acf06-54ef-41ff-8e5e-b49f3b736fa8}">
+                      <cell id="{78119123-1a48-4e87-98dc-b5bdeb9c776b}">
                         <labels>
                           <label description="Department" languagecode="1033" />
                         </labels>
@@ -78,7 +78,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{4d1bb7ce-d9b4-4e5d-80f3-3ef9371b585c}">
+                      <cell id="{cacd9dbe-986d-4d91-8cc5-85a4e65bef6e}">
                         <labels>
                           <label description="Building Code" languagecode="1033" />
                         </labels>
@@ -86,7 +86,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{a98a3935-4312-45e9-b143-a7a878190945}">
+                      <cell id="{3cc3b4e5-071d-4e17-91af-4b5e650d8e59}">
                         <labels>
                           <label description="Estimated Value" languagecode="1033" />
                         </labels>
@@ -94,7 +94,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{a4203ebb-184c-47e5-898e-6ff64388cfe5}">
+                      <cell id="{8ac5ab5b-88a7-4c07-be98-ecf7f8fdcbf7}">
                         <labels>
                           <label description="Request Status" languagecode="1033" />
                         </labels>
@@ -102,7 +102,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{2cb0398e-be52-4d56-8863-18e0912d6c77}">
+                      <cell id="{8561b979-5ae3-4f5d-89e2-a7742fd09d17}">
                         <labels>
                           <label description="Risk Severity" languagecode="1033" />
                         </labels>
@@ -110,7 +110,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{f44f9171-0b4e-450a-b1ad-968694d68e9c}">
+                      <cell id="{a9aca721-f4d2-4739-8cea-953bae42916e}">
                         <labels>
                           <label description="Likelihood (1-5)" languagecode="1033" />
                         </labels>
@@ -118,7 +118,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{17467852-7982-43ab-a2e7-567181fe998c}">
+                      <cell id="{9512f399-cfd5-4efc-8c2e-9d3f8400cb71}">
                         <labels>
                           <label description="Impact (1-5)" languagecode="1033" />
                         </labels>
@@ -126,7 +126,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{ed6e1f56-71f6-4e60-912f-6e92aa68f746}">
+                      <cell id="{cfc192b4-46ce-476d-be84-d11d59ae7179}">
                         <labels>
                           <label description="Mitigation" languagecode="1033" />
                         </labels>
@@ -134,7 +134,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{f5013ffb-d8dc-48db-baf2-41b5f705fda5}">
+                      <cell id="{51b713ec-2036-496a-891b-931ad6dc2813}">
                         <labels>
                           <label description="Review Date" languagecode="1033" />
                         </labels>
@@ -142,7 +142,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{9f28a28f-7137-4a7b-a9d2-0547819eff49}">
+                      <cell id="{bdc94f48-892a-4ced-ae15-02e7d039167d}">
                         <labels>
                           <label description="Current Step" languagecode="1033" />
                         </labels>
@@ -150,7 +150,7 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{488dcb93-b340-4baf-8681-16d2d3b8fa21}">
+                      <cell id="{51358d7a-0a60-4ded-89b1-8fb779e30529}">
                         <labels>
                           <label description="Current Approver Email" languagecode="1033" />
                         </labels>
@@ -158,11 +158,27 @@
                       </cell>
                     </row>
                     <row>
-                      <cell id="{16a9913a-064b-4447-8d07-2fb0498fa1d1}">
+                      <cell id="{4586ba35-f9d5-4a20-8641-2d7f10be353b}">
                         <labels>
                           <label description="Step Due On" languagecode="1033" />
                         </labels>
                         <control id="fmc_stepdueon" datafieldname="fmc_stepdueon" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{37c2900a-798f-4c9c-80d2-284162b5587f}">
+                        <labels>
+                          <label description="Evidence reading ID" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_evidencereadingid" datafieldname="fmc_evidencereadingid" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{cbaf5e1f-2c07-47a8-828c-5703624fa660}">
+                        <labels>
+                          <label description="Reading evidence snapshot" languagecode="1033" />
+                        </labels>
+                        <control id="fmc_evidencesnapshot" datafieldname="fmc_evidencesnapshot" classid="{E0DECE4B-6FC8-4A8F-A065-082708572369}" disabled="true" />
                       </cell>
                     </row>
                   </rows>
@@ -171,20 +187,20 @@
             </column>
           </columns>
         </tab>
-        <tab name="fmc_workflow_actions" id="{de530ca5-1ade-4e36-9224-ead2433cd2aa}" IsUserDefined="1" expanded="true">
+        <tab name="fmc_workflow_actions" id="{9d4387db-8572-439d-a92c-2dd0ac75f225}" IsUserDefined="1" expanded="true">
           <labels>
             <label description="Workflow actions &amp; history" languagecode="1033" />
           </labels>
           <columns>
             <column width="100%">
               <sections>
-                <section name="fmc_workflow_actions_section" id="{d40514c7-fe74-4223-a066-3fb959c81de1}" showlabel="false" showbar="false" columns="1">
+                <section name="fmc_workflow_actions_section" id="{961e1186-9a0a-4aed-a794-a243f2d5c000}" showlabel="false" showbar="false" columns="1">
                   <labels>
                     <label description="Workflow actions &amp; history" languagecode="1033" />
                   </labels>
                   <rows>
                     <row>
-                      <cell id="{e7f98ceb-25d3-45f2-b4cf-6102b7564d02}" showlabel="false" rowspan="20">
+                      <cell id="{5e9a3bf1-fe05-4b92-ac5f-6cc1b42730fc}" showlabel="false" rowspan="20">
                         <labels>
                           <label description="Workflow actions" languagecode="1033" />
                         </labels>

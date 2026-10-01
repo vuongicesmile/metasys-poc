@@ -128,7 +128,7 @@
       <RootComponent type="66" schemaName="fmc_FMC.Bms.BmsPointGrid" behavior="0" />
       <RootComponent type="66" schemaName="fmc_FMC.Bms.ScrollDownButton" behavior="0" />
       <RootComponent type="80" schemaName="fmc_FMCBMSDemo" behavior="0" />
-      <RootComponent type="91" id="{a5233bd0-bbac-f111-aaad-00224819a344}" schemaName="FMCentralBms.Plugins, Version=1.0.0.13, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" behavior="0" />
+      <RootComponent type="91" id="{a5233bd0-bbac-f111-aaad-00224819a344}" schemaName="FMCentralBms.Plugins, Version=1.0.0.14, Culture=neutral, PublicKeyToken=e122b5e4dcc2589d" behavior="0" />
       <RootComponent type="92" id="{00029f22-bcac-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{013ca71a-f2b6-f111-aaae-00224819a344}" behavior="0" />
       <RootComponent type="92" id="{11adca20-f2b6-f111-aaae-00224819a344}" behavior="0" />
