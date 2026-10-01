@@ -1,7 +1,8 @@
-"""Provision and verify the solution-aware FMC user email notification flow.
+"""Provision and verify the solution-aware FMC user notification flow.
 
-The flow consumes Pending fmc_notification outbox rows, sends them through the
-Office 365 Outlook connector, and writes a delivery receipt back to Dataverse.
+The flow consumes Pending fmc_notification outbox rows, sends each notification
+through Office 365 Outlook and Microsoft Teams, and writes a combined delivery
+receipt back to Dataverse.
 """
 
 import argparse
@@ -27,6 +28,10 @@ OUTLOOK = "shared_office365"
 OUTLOOK_CONNECTOR = "/providers/Microsoft.PowerApps/apis/" + OUTLOOK
 OUTLOOK_CONNECTION_LOGICAL = "fmc_sharedoffice365outlook"
 OUTLOOK_CONNECTION_ID = "fae65120-ff53-4323-9e06-e0415cb4125a"
+TEAMS = "shared_teams"
+TEAMS_CONNECTOR = "/providers/Microsoft.PowerApps/apis/" + TEAMS
+TEAMS_CONNECTION_LOGICAL = "fmc_sharedteams"
+TEAMS_CONNECTION_ID = "424c2481-8a78-4494-ba0b-28ac37dff287"
 EMAIL_CHANNEL = 789120000
 PENDING = 789121000
 SENT = 789121001
@@ -65,7 +70,7 @@ def dataverse_update(entity_set, values, run_after):
     }
 
 
-def build(entity_set, dv_connection_id, outlook_connection_id):
+def build(entity_set, dv_connection_id, outlook_connection_id, teams_connection_id):
     definition = {
         "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
         "contentVersion": "1.0.0.0",
@@ -127,6 +132,27 @@ def build(entity_set, dv_connection_id, outlook_connection_id):
                 },
                 "runtimeConfiguration": {"retryPolicy": {"type": "none"}},
             },
+            "Send_Teams_message": {
+                "type": "OpenApiConnection",
+                "runAfter": {"Send_email": ["Succeeded"]},
+                "inputs": {
+                    "host": {
+                        "apiId": TEAMS_CONNECTOR,
+                        "connectionName": TEAMS,
+                        "operationId": "PostMessageToConversation",
+                    },
+                    "parameters": {
+                        "poster": "Flow bot",
+                        "location": "Chat with Flow bot",
+                        "body/recipient": (
+                            "@concat(triggerOutputs()?['body/fmc_recipientemail'], ';')"
+                        ),
+                        "body/messageBody": "@triggerOutputs()?['body/fmc_body']",
+                    },
+                    "authentication": "@parameters('$authentication')",
+                },
+                "runtimeConfiguration": {"retryPolicy": {"type": "none"}},
+            },
             "Mark_sent": dataverse_update(
                 entity_set,
                 {
@@ -134,9 +160,9 @@ def build(entity_set, dv_connection_id, outlook_connection_id):
                     "fmc_sentat": "@utcNow()",
                     "fmc_errormessage": None,
                 },
-                {"Send_email": ["Succeeded"]},
+                {"Send_Teams_message": ["Succeeded"]},
             ),
-            "Mark_failed": dataverse_update(
+            "Mark_email_failed": dataverse_update(
                 entity_set,
                 {
                     "fmc_status": FAILED,
@@ -147,12 +173,26 @@ def build(entity_set, dv_connection_id, outlook_connection_id):
                 },
                 {"Send_email": ["Failed", "TimedOut"]},
             ),
+            "Mark_Teams_failed": dataverse_update(
+                entity_set,
+                {
+                    "fmc_status": FAILED,
+                    "fmc_errormessage": (
+                        "TEAMS-001 Microsoft Teams delivery failed after email delivery. "
+                        "Inspect the Power Automate run by fmc_flowrunid."
+                    ),
+                },
+                {"Send_Teams_message": ["Failed", "TimedOut"]},
+            ),
         },
     }
     refs = {
         DV: connection_reference(DV_CONNECTION_LOGICAL, dv_connection_id, DV),
         OUTLOOK: connection_reference(
             OUTLOOK_CONNECTION_LOGICAL, outlook_connection_id, OUTLOOK
+        ),
+        TEAMS: connection_reference(
+            TEAMS_CONNECTION_LOGICAL, teams_connection_id, TEAMS
         ),
     }
     return {
@@ -181,6 +221,14 @@ def main():
         default=OUTLOOK_CONNECTION_ID,
         help=(
             "Office 365 Outlook connection ID used only by bootstrap-reference. "
+            "Defaults to the checked Developer-environment connection."
+        ),
+    )
+    parser.add_argument(
+        "--teams-connection-id",
+        default=TEAMS_CONNECTION_ID,
+        help=(
+            "Microsoft Teams connection ID used only by bootstrap-reference. "
             "Defaults to the checked Developer-environment connection."
         ),
     )
@@ -235,39 +283,65 @@ def main():
     entity_set = metadata["EntitySetName"]
 
     if args.mode == "bootstrap-reference":
-        found = rows(
-            "connectionreferences",
-            f"connectionreferencelogicalname eq '{OUTLOOK_CONNECTION_LOGICAL}'",
-            "connectionreferenceid,connectionid,connectorid",
-        )
-        if len(found) > 1:
-            raise RuntimeError("Duplicate Office 365 Outlook connection references")
-        values = {
-            "connectionreferencelogicalname": OUTLOOK_CONNECTION_LOGICAL,
-            "connectionreferencedisplayname": "FM Central Office 365 Outlook",
-            "description": "Office 365 Outlook connection used by FMC user email notifications.",
-            "connectorid": OUTLOOK_CONNECTOR,
-            "connectionid": args.outlook_connection_id,
-        }
-        if found:
-            reference_id = found[0]["connectionreferenceid"]
-            if found[0].get("connectorid") != OUTLOOK_CONNECTOR:
-                raise RuntimeError("Existing Outlook connection reference uses another connector")
-            api("PATCH", f"connectionreferences({reference_id})", json=values)
-        else:
-            reference_id = str(uuid.uuid4())
-            api(
-                "POST",
+        def upsert_reference(logical_name, display_name, description, connector_id, connection_id):
+            found = rows(
                 "connectionreferences",
-                json={"connectionreferenceid": reference_id, **values},
-                headers={"MSCRM.SolutionUniqueName": SOLUTION},
+                f"connectionreferencelogicalname eq '{logical_name}'",
+                "connectionreferenceid,connectionid,connectorid",
             )
+            if len(found) > 1:
+                raise RuntimeError(f"Duplicate connection references for {logical_name}")
+            values = {
+                "connectionreferencelogicalname": logical_name,
+                "connectionreferencedisplayname": display_name,
+                "description": description,
+                "connectorid": connector_id,
+                "connectionid": connection_id,
+            }
+            if found:
+                reference_id = found[0]["connectionreferenceid"]
+                if found[0].get("connectorid") != connector_id:
+                    raise RuntimeError(
+                        f"Existing connection reference {logical_name} uses another connector"
+                    )
+                api("PATCH", f"connectionreferences({reference_id})", json=values)
+            else:
+                reference_id = str(uuid.uuid4())
+                api(
+                    "POST",
+                    "connectionreferences",
+                    json={"connectionreferenceid": reference_id, **values},
+                    headers={"MSCRM.SolutionUniqueName": SOLUTION},
+                )
+            return reference_id
+
+        outlook_reference_id = upsert_reference(
+            OUTLOOK_CONNECTION_LOGICAL,
+            "FM Central Office 365 Outlook",
+            "Office 365 Outlook connection used by FMC user notifications.",
+            OUTLOOK_CONNECTOR,
+            args.outlook_connection_id,
+        )
+        teams_reference_id = upsert_reference(
+            TEAMS_CONNECTION_LOGICAL,
+            "FM Central Microsoft Teams",
+            "Microsoft Teams connection used by FMC user notifications.",
+            TEAMS_CONNECTOR,
+            args.teams_connection_id,
+        )
         print(
             json.dumps(
                 {
-                    "connectionReferenceId": reference_id,
-                    "logicalName": OUTLOOK_CONNECTION_LOGICAL,
-                    "connectionId": args.outlook_connection_id,
+                    "outlook": {
+                        "connectionReferenceId": outlook_reference_id,
+                        "logicalName": OUTLOOK_CONNECTION_LOGICAL,
+                        "connectionId": args.outlook_connection_id,
+                    },
+                    "teams": {
+                        "connectionReferenceId": teams_reference_id,
+                        "logicalName": TEAMS_CONNECTION_LOGICAL,
+                        "connectionId": args.teams_connection_id,
+                    },
                 }
             )
         )
@@ -291,7 +365,12 @@ def main():
     outlook_connection_id = resolve_connection(
         OUTLOOK_CONNECTION_LOGICAL, OUTLOOK_CONNECTOR
     )
-    clientdata = build(entity_set, dv_connection_id, outlook_connection_id)
+    teams_connection_id = resolve_connection(
+        TEAMS_CONNECTION_LOGICAL, TEAMS_CONNECTOR
+    )
+    clientdata = build(
+        entity_set, dv_connection_id, outlook_connection_id, teams_connection_id
+    )
     rendered = ARTIFACTS / "clientdata.json"
     if args.mode == "render":
         rendered.write_text(json.dumps(clientdata, indent=2) + "\n", encoding="utf-8")
@@ -316,8 +395,8 @@ def main():
             "type": 1,
             "primaryentity": "none",
             "description": (
-                "Sends Pending fmc_notification email outbox rows and records "
-                "Sent or Failed delivery receipts."
+                "Sends Pending fmc_notification rows through Outlook and Teams "
+                "and records combined Sent or Failed delivery receipts."
             ),
             "clientdata": json.dumps(clientdata, separators=(",", ":")),
         }
@@ -379,7 +458,10 @@ def main():
                 "fmc_recipientemail": recipient,
                 "fmc_recipientname": user.get("fullname"),
                 "fmc_subject": "[FMC BMS] Notification smoke test",
-                "fmc_body": "<p>The FMCentralBms email notification flow is working.</p>",
+                "fmc_body": (
+                    "<p><strong>FMCentralBms notification smoke test</strong></p>"
+                    "<p>Both Outlook and Microsoft Teams delivery are working.</p>"
+                ),
                 "fmc_correlationkey": "notification-smoke:" + notification_id,
                 "fmc_regardingtable": "smoke-test",
                 "fmc_regardingid": notification_id,
@@ -491,13 +573,21 @@ def verify(api, rows, flow_id):
     definition = clientdata["properties"]["definition"]
     trigger = definition["triggers"]["When_a_pending_email_notification_is_created"]
     send = definition["actions"]["Send_email"]
+    send_teams = definition["actions"]["Send_Teams_message"]
+    refs = clientdata["properties"]["connectionReferences"]
     if (
         flow["statecode"] != 1
         or trigger["inputs"]["parameters"]["subscriptionRequest/entityname"]
         != "fmc_notification"
         or send["inputs"]["host"]["operationId"] != "SendEmailV2"
+        or send_teams["inputs"]["host"]["operationId"]
+        != "PostMessageToConversation"
+        or send_teams["inputs"]["parameters"]["location"]
+        != "Chat with Flow bot"
+        or refs[TEAMS]["connection"]["connectionReferenceLogicalName"]
+        != TEAMS_CONNECTION_LOGICAL
     ):
-        raise RuntimeError("Notification flow trigger or email action differs")
+        raise RuntimeError("Notification flow trigger, email, or Teams action differs")
     callbacks = rows(
         "callbackregistrations",
         "entityname eq 'fmc_notification'",
@@ -514,8 +604,8 @@ def verify(api, rows, flow_id):
         "name eq 'FMCentralBms.Plugins'",
         "pluginassemblyid,name,version",
     )
-    if len(assemblies) != 1 or assemblies[0].get("version") != "1.0.0.5":
-        raise RuntimeError("Expected FMCentralBms.Plugins assembly version 1.0.0.5")
+    if len(assemblies) != 1 or assemblies[0].get("version") != "1.0.0.15":
+        raise RuntimeError("Expected FMCentralBms.Plugins assembly version 1.0.0.15")
     steps = rows(
         "sdkmessageprocessingsteps",
         "name eq 'BMS: Queue notification on Sync Request completion'",

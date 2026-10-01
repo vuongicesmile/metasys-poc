@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Workflow WorkflowId="{0d9e5ee1-61bd-f111-aaaf-00224819a344}" Name="FM Request — Tạo và gửi yêu cầu" Description="Hướng dẫn tạo FM Request: nhập Name, Description, Request Type, Department và Estimated Value; bằng chứng tùy chọn được lọc/chọn nhiều readings trong panel Reading ở tab Workflow actions &amp; history trên form Information; snapshot do server quản lý. Kiểm tra thông tin rồi dùng thao tác gửi phê duyệt hiện có. BPF không có workflow Submit/Approve hoặc đổi Request Status. Giới hạn đã báo trước khi activate: chuyển stage BPF có thể Save main form; Save chuẩn hiện lưu Draft, chụp evidence và Submit liên tiếp. Không dùng Next Stage/Finish trước khi đã sẵn sàng gửi duyệt." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <XamlFileName>/Workflows/FMRequestTovgiyucu-0D9E5EE1-61BD-F111-AAAF-00224819A344.xaml</XamlFileName>
+  <Type>1</Type>
+  <Subprocess>0</Subprocess>
+  <Category>4</Category>
+  <Mode>0</Mode>
+  <Scope>4</Scope>
+  <OnDemand>0</OnDemand>
+  <TriggerOnCreate>1</TriggerOnCreate>
+  <TriggerOnDelete>0</TriggerOnDelete>
+  <AsyncAutodelete>0</AsyncAutodelete>
+  <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+  <StateCode>1</StateCode>
+  <StatusCode>2</StatusCode>
+  <processorder>100</processorder>
+  <RunAs>1</RunAs>
+  <UniqueName>fmc_fmrequestcreatesubmit</UniqueName>
+  <IsTransacted>1</IsTransacted>
+  <IntroducedVersion>1.0.3.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <BusinessProcessType>0</BusinessProcessType>
+  <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+  <ProcessTriggerScope>1</ProcessTriggerScope>
+  <ModernFlowType>0</ModernFlowType>
+  <PrimaryEntity>fmc_fmrequest</PrimaryEntity>
+  <LocalizedNames>
+    <LocalizedName languagecode="1033" description="FM Request — Tạo và gửi yêu cầu" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description languagecode="1033" description="Hướng dẫn tạo FM Request: nhập Name, Description, Request Type, Department và Estimated Value; bằng chứng tùy chọn được lọc/chọn nhiều readings trong panel Reading ở tab Workflow actions &amp; history trên form Information; snapshot do server quản lý. Kiểm tra thông tin rồi dùng thao tác gửi phê duyệt hiện có. BPF không có workflow Submit/Approve hoặc đổi Request Status. Giới hạn đã báo trước khi activate: chuyển stage BPF có thể Save main form; Save chuẩn hiện lưu Draft, chụp evidence và Submit liên tiếp. Không dùng Next Stage/Finish trước khi đã sẵn sàng gửi duyệt." />
+  </Descriptions>
+  <labels>
+    <steplabels id="{35397e83-e751-443d-8a03-81e434237a8f}">
+      <label languagecode="1033" description="Thông Tin Yêu Cầu" />
+    </steplabels>
+    <steplabels id="{a742f4ce-1b6f-4016-9888-0383f2cfd50d}">
+      <label languagecode="1033" description="Name" />
+    </steplabels>
+    <steplabels id="{22626efa-f137-4808-a7a6-998358b94048}">
+      <label languagecode="1033" description="Description" />
+    </steplabels>
+    <steplabels id="{efaee65e-3d1d-4062-9b55-1488cf2ce081}">
+      <label languagecode="1033" description="Request Type" />
+    </steplabels>
+    <steplabels id="{0b8f6cd6-6397-418e-8d09-b107d7abb70f}">
+      <label languagecode="1033" description="Department" />
+    </steplabels>
+    <steplabels id="{05c95338-d162-49b7-b8d0-00c2a126313c}">
+      <label languagecode="1033" description="Estimated Value" />
+    </steplabels>
+    <steplabels id="{8933cfe2-149f-4ba1-b143-df6f0f6cb93d}">
+      <label languagecode="1033" description="Bằng Chứng" />
+    </steplabels>
+    <steplabels id="{a8521449-88f2-4cba-9090-6dde252d9212}">
+      <label languagecode="1033" description="Building Code (tùy chọn); panel Reading trên form: lọc bất thường, chọn nhiều readings" />
+    </steplabels>
+    <steplabels id="{5de48377-a7f9-42d5-9692-3da9a7413907}">
+      <label languagecode="1033" description="Kiểm Tra &amp; Gửi" />
+    </steplabels>
+    <steplabels id="{56a0c3fe-2726-462c-81fd-8473a5d410ac}">
+      <label languagecode="1033" description="Kiểm tra Name; dùng gửi phê duyệt trên form. Next Stage/Finish không phải Submit" />
+    </steplabels>
+  </labels>
+</Workflow>

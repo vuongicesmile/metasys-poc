@@ -4,6 +4,8 @@
   const types = {789140000:'CIWG',789140001:'Risk',789140002:'Project'};
   const cleanId = value => String(value || '').replace(/[{}]/g, '').toLowerCase();
   const quote = value => String(value).replace(/'/g, "''");
+  const serializeEvidenceIds = ids => (ids || []).map(cleanId).filter(Boolean).join('\n');
+  const parseEvidenceIds = value => String(value || '').split(/[\s,;]+/).map(cleanId).filter(Boolean);
   const allowed = (r, user, email) => ({Submit:r.fmc_requeststatus===789141000 && cleanId(r._ownerid_value)===cleanId(user),
     Approve:r.fmc_requeststatus===789141002 && String(r.fmc_currentapproveremail||'').toLowerCase()===email.toLowerCase(),
     Reject:r.fmc_requeststatus===789141002 && String(r.fmc_currentapproveremail||'').toLowerCase()===email.toLowerCase(),
@@ -13,7 +15,7 @@
     for (const r of rows) if (r.fmc_likelihood>=1 && r.fmc_likelihood<=5 && r.fmc_impact>=1 && r.fmc_impact<=5) cells[r.fmc_likelihood-1][r.fmc_impact-1]++;
     return cells;
   }
-  if (typeof module !== 'undefined') module.exports = {allowed, heatmap, quote, cleanId};
+  if (typeof module !== 'undefined') module.exports = {allowed, heatmap, quote, cleanId, serializeEvidenceIds, parseEvidenceIds};
   if (!root.document) return;
   const $ = id => document.getElementById(id);
   const element = (tag, text, cls) => {const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
@@ -144,10 +146,10 @@
     async function attach(readings){
       if(!r['@odata.etag'])throw Error('Thiếu phiên bản request. Refresh trước khi đính kèm.');
       const ids=readings.map(row=>cleanId(row.fmc_bmsreadingsnapshotid));
-      await api(`fmc_fmrequests(${cleanId(r.fmc_fmrequestid)})`,{fmc_evidencereadingid:ids[0]||null,fmc_evidencereadingids:ids.join('\n')||null},'PATCH',{'If-Match':r['@odata.etag']});
+      await api(`fmc_fmrequests(${cleanId(r.fmc_fmrequestid)})`,{fmc_evidencereadingid:ids[0]||null,fmc_evidencereadingids:serializeEvidenceIds(ids)||null},'PATCH',{'If-Match':r['@odata.etag']});
       await loadRecord(r.fmc_fmrequestid);
     }
-    readingPicker(body,attach,(r.fmc_evidencereadingids||r.fmc_evidencereadingid||'').split(/[\\n,; ]+/).filter(Boolean));
+    readingPicker(body,attach,parseEvidenceIds(r.fmc_evidencereadingids||r.fmc_evidencereadingid));
     if(r.fmc_evidencereadingids){const clear=element('button','Gỡ toàn bộ bằng chứng');clear.onclick=()=>safe(async()=>{await api(`fmc_fmrequests(${cleanId(r.fmc_fmrequestid)})`,{fmc_evidencereadingid:null,fmc_evidencereadingids:null},'PATCH',{'If-Match':r['@odata.etag']});await loadRecord(r.fmc_fmrequestid);});body.append(clear);}
     if(r.fmc_evidencereadingid){const remove=element('button','Gỡ bằng chứng');remove.onclick=()=>safe(async()=>{await api(`fmc_fmrequests(${cleanId(r.fmc_fmrequestid)})`,{fmc_evidencereadingid:null},'PATCH',{'If-Match':r['@odata.etag']});await loadRecord(r.fmc_fmrequestid);});body.append(remove);}
   }
@@ -164,7 +166,7 @@
     let chosen=null,autoSubmit=false,suppressAuto=false;
     readingPicker(body,async row=>{chosen=row;attribute.setValue(cleanId(row.fmc_bmsreadingsnapshotid));attribute.setSubmitMode('always');});
     const actions=element('div',undefined,'create-actions'),save=element('button','Lưu Draft'),submit=element('button','Lưu & gửi phê duyệt','primary');actions.append(save,submit);body.append(actions);
-    const multi=form.getAttribute('fmc_evidencereadingids');if(multi){setInterval(()=>{const ids=root.__selectedEvidenceIds;if(ids){multi.setValue(ids.join('\\n'));multi.setSubmitMode('always');}},250);}
+    const multi=form.getAttribute('fmc_evidencereadingids');if(multi){setInterval(()=>{const ids=root.__selectedEvidenceIds;if(ids){multi.setValue(serializeEvidenceIds(ids));multi.setSubmitMode('always');}},250);}
     async function submitSavedRecord(){
       const id=cleanId(form.data.entity.getId());if(!id)throw Error('Request chưa được tạo. Kiểm tra các trường bắt buộc trên form.');
       const r=await api(`fmc_fmrequests(${id})?$select=${fields}`);

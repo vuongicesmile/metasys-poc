@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Workflow WorkflowId="{23cc5a60-0e28-4afd-8226-042dfeab84d4}" Name="FMC - Send User Email Notification" Description="Sends Pending fmc_notification email outbox rows and records Sent or Failed delivery receipts." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Workflow WorkflowId="{23cc5a60-0e28-4afd-8226-042dfeab84d4}" Name="FMC - Send User Email Notification" Description="Sends Pending fmc_notification rows through Outlook and Teams and records combined Sent or Failed delivery receipts." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <JsonFileName>/Workflows/FMC-SendUserEmailNotification-23CC5A60-0E28-4AFD-8226-042DFEAB84D4.json</JsonFileName>
   <Type>1</Type>
   <Subprocess>0</Subprocess>
@@ -25,6 +25,6 @@
     <LocalizedName languagecode="1033" description="FMC - Send User Email Notification" />
   </LocalizedNames>
   <Descriptions>
-    <Description languagecode="1033" description="Sends Pending fmc_notification email outbox rows and records Sent or Failed delivery receipts." />
+    <Description languagecode="1033" description="Sends Pending fmc_notification rows through Outlook and Teams and records combined Sent or Failed delivery receipts." />
   </Descriptions>
 </Workflow>

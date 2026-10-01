@@ -1,5 +1,12 @@
 # Dataverse User Email Notifications — hướng dẫn triển khai từng bước
 
+> Cập nhật 01/10/2026: flow solution-aware hiện gửi mỗi notification qua
+> Office 365 Outlook rồi Microsoft Teams `PostMessageToConversation` bằng Flow
+> bot vào chat của `fmc_recipientemail`. Receipt chỉ thành `Sent` khi cả hai
+> action thành công; lỗi Teams ghi `TEAMS-001`. Connection reference Teams là
+> `fmc_sharedteams`. Tên flow cũ được giữ để không làm hỏng deployment scripts
+> và các tham chiếu solution hiện có.
+
 > [!IMPORTANT]
 > Tài liệu này mô tả đúng implementation đang dùng trong `FMCentralBms`:
 > Dataverse outbox + async plug-in + solution-aware Power Automate flow.
@@ -45,13 +52,14 @@ flowchart LR
     Plugin -->|"create idempotent row"| Outbox[("fmc_notification<br/>Pending")]
     Outbox -->|"Dataverse Create trigger"| Flow["FMC - Send User<br/>Email Notification"]
     Flow -->|"Send an email V2"| Outlook["Office 365 Outlook"]
+    Outlook -->|"PostMessageToConversation"| Teams["Microsoft Teams<br/>Flow bot chat"]
     Flow -->|"Sent hoặc Failed receipt"| Outbox
 ```
 
 `fmc_syncrequest` chỉ kết thúc công việc sync. Plug-in tạo một bản ghi outbox
-riêng. Power Automate đọc outbox và gửi mail. Vì ba phần tách rời nên:
+riêng. Power Automate đọc outbox và gửi email rồi Teams. Vì các phần tách rời nên:
 
-- lỗi Outlook không rollback một sync đã hoàn tất;
+- lỗi Outlook hoặc Teams không rollback một sync đã hoàn tất;
 - notification có receipt và lịch sử riêng;
 - producer không chứa credential email;
 - có thể tái sử dụng outbox cho Submitted, Approved, Rejected, Overdue và
@@ -63,8 +71,8 @@ riêng. Power Automate đọc outbox và gửi mail. Vì ba phần tách rời n
 stateDiagram-v2
     [*] --> Pending: Có recipient hợp lệ
     [*] --> Skipped: Không resolve được email
-    Pending --> Sent: SendEmailV2 thành công
-    Pending --> Failed: SendEmailV2 failed hoặc timed out
+    Pending --> Sent: Outlook và Teams thành công
+    Pending --> Failed: Outlook hoặc Teams failed/timed out
     Sent --> [*]
     Failed --> [*]
     Skipped --> [*]
@@ -76,8 +84,10 @@ stateDiagram-v2
 flowchart TD
     Trigger["When a row is added<br/>Pending + Email + recipient"] --> Attempt["Mark attempt<br/>time + count + run ID"]
     Attempt --> Send["Send email<br/>Office 365 Outlook"]
-    Send -->|"Succeeded"| Sent["Mark sent<br/>status + sent time"]
-    Send -->|"Failed / Timed out"| Failed["Mark failed<br/>status + error code"]
+    Send -->|"Succeeded"| Teams["Post message<br/>Teams Flow bot"]
+    Teams -->|"Succeeded"| Sent["Mark sent<br/>status + sent time"]
+    Send -->|"Failed / Timed out"| EmailFailed["Mark failed<br/>EMAIL-001"]
+    Teams -->|"Failed / Timed out"| TeamsFailed["Mark failed<br/>TEAMS-001"]
 ```
 
 ---
@@ -324,14 +334,15 @@ Mở [Power Automate](https://make.powerautomate.com/), chọn đúng environmen
 
 1. Chọn **Solutions → FMCentralBms**.
 2. Chọn **New → More → Connection reference**.
-3. Tạo hoặc kiểm tra hai reference:
+3. Tạo hoặc kiểm tra ba reference:
 
 | Mục đích | Display name | Logical name | Connector |
 | --- | --- | --- | --- |
 | Dataverse | FM Central Microsoft Dataverse | `fmc_sharedcommondataserviceforapps` | Microsoft Dataverse |
 | Gửi mail | FM Central Office 365 Outlook | `fmc_sharedoffice365outlook` | Office 365 Outlook |
+| Gửi Teams | FM Central Microsoft Teams | `fmc_sharedteams` | Microsoft Teams |
 
-Với Outlook, chọn connection của mailbox/service account được phép gửi mail.
+Với Outlook và Teams, chọn connection của account được phép gửi notification.
 Nếu tạo connection mới, chọn **Refresh** rồi chọn connection vừa tạo.
 
 > [!NOTE]
@@ -429,9 +440,24 @@ Retry được tắt có chủ đích: nếu Outlook đã nhận request nhưng 
 retry tự động có thể gửi email trùng. Khi thất bại, operator đọc receipt và
 requeue có kiểm soát.
 
-### 6.6 Nhánh thành công — Mark sent
+### 6.6 Action 3 — Send Teams message
 
-Sau `Send email`, thêm action **Microsoft Dataverse — Update a row**, đổi tên
+Sau `Send email`, thêm **Microsoft Teams — Post message in a chat or channel**:
+
+| Field | Giá trị |
+| --- | --- |
+| Post as | `Flow bot` |
+| Post in | `Chat with Flow bot` |
+| Recipient | `concat(triggerOutputs()?['body/fmc_recipientemail'], ';')` |
+| Message | `triggerOutputs()?['body/fmc_body']` |
+
+Đặt **Retry policy = None**. Action này cần app **Workflows** được Teams admin
+cho phép. Microsoft Teams connector giới hạn message khoảng 28 KB; body workflow
+hiện nhỏ hơn giới hạn này.
+
+### 6.7 Nhánh thành công — Mark sent
+
+Sau `Send Teams message`, thêm action **Microsoft Dataverse — Update a row**, đổi tên
 thành `Mark sent`:
 
 | Field | Giá trị |
@@ -442,9 +468,9 @@ thành `Mark sent`:
 | Sent At | `utcNow()` |
 | Delivery Error | expression `null` |
 
-Mở **Configure run after** và chỉ chọn **is successful** cho `Send email`.
+Mở **Configure run after** và chỉ chọn **is successful** cho `Send Teams message`.
 
-### 6.7 Nhánh lỗi — Mark failed
+### 6.8 Nhánh lỗi — Mark failed
 
 Tạo parallel branch trực tiếp sau `Send email`, thêm
 **Microsoft Dataverse — Update a row**, đổi tên thành `Mark failed`:
@@ -467,13 +493,19 @@ Trong **Configure run after**:
 - chọn **has timed out**;
 - không chọn **is skipped**.
 
-### 6.8 Save, Flow checker và bật flow
+Tạo nhánh lỗi tương tự sau `Send Teams message`, dùng nội dung:
+
+```text
+TEAMS-001 Microsoft Teams delivery failed after email delivery. Inspect the Power Automate run by fmc_flowrunid.
+```
+
+### 6.9 Save, Flow checker và bật flow
 
 1. Chọn **Save**.
 2. Mở **Flow checker** và xử lý toàn bộ connection/required-field error.
 3. Quay lại flow details, kiểm tra card **Solutions** có `FMCentralBms`.
 4. Chọn **Turn on**.
-5. Kiểm tra cả Dataverse và Outlook action đang dùng đúng connection reference,
+5. Kiểm tra Dataverse, Outlook và Teams action đang dùng đúng connection reference,
    không phải connection rời ngoài solution.
 
 Checklist designer cuối cùng:
@@ -483,6 +515,7 @@ Checklist designer cuối cùng:
 - [ ] Filter rows dùng đúng ba điều kiện và numeric choice values.
 - [ ] Mark attempt chạy trước Send email.
 - [ ] Send email retry policy = None.
+- [ ] Send Teams message dùng Flow bot, chat người nhận và retry policy = None.
 - [ ] Mark sent chỉ chạy khi Succeeded.
 - [ ] Mark failed chỉ chạy khi Failed hoặc Timed out.
 - [ ] Flow đang On.
@@ -504,7 +537,8 @@ pac connection list --environment https://org06cbc9ec.crm5.dynamics.com/
 ```powershell
 py .\scripts\provision-user-notification-flow.py `
   bootstrap-reference `
-  --outlook-connection-id <connection-id-cua-environment-dich>
+  --outlook-connection-id <outlook-connection-id> `
+  --teams-connection-id <teams-connection-id>
 ```
 
 Không bỏ tham số này khi triển khai sang environment khác.
@@ -531,7 +565,7 @@ FMC - Send User Email Notification
 
 ## 8. Kiểm thử
 
-### 8.1 Test trực tiếp outbox → flow → email
+### 8.1 Test trực tiếp outbox → flow → email + Teams
 
 ```powershell
 py .\scripts\provision-user-notification-flow.py test
@@ -547,13 +581,13 @@ fmc_sentat    != null
 fmc_flowrunid != null
 ```
 
-Kiểm tra cả Inbox và Junk với subject:
+Kiểm tra cả Inbox/Junk và chat với Flow bot trong Teams với subject:
 
 ```text
 [FMC BMS] Notification smoke test
 ```
 
-### 8.2 Test producer plug-in → outbox → flow → email
+### 8.2 Test producer plug-in → outbox → flow → email + Teams
 
 ```powershell
 py .\scripts\provision-user-notification-flow.py test-producer
@@ -584,8 +618,8 @@ key và status cuối là `Sent`.
 5. Mở flow **Run history**, tìm run có ID bằng `fmc_flowrunid`.
 
 > [!NOTE]
-> `Sent` chứng minh connector action thành công; nó không chứng minh người nhận
-> đã mở hoặc đọc email.
+> `Sent` chứng minh cả Outlook và Teams connector action thành công; nó không
+> chứng minh người nhận đã mở hoặc đọc notification.
 
 ---
 
@@ -598,8 +632,9 @@ key và status cuối là `Sent`.
 | Row mãi `Pending` | Trigger callback | Flow phải On; filter choice value đúng; connection reference Dataverse hợp lệ |
 | `attempts = 0` | Flow chưa nhận event | Kiểm tra trigger run history và callback registration |
 | `attempts = 1`, status `Failed` | Outlook action | Mở run bằng `fmc_flowrunid`; kiểm tra mailbox policy, DLP, connector permission |
+| Error `TEAMS-001` | Teams action | Mở run bằng `fmc_flowrunid`; kiểm tra Teams connection, license và app Workflows trong Teams admin center |
 | Có mail nhưng update receipt lỗi | Dataverse Write privilege | Cấp Write trên `fmc_notification` cho flow owner/service identity |
-| Flow không bật được | Connection ownership | Owner phải sở hữu hoặc được phép dùng cả Dataverse và Outlook connections |
+| Flow không bật được | Connection ownership | Owner phải sở hữu hoặc được phép dùng Dataverse, Outlook và Teams connections |
 | Gửi trùng | Correlation/key hoặc retry | Kiểm tra alternate key Active, correlation key ổn định và retry policy = None |
 | Import xong flow Off | Connection mapping | Map connection references trong import wizard rồi Turn on |
 
@@ -663,7 +698,7 @@ Review tối thiểu:
 - [ ] Connection references được map sang connection Production.
 - [ ] Flow owner không phải tài khoản developer sắp hết hạn.
 - [ ] Security role chỉ có quyền cần thiết.
-- [ ] DLP policy cho phép Dataverse và Office 365 Outlook cùng flow.
+- [ ] DLP policy cho phép Dataverse, Office 365 Outlook và Microsoft Teams cùng flow.
 - [ ] Test recipient được giới hạn trước khi mở gửi thật.
 - [ ] Run history/receipt có quy trình monitoring và support owner.
 - [ ] Capacity/licensing và giới hạn connector được xác nhận cho tải dự kiến.
@@ -684,6 +719,14 @@ Receipt ngày 2026-09-16:
 - Outlook connection reference `fmc_sharedoffice365outlook`;
 - direct outbox test và full producer-chain test đều đạt `Sent`, attempts = 1.
 
+Receipt bổ sung ngày 2026-10-01:
+
+- Teams connection reference `fmc_sharedteams` dùng connection Developer
+  `424c2481-8a78-4494-ba0b-28ac37dff287`;
+- flow gửi Outlook rồi `PostMessageToConversation` vào `Chat with Flow bot`;
+- smoke notification `5f7df807-83b7-470f-81e2-e8fc58eb59fa` đạt `Sent`, attempts = 1,
+  run ID `08584107609958678799529694695cU14`.
+
 Receipt này không thay thế kiểm tra live:
 
 ```powershell
@@ -699,3 +742,5 @@ py .\scripts\provision-user-notification-flow.py verify
 - [Use a connection reference in a solution](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/create-connection-reference)
 - [Employ robust error handling](https://learn.microsoft.com/en-us/power-automate/guidance/coding-guidelines/error-handling)
 - [Create flows for popular email scenarios](https://learn.microsoft.com/en-us/power-automate/email-top-scenarios)
+- [Send a message in Teams using Power Automate](https://learn.microsoft.com/en-us/power-automate/teams/send-a-message-in-teams)
+- [Microsoft Teams connector reference](https://learn.microsoft.com/en-us/connectors/teams/)

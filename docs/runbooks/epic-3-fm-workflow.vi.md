@@ -54,7 +54,7 @@ python scripts/verify-fm-evidence.py rollback-smoke
 `Draft → Submit → In Approval (step 1 … n) → Approved hoặc Rejected → Close`
 
 - Custom API `fmc_TransitionFmRequest` kiểm tra trạng thái, người gọi, revision và operation ID; update request + append history + tạo email outbox trong cùng transaction.
-- Flow **FMC - Send User Email Notification** tiêu thụ `fmc_notification` Pending → gửi Outlook → ghi Sent/Failed. Body là HTML card responsive (inline CSS, không phụ thuộc ảnh ngoài) gồm brand header, status badge, step/approver/due, workflow note và CTA mở request. Đây là flow dùng lại, không phải một flow mới cho từng request type.
+- Flow **FMC - Send User Email Notification** tiêu thụ `fmc_notification` Pending → gửi Outlook → gửi Microsoft Teams bằng Flow bot vào chat của người nhận → ghi Sent khi cả hai kênh thành công. Nếu Outlook hoặc Teams lỗi, flow ghi Failed với mã `EMAIL-001` hoặc `TEAMS-001`. Body là HTML card responsive gồm brand header, status badge, step/approver/due, workflow note và CTA mở request. Đây là flow dùng lại, không phải một flow mới cho từng request type.
 - Flow **FMC - Process FM Request Deadlines** chạy mỗi 5 phút → đọc request đang duyệt → gọi `fmc_ProcessFmRequestDeadline` → plugin kiểm tra giờ UTC → reminder/escalation + history + email outbox.
 - Nhắc 1 lần mỗi bước trước hạn. Khi vừa quá hạn nhưng chưa tới giờ escalation, gửi **Overdue** một lần. Đến `due + escalation hours`, quyền duyệt chuyển sang escalation user, vẫn In Approval. Nếu escalation hours = 0, một thông báo escalation đồng thời báo quá hạn. Không tự động approve hoặc reject.
 - Bell khi **tạo** FM Request giữ nguyên plugin gửi cho Operator đã có; email workflow và bell là hai kênh khác nhau.
@@ -131,7 +131,7 @@ Chỉ dùng `seed-demo` và `test-fm-workflow-live.py run` khi muốn tạo dữ
 - `fmc_FmAppUrl` cấu hình link email; URL phải HTTPS, chỉ một current value. Default trỏ app demo này; triển khai environment khác phải đổi cấu hình/target rõ ràng.
 - Deadline flow đang dùng connection demo có System Administrator; chưa phải service principal production least-privilege. Không cấp thêm role cho người dùng trong lần triển khai này.
 - UI My Requests/Pending là bộ lọc tiện dụng, không thay quyền đọc Dataverse hiện có của Operator.
-- Email outbox deduplicate việc tạo event; không cam kết exactly-once delivery của Outlook. Khi Failed hoặc Pending lâu: xem `fmc_flowrunid`/flow run, không tự tạo lại mail hàng loạt.
+- Notification outbox deduplicate việc tạo event; không cam kết exactly-once delivery của Outlook hoặc Teams. Teams chạy sau Outlook, nên retry thủ công một receipt lỗi Teams có thể gửi lại email. Khi Failed hoặc Pending lâu: xem `fmc_flowrunid`/flow run, không tự tạo lại notification hàng loạt.
 - Scheduler phân trang đến 100.000 request; chưa phải kiểm thử tải/capacity. SLA là thời gian lịch UTC, chưa có business calendar/ngày nghỉ.
 - Có thể tắt riêng deadline flow để dừng reminder/escalation. Đừng tắt guard/rollback DLL khi còn request đang duyệt. Backup form/sitemap trước deploy nằm `.artifacts/epic3-workflow`; migration không drop table.
 

@@ -39,4 +39,47 @@ public sealed partial class DataverseProvisioner
             SchemaName = S.EvidenceReadingIds, DisplayName = new Label("Evidence reading IDs", 1033), MaxLength = 4000 });
         service.Execute(new PublishXmlRequest { ParameterXml = $"<importexportxml><entities><entity>{S.Request}</entity></entities></importexportxml>" });
     }
+
+    private void ApplyMigration008(IOrganizationService service)
+    {
+        if (!TableExists(service, BuildingTable))
+            throw new InvalidOperationException("BMS Building table must exist before FM Request building lookup provisioning.");
+        if (!ColumnExists(service, S.Request, S.BuildingLookup))
+            service.Execute(new CreateOneToManyRequest
+            {
+                SolutionUniqueName = Solution,
+                Lookup = new LookupAttributeMetadata
+                {
+                    SchemaName = S.BuildingLookup,
+                    DisplayName = new Label("Building", 1033),
+                    RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.None)
+                },
+                OneToManyRelationship = new OneToManyRelationshipMetadata
+                {
+                    SchemaName = "fmc_bmsbuilding_fmrequest",
+                    ReferencedEntity = BuildingTable,
+                    ReferencingEntity = S.Request,
+                    AssociatedMenuConfiguration = new AssociatedMenuConfiguration
+                    {
+                        Behavior = AssociatedMenuBehavior.UseLabel,
+                        Group = AssociatedMenuGroup.Details,
+                        Label = new Label("FM Requests", 1033),
+                        Order = 10000
+                    },
+                    CascadeConfiguration = new CascadeConfiguration
+                    {
+                        Assign = CascadeType.NoCascade,
+                        Delete = CascadeType.Restrict,
+                        Merge = CascadeType.NoCascade,
+                        Reparent = CascadeType.NoCascade,
+                        Share = CascadeType.NoCascade,
+                        Unshare = CascadeType.NoCascade
+                    }
+                }
+            });
+        service.Execute(new PublishXmlRequest
+        {
+            ParameterXml = $"<importexportxml><entities><entity>{S.Request}</entity><entity>{BuildingTable}</entity></entities></importexportxml>"
+        });
+    }
 }

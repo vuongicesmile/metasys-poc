@@ -10,6 +10,7 @@ namespace Dataverse.SyncWorker.DataAccess.Constants
             public const string Name = "fmc_name", Description = "fmc_description", Type = "fmc_requesttype";
             public const string Status = "fmc_requeststatus", LegacyStatus = "fmc_status", Department = "fmc_department";
             public const string Value = "fmc_estimatedvalue", Severity = "fmc_riskseverity", Building = "fmc_buildingcode";
+            public const string BuildingLookup = "fmc_buildingid";
             public const string Likelihood = "fmc_likelihood", Impact = "fmc_impact", Mitigation = "fmc_mitigation", ReviewDate = "fmc_reviewdate";
             public const string Requester = "fmc_requesteremail", Approver = "fmc_currentapproveremail", Step = "fmc_currentstep";
             public const string Due = "fmc_stepdueon", SubmittedOn = "fmc_submittedon", CompletedOn = "fmc_completedon";

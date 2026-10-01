@@ -23,8 +23,9 @@ DV = "shared_commondataserviceforapps"
 REFERENCE = "fmc_sharedcommondataserviceforapps"
 PAGE = "fmc_/pages/FmWorkflow.html"
 SCRIPT = "fmc_/scripts/FmWorkflow.js"
+FORM_SCRIPT = "fmc_/scripts/FmRequestForm.js"
 ARTIFACTS = ROOT / ".artifacts/epic3-workflow"
-REQUEST_FIELDS = ["fmc_description", "fmc_requesttype", "fmc_department", "fmc_buildingcode", "fmc_estimatedvalue",
+REQUEST_FIELDS = ["fmc_description", "fmc_requesttype", "fmc_department", "fmc_buildingid", "fmc_buildingcode", "fmc_estimatedvalue",
     "fmc_requeststatus", "fmc_riskseverity", "fmc_likelihood", "fmc_impact", "fmc_mitigation", "fmc_reviewdate",
     "fmc_currentstep", "fmc_currentapproveremail", "fmc_stepdueon", "fmc_evidencereadingid", "fmc_evidencereadingids", "fmc_evidencesnapshot"]
 
@@ -136,7 +137,31 @@ def section(form, name, title):
     return ET.SubElement(sec, "rows")
 
 
-def deploy_form(c, table, fields, resource_id=None):
+def ensure_form_script(form, resource_id):
+    libraries = form.find("formLibraries")
+    if libraries is None:
+        libraries = ET.SubElement(form, "formLibraries")
+    for library in list(libraries):
+        if library.get("name") == FORM_SCRIPT:
+            libraries.remove(library)
+    ET.SubElement(libraries, "Library", {"name": FORM_SCRIPT, "libraryUniqueId": "{" + resource_id + "}"})
+    events = form.find("events")
+    if events is None:
+        events = ET.SubElement(form, "events")
+    onload = events.find("event[@name='onload']")
+    if onload is None:
+        onload = ET.SubElement(events, "event", {"name": "onload", "application": "false", "active": "false"})
+    handlers = onload.find("Handlers")
+    if handlers is None:
+        handlers = ET.SubElement(onload, "Handlers")
+    for handler in list(handlers):
+        if handler.get("libraryName") == FORM_SCRIPT:
+            handlers.remove(handler)
+    ET.SubElement(handlers, "Handler", {"libraryName": FORM_SCRIPT, "passExecutionContext": "true",
+        "functionName": "FMC.FmRequestForm.onLoad", "enabled": "true", "parameters": "", "handlerUniqueId": guid()})
+
+
+def deploy_form(c, table, fields, resource_id=None, form_script_id=None):
     forms = c.rows("systemforms", f"objecttypecode eq '{table}' and type eq 2 and formactivationstate eq 1", "formid,name,formxml")
     if len(forms) != 1:
         raise RuntimeError(f"Expected one active main form for {table}; observed {len(forms)}")
@@ -149,7 +174,10 @@ def deploy_form(c, table, fields, resource_id=None):
         # Keep existing controls intact; only add fields not already present elsewhere.
         if form.find(f".//control[@datafieldname='{field}']") is not None:
             continue
-        attr = attributes[field]; cell = ET.SubElement(ET.SubElement(rows, "row"), "cell", {"id": guid()})
+        attr = attributes[field]; cell_attrs = {"id": guid()}
+        if field == "fmc_buildingcode":
+            cell_attrs["visible"] = "false"
+        cell = ET.SubElement(ET.SubElement(rows, "row"), "cell", cell_attrs)
         title = (attr.get("DisplayName", {}).get("UserLocalizedLabel") or {}).get("Label", field)
         label(cell, title)
         control = ET.SubElement(cell, "control", {"id": field, "datafieldname": field, "classid": "{" + CONTROL[attr["AttributeType"]] + "}"})
@@ -165,6 +193,8 @@ def deploy_form(c, table, fields, resource_id=None):
         params = ET.SubElement(control, "parameters")
         for key, value in {"Url": PAGE, "PassParameters": "true", "Security": "false", "Scrolling": "auto", "Border": "false", "WebResourceId": "{" + resource_id + "}"}.items():
             ET.SubElement(params, key).text = value
+    if form_script_id:
+        ensure_form_script(form, form_script_id)
     c.api("PATCH", f"systemforms({record['formid']})", json={"formxml": ET.tostring(form, encoding="unicode")})
     c.add(record["formid"], 60)
     print(json.dumps({"form": table, "id": record["formid"]}))
@@ -189,12 +219,13 @@ def verify_app_form(c, form_id):
 
 def deploy_resources(c):
     ids = {}
-    for name, kind in ((PAGE, 1), (SCRIPT, 3)):
+    for name, kind in ((PAGE, 1), (SCRIPT, 3), (FORM_SCRIPT, 3)):
         found = c.rows("webresourceset", f"name eq '{name}'", "webresourceid,content")
         if len(found) > 1:
             raise RuntimeError("Duplicate webresource")
         id = found[0]["webresourceid"] if found else str(uuid.uuid4())
-        values = {"name": name, "displayname": "FM Workflow " + ("Page" if kind == 1 else "Script"), "webresourcetype": kind,
+        display = "FM Request Form Rules" if name == FORM_SCRIPT else "FM Workflow " + ("Page" if kind == 1 else "Script")
+        values = {"name": name, "displayname": display, "webresourcetype": kind,
                   "content": base64.b64encode((ROOT / "dataverse/webresources" / name).read_bytes()).decode()}
         if found:
             c.backup("webresource-" + str(kind) + "-before", found[0]); c.api("PATCH", f"webresourceset({id})", json=values)
@@ -214,7 +245,7 @@ def deploy_ui(c):
         c.api("PATCH", f"environmentvariabledefinitions({definition['environmentvariabledefinitionid']})", json={"defaultvalue": ORG + "/main.aspx?appid=" + APP})
     c.add(definition["environmentvariabledefinitionid"], 380)
     ids = deploy_resources(c)
-    request_form = deploy_form(c, "fmc_fmrequest", REQUEST_FIELDS, ids[PAGE])
+    request_form = deploy_form(c, "fmc_fmrequest", REQUEST_FIELDS, ids[PAGE], ids[FORM_SCRIPT])
     ensure_app_form(c, request_form)
     deploy_form(c, "fmc_approvalroute", ["fmc_requesttype", "fmc_department", "fmc_stepno", "fmc_minvalue", "fmc_minseverity", "fmc_approveremail", "fmc_approverrole", "fmc_escalationemail", "fmc_sladays", "fmc_reminderhours", "fmc_escalationhours", "fmc_isactive"])
     maps = c.rows("sitemaps", "sitemapnameunique eq 'fmc_FMCBMSDemo'", "sitemapid,sitemapxml")
@@ -244,7 +275,7 @@ def deploy_evidence_ui(c):
     global ARTIFACTS
     ARTIFACTS = ROOT / ".artifacts/fm-reading-evidence"
     ids = deploy_resources(c)
-    request_form = deploy_form(c, "fmc_fmrequest", REQUEST_FIELDS, ids[PAGE])
+    request_form = deploy_form(c, "fmc_fmrequest", REQUEST_FIELDS, ids[PAGE], ids[FORM_SCRIPT])
     ensure_app_form(c, request_form)
     c.api("POST", "PublishXml", json={"ParameterXml": "<importexportxml><entities><entity>fmc_fmrequest</entity></entities>"
         f"<appmodules><appmodule>{APP}</appmodule></appmodules></importexportxml>"})
@@ -273,7 +304,7 @@ def seed_demo(c):
 
 
 def verify(c):
-    for table, fields in {"fmc_fmrequest": ["fmc_workflowrevision", "fmc_workflowplan", "fmc_reminderon", "fmc_overdueon", "fmc_escalatedon", "fmc_evidencereadingid", "fmc_evidencereadingids", "fmc_evidencesnapshot"], "fmc_requesthistory": ["fmc_actorid", "fmc_command", "fmc_resultrevision"]}.items():
+    for table, fields in {"fmc_fmrequest": ["fmc_buildingid", "fmc_workflowrevision", "fmc_workflowplan", "fmc_reminderon", "fmc_overdueon", "fmc_escalatedon", "fmc_evidencereadingid", "fmc_evidencereadingids", "fmc_evidencesnapshot"], "fmc_requesthistory": ["fmc_actorid", "fmc_command", "fmc_resultrevision"]}.items():
         for field in fields:
             c.api("GET", f"EntityDefinitions(LogicalName='{table}')/Attributes(LogicalName='{field}')", params={"$select": "LogicalName"})
     flows = c.rows("workflows", f"name eq '{FLOW}' and category eq 5 and type eq 1", "workflowid,name,statecode,clientdata")
@@ -291,8 +322,8 @@ def verify(c):
     steps = c.rows("sdkmessageprocessingsteps", "startswith(name,'FM Workflow:')", "name,statecode,mode,stage")
     if len(steps) != 10 or any(s["statecode"] != 0 or s["mode"] != 0 or s["stage"] != 20 for s in steps):
         raise RuntimeError("Expected ten synchronous active PreOperation guards")
-    resources = c.rows("webresourceset", f"name eq '{PAGE}' or name eq '{SCRIPT}'", "name,webresourceid,content")
-    if len(resources) != 2:
+    resources = c.rows("webresourceset", f"name eq '{PAGE}' or name eq '{SCRIPT}' or name eq '{FORM_SCRIPT}'", "name,webresourceid,content")
+    if len(resources) != 3:
         raise RuntimeError("Missing workflow webresources")
     for r in resources:
         data = base64.b64decode(r.pop("content")); local = (ROOT / "dataverse/webresources" / r["name"]).read_bytes()
@@ -300,8 +331,11 @@ def verify(c):
             raise RuntimeError("Live webresource differs: " + r["name"])
         r["sha256"] = hashlib.sha256(data).hexdigest()
     form = c.rows("systemforms", "objecttypecode eq 'fmc_fmrequest' and type eq 2 and formactivationstate eq 1", "formxml")
-    if len(form) != 1 or ET.fromstring(form[0]["formxml"]).find(".//control[@id='WebResource_fmc_workflow']") is None:
+    form_xml = ET.fromstring(form[0]["formxml"]) if len(form) == 1 else None
+    if form_xml is None or form_xml.find(".//control[@id='WebResource_fmc_workflow']") is None:
         raise RuntimeError("Workflow form panel missing")
+    if form_xml.find(".//control[@datafieldname='fmc_buildingid']") is None or form_xml.find(".//Handler[@functionName='FMC.FmRequestForm.onLoad']") is None:
+        raise RuntimeError("FM Request building lookup or required-field rules missing")
     verify_app_form(c, form[0]["formid"])
     validation = c.api("GET", f"ValidateApp(AppModuleId={APP})")["AppValidationResponse"]
     if not validation["ValidationSuccess"]:

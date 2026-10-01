@@ -123,9 +123,10 @@ described in the [Power Automate runbook](docs/runbooks/power-automate-sql-sync.
 When a Sync Request reaches `Succeeded`, `CompletedWithIssues` or `Failed`, the
 asynchronous `QueueSyncNotification` plug-in creates one idempotent
 `fmc_notification` outbox record. `FMC - Send User Email Notification` sends it
-through Office 365 Outlook and records `Sent`, `Failed` or `Skipped` in
-Dataverse. Email delivery is isolated from the sync transaction, so a connector
-failure does not roll back an already completed data synchronization.
+through Office 365 Outlook and Microsoft Teams, then records `Sent`, `Failed`
+or `Skipped` in Dataverse. Notification delivery is isolated from the sync
+transaction, so a connector failure does not roll back an already completed
+data synchronization.
 
 POC data flow:
 

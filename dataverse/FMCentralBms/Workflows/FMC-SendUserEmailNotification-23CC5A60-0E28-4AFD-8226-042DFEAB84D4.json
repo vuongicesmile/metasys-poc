@@ -18,6 +18,15 @@
         "api": {
           "name": "shared_office365"
         }
+      },
+      "shared_teams": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "fmc_sharedteams"
+        },
+        "api": {
+          "name": "shared_teams"
+        }
       }
     },
     "definition": {
@@ -105,10 +114,37 @@
             }
           }
         },
-        "Mark_sent": {
+        "Send_Teams_message": {
           "type": "OpenApiConnection",
           "runAfter": {
             "Send_email": [
+              "Succeeded"
+            ]
+          },
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams",
+              "connectionName": "shared_teams",
+              "operationId": "PostMessageToConversation"
+            },
+            "parameters": {
+              "poster": "Flow bot",
+              "location": "Chat with Flow bot",
+              "body/recipient": "@concat(triggerOutputs()?['body/fmc_recipientemail'], ';')",
+              "body/messageBody": "@triggerOutputs()?['body/fmc_body']"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runtimeConfiguration": {
+            "retryPolicy": {
+              "type": "none"
+            }
+          }
+        },
+        "Mark_sent": {
+          "type": "OpenApiConnection",
+          "runAfter": {
+            "Send_Teams_message": [
               "Succeeded"
             ]
           },
@@ -128,7 +164,7 @@
             "authentication": "@parameters('$authentication')"
           }
         },
-        "Mark_failed": {
+        "Mark_email_failed": {
           "type": "OpenApiConnection",
           "runAfter": {
             "Send_email": [
@@ -147,6 +183,29 @@
               "recordId": "@triggerOutputs()?['body/fmc_notificationid']",
               "item/fmc_status": 789121002,
               "item/fmc_errormessage": "EMAIL-001 Office 365 Outlook delivery failed. Inspect the Power Automate run by fmc_flowrunid."
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Mark_Teams_failed": {
+          "type": "OpenApiConnection",
+          "runAfter": {
+            "Send_Teams_message": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "UpdateOnlyRecord"
+            },
+            "parameters": {
+              "entityName": "fmc_notifications",
+              "recordId": "@triggerOutputs()?['body/fmc_notificationid']",
+              "item/fmc_status": 789121002,
+              "item/fmc_errormessage": "TEAMS-001 Microsoft Teams delivery failed after email delivery. Inspect the Power Automate run by fmc_flowrunid."
             },
             "authentication": "@parameters('$authentication')"
           }

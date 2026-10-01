@@ -48,6 +48,43 @@ two deployment tests and desktop/mobile browser regression passed. See the
 [evidence operating steps](../runbooks/epic-3-fm-workflow.vi.md#reading-bằng-chứng).
 Receipts and solution export are retained under `.artifacts/fm-reading-evidence`.
 
+Hotfix on 2026-10-01 at 14:34 Asia/Bangkok corrected the New form's
+multi-reading serialization. The form had written a literal `\n` separator into
+`fmc_evidencereadingids`, while the server accepts real whitespace between GUIDs;
+Create therefore rolled back with `FM-WORKFLOW: Select a Standard BMS reading as
+evidence.` The published script SHA-256 is
+`EA395FC89791B4697E2A5CA297E16EEFF269185C3B7A903036A6435D46083FBE`, and
+`ValidateApp` passed with no issues.
+
+Later on 2026-10-01, migration 008 (receipt
+`92dfc13a-70bd-f111-aaaf-00224819a344`) added optional lookup
+`fmc_fmrequest.fmc_buildingid` through relationship
+`fmc_bmsbuilding_fmrequest`. The lookup targets `fmc_bmsbuilding`, whose primary
+name is `fmc_name`, so the request form displays Building Name in a dropdown.
+Form script `fmc_/scripts/FmRequestForm.js` makes Name, Description, Request Type
+and Department required; Risk also requires Risk Severity, Likelihood, Impact,
+Mitigation and Review Date. New forms default Request Type to CIWG and Estimated
+Value to zero; Risk defaults severity to Medium. Selecting a Building copies its
+code to the hidden legacy `fmc_buildingcode` field. `FMC BMS Demo Operator`
+already had global Read/Append To on Building and Append on FM Request, so no
+role grant was needed. The live form, webresource hashes, relationship, role
+privileges and app validation were re-read successfully.
+
+The generated BPF entity `fmc_fmrequestcreatesubmit` was then added to
+`FMCentralBms`, resolving the earlier export blocker. A fresh unmanaged export
+and unpack succeeded at
+`tmp/FMCentralBms-20261001-buildinglookup`; the checked-in solution source now
+contains the BPF definition and generated entity. The live BPF `Bằng Chứng`
+stage still labels its existing text step as Building Code. Changing that stage
+requires the supported Maker BPF designer; browser automation was unavailable
+during this deployment, so the deployed main form is the verified Building
+dropdown surface. Packing the entire checked-in solution tree still reports
+older, unrelated missing source components (`cr3c8_fmc_silver_*`, Gold tables,
+schema migration, utility target and workflow `f2212c5e-05b8-f111-aaae-00224819a344`).
+The fresh live export/unpack succeeds, and PAC recognizes the new lookup,
+form script, BPF and generated entity; the remaining repository-wide source
+reconciliation is outside this form change.
+
 ## FM Request in-app notification (2026-09-30)
 
 Epic 3 workflow bổ sung sau bản notification: migrations 004/005, signed assembly
@@ -168,6 +205,16 @@ flow ID is `23cc5a60-0e28-4afd-8226-042dfeab84d4`; plug-in assembly version is
 attempt. See the [notification plan and receipt](../plans/user-email-notifications.vi.md)
 and [operating runbook](../runbooks/user-email-notifications.vi.md). This dated
 receipt does not prove future mail delivery or production mailbox readiness.
+
+On 2026-10-01, the same solution flow was extended to deliver each Pending
+notification through Office 365 Outlook and then Microsoft Teams
+`PostMessageToConversation` as Flow bot to the recipient's one-to-one chat. The
+solution-aware connection reference is `fmc_sharedteams`; the flow records Sent
+only after both actions succeed and records `TEAMS-001` when Teams delivery
+fails after email delivery. Smoke notification
+`5f7df807-83b7-470f-81e2-e8fc58eb59fa` reached Sent in one attempt through run
+`08584107609958678799529694695cU14`. This is Developer evidence for the signed-in
+demo connection, not a production service identity or an exactly-once guarantee.
 
 The Building/Equipment extension was verified on 2026-09-09. Request
 `c99f3d86-1fac-f111-aaad-00224819a344` succeeded at SQL cutoff 23377 with zero

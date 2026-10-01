@@ -88,6 +88,7 @@
       <RootComponent type="1" schemaName="fmc_bmsreadingsnapshot" behavior="0" />
       <RootComponent type="1" schemaName="fmc_changelog" behavior="0" />
       <RootComponent type="1" schemaName="fmc_fmrequest" behavior="0" />
+      <RootComponent type="1" schemaName="fmc_fmrequestcreatesubmit" behavior="0" />
       <RootComponent type="1" schemaName="fmc_goldmeterdaily" behavior="0" />
       <RootComponent type="1" schemaName="fmc_goldmeterhourly" behavior="0" />
       <RootComponent type="1" schemaName="fmc_notification" behavior="0" />
@@ -103,6 +104,7 @@
       <RootComponent type="20" id="{6348e20b-05ae-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="20" id="{6cc6f7bf-86ae-f111-aaad-00224819a344}" behavior="0" />
       <RootComponent type="20" id="{a00ad2b9-86ae-f111-aaad-00224819a344}" behavior="0" />
+      <RootComponent type="29" id="{0d9e5ee1-61bd-f111-aaaf-00224819a344}" behavior="0" />
       <RootComponent type="29" id="{1c3eda7d-9bec-4a43-adc3-1426b89d2a84}" behavior="0" />
       <RootComponent type="29" id="{23cc5a60-0e28-4afd-8226-042dfeab84d4}" behavior="0" />
       <RootComponent type="29" id="{2d643497-109a-406d-a350-e039d41ecd5b}" behavior="0" />
@@ -122,6 +124,7 @@
       <RootComponent type="61" schemaName="fmc_/pages/FmWorkflow.html" behavior="0" />
       <RootComponent type="61" schemaName="fmc_/scripts/EquipmentPluginTest.js" behavior="0" />
       <RootComponent type="61" schemaName="fmc_/scripts/FmWorkflow.js" behavior="0" />
+      <RootComponent type="61" schemaName="fmc_/scripts/FmRequestForm.js" behavior="0" />
       <RootComponent type="61" schemaName="fmc_FMCBMSDemo_icon" behavior="0" />
       <RootComponent type="61" schemaName="fmc_FMCBMSDemo_pagemanifest" behavior="0" />
       <RootComponent type="62" schemaName="fmc_FMCBMSDemo" behavior="0" />

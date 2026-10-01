@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WebResource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <WebResourceId>{ddb1fea2-73ff-49e0-aa44-277bb8b4b91f}</WebResourceId>
+  <Name>fmc_/scripts/FmRequestForm.js</Name>
+  <DisplayName>FM Request Form Rules</DisplayName>
+  <WebResourceType>3</WebResourceType>
+  <IntroducedVersion>1.0.3.0</IntroducedVersion>
+  <IsEnabledForMobileClient>0</IsEnabledForMobileClient>
+  <IsAvailableForMobileOffline>0</IsAvailableForMobileOffline>
+  <IsCustomizable>1</IsCustomizable>
+  <CanBeDeleted>1</CanBeDeleted>
+  <IsHidden>0</IsHidden>
+  <FileName>/WebResources/fmc_scriptsFmRequestFormjsDDB1FEA2-73FF-49E0-AA44-277BB8B4B91F</FileName>
+</WebResource>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{fe4e3359-fb63-46ec-b76b-7709f2bae7da}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{35397e83-e751-443d-8a03-81e434237a8f}" name="StageStep3" locklevel="0" expanded="true" visible="false" labelid="{2ab5a80e-ff18-4535-a434-693389c51a3c}">
+          <labels>
+            <label description="Thông Tin Yêu Cầu" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{8e3bbd0c-9bb3-9640-ccae-1b87934d9d7d}" name="StageStep3_section1" labelid="{187cee2f-0e67-4708-9104-84c44c1b0e0f}">
+                  <labels>
+                    <label description="Thông Tin Yêu Cầu" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{a742f4ce-1b6f-4016-9888-0383f2cfd50d}" showlabel="true" visible="true" labelid="{3d504e59-e792-4c3d-a9fc-4f2923a4d09b}">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit:fmc_name" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="fmc_name" relationship="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{22626efa-f137-4808-a7a6-998358b94048}" showlabel="true" visible="true" labelid="{3a8b99a5-8887-469b-8fc2-569ff037ca5d}">
+                        <labels>
+                          <label description="Description" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit:fmc_description" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="fmc_description" relationship="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{efaee65e-3d1d-4062-9b55-1488cf2ce081}" showlabel="true" visible="true" labelid="{c2898a2e-06ac-478b-92fb-7f00407eac29}">
+                        <labels>
+                          <label description="Request Type" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit:fmc_requesttype" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="fmc_requesttype" relationship="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{0b8f6cd6-6397-418e-8d09-b107d7abb70f}" showlabel="true" visible="true" labelid="{b1e0ecfa-ca25-403d-9ab7-86ebaab74401}">
+                        <labels>
+                          <label description="Department" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit:fmc_department" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="fmc_department" relationship="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{05c95338-d162-49b7-b8d0-00c2a126313c}" showlabel="true" visible="true" labelid="{da78e9a4-6176-44c2-9b69-e01b0b1e6f76}">
+                        <labels>
+                          <label description="Estimated Value" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit:fmc_estimatedvalue" classid="{c3efe0c3-0ec6-42be-8349-cbd9079dfd8e}" datafieldname="fmc_estimatedvalue" relationship="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab verticallayout="true" id="{8933cfe2-149f-4ba1-b143-df6f0f6cb93d}" name="StageStep15" locklevel="0" expanded="true" visible="false" labelid="{03f39fd9-b80e-402e-aff8-5dd2e799ba20}">
+          <labels>
+            <label description="Bằng Chứng" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{8fef1c28-240a-2bf9-138b-0e1bec64106b}" name="StageStep15_section1" labelid="{580456d9-fff3-406d-a237-19a6ac7c9c4d}">
+                  <labels>
+                    <label description="Bằng Chứng" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{a8521449-88f2-4cba-9090-6dde252d9212}" showlabel="true" visible="true" labelid="{e3c7b2ac-0457-48ac-a487-b253323671f4}">
+                        <labels>
+                          <label description="Building Code (tùy chọn); panel Reading trên form: lọc bất thường, chọn nhiều readings" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit:fmc_buildingcode" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="fmc_buildingcode" relationship="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab verticallayout="true" id="{5de48377-a7f9-42d5-9692-3da9a7413907}" name="StageStep19" locklevel="0" expanded="true" visible="false" labelid="{c234bbd3-f238-4680-9c9a-e16fc5ec2f28}">
+          <labels>
+            <label description="Kiểm Tra &amp; Gửi" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{89ef0e82-3476-4f34-6d15-360824dd1c4a}" name="StageStep19_section1" labelid="{2bf9b17b-5823-4b34-bfac-87323ef79997}">
+                  <labels>
+                    <label description="Kiểm Tra &amp; Gửi" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{56a0c3fe-2726-462c-81fd-8473a5d410ac}" showlabel="true" visible="true" labelid="{78af22c9-6ea6-4281-8b2a-4b2b555c9eec}">
+                        <labels>
+                          <label description="Kiểm tra Name; dùng gửi phê duyệt trên form. Next Stage/Finish không phải Submit" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit:fmc_name" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="fmc_name" relationship="bpf_fmc_fmrequest_fmc_fmrequestcreatesubmit" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

@@ -19,6 +19,7 @@ public sealed partial class DataverseProvisioner
         RunMigration(service, "005", "FM overdue notification before delayed escalation", ApplyMigration005);
         RunMigration(service, "006", "FM Request frozen reading evidence", ApplyMigration006);
         RunMigration(service, "007", "FM Request multi-reading evidence", ApplyMigration007);
+        RunMigration(service, "008", "FM Request building lookup", ApplyMigration008);
     }
 
     private static void RunMigration(IOrganizationService service, string version, string name,
